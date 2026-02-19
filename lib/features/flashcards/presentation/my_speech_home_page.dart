@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'deck_editor_page.dart';
+
 class MySpeechHomePage extends StatelessWidget {
   const MySpeechHomePage({super.key});
 
@@ -19,9 +21,10 @@ class MySpeechHomePage extends StatelessWidget {
               height: 64,
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Deck Editor coming in next commit'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const DeckEditorPage(),
                     ),
                   );
                 },
