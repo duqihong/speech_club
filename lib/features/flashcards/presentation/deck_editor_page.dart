@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/my_speech_deck.dart';
 import '../data/my_speech_storage.dart';
+import 'card_editor_page.dart';
 
 class DeckEditorPage extends StatefulWidget {
   const DeckEditorPage({super.key});
@@ -33,57 +34,6 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
     });
   }
 
-  Future<String?> _showCardTextDialog({
-    required String title,
-    String initialText = '',
-  }) async {
-    final TextEditingController controller =
-        TextEditingController(text: initialText);
-
-    final String? result = await showDialog<String>(
-      context: context,
-      useRootNavigator: true,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        void safePop(String? value) {
-          FocusScope.of(dialogContext).unfocus();
-          Future.microtask(() {
-            if (Navigator.of(dialogContext).canPop()) {
-              Navigator.of(dialogContext).pop(value);
-            }
-          });
-        }
-
-        return AlertDialog(
-          title: Text(title),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLines: 6,
-            decoration: const InputDecoration(
-              hintText: 'Type your card text...',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => safePop(null),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => safePop(controller.text.trim()),
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-
-    Future.microtask(controller.dispose);
-
-    return result;
-  }
-
   Future<void> _autosave() async {
     await _storage.save(_deck);
     if (!mounted) {
@@ -92,7 +42,12 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
   }
 
   Future<void> _addCard() async {
-    final String? text = await _showCardTextDialog(title: 'Add Card');
+    final String? text = await Navigator.push<String?>(
+      context,
+      MaterialPageRoute<String?>(
+        builder: (_) => const CardEditorPage(title: 'Add Card'),
+      ),
+    );
     if (!mounted) {
       return;
     }
@@ -107,9 +62,14 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
   }
 
   Future<void> _editCard(int index) async {
-    final String? text = await _showCardTextDialog(
-      title: 'Edit Card',
-      initialText: _deck.cards[index],
+    final String? text = await Navigator.push<String?>(
+      context,
+      MaterialPageRoute<String?>(
+        builder: (_) => CardEditorPage(
+          title: 'Edit Card',
+          initialText: _deck.cards[index],
+        ),
+      ),
     );
     if (!mounted) {
       return;
