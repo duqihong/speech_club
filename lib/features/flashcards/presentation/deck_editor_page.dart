@@ -40,10 +40,18 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
     final TextEditingController controller =
         TextEditingController(text: initialText);
 
-    final String? result = await showDialog<String>(
+    String? result;
+
+    result = await showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
+        void safePop(String? value) {
+          if (Navigator.of(dialogContext).canPop()) {
+            Navigator.of(dialogContext).pop(value);
+          }
+        }
+
         return AlertDialog(
           title: Text(title),
           content: TextField(
@@ -51,9 +59,7 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
             autofocus: true,
             maxLines: 6,
             textInputAction: TextInputAction.done,
-            onSubmitted: (_) {
-              Navigator.of(dialogContext).pop(controller.text.trim());
-            },
+            onSubmitted: (_) => safePop(controller.text.trim()),
             decoration: const InputDecoration(
               hintText: 'Type your card text...',
               border: OutlineInputBorder(),
@@ -61,12 +67,11 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(null),
+              onPressed: () => safePop(null),
               child: const Text('Cancel'),
             ),
             FilledButton(
-              onPressed: () =>
-                  Navigator.of(dialogContext).pop(controller.text.trim()),
+              onPressed: () => safePop(controller.text.trim()),
               child: const Text('Save'),
             ),
           ],
@@ -74,7 +79,10 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
       },
     );
 
-    controller.dispose();
+    Future.microtask(() {
+      controller.dispose();
+    });
+
     return result;
   }
 
