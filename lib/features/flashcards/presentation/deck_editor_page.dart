@@ -40,16 +40,18 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
     final TextEditingController controller =
         TextEditingController(text: initialText);
 
-    String? result;
-
-    result = await showDialog<String>(
+    final String? result = await showDialog<String>(
       context: context,
+      useRootNavigator: true,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         void safePop(String? value) {
-          if (Navigator.of(dialogContext).canPop()) {
-            Navigator.of(dialogContext).pop(value);
-          }
+          FocusScope.of(dialogContext).unfocus();
+          Future.microtask(() {
+            if (Navigator.of(dialogContext).canPop()) {
+              Navigator.of(dialogContext).pop(value);
+            }
+          });
         }
 
         return AlertDialog(
@@ -58,8 +60,6 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
             controller: controller,
             autofocus: true,
             maxLines: 6,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => safePop(controller.text.trim()),
             decoration: const InputDecoration(
               hintText: 'Type your card text...',
               border: OutlineInputBorder(),
@@ -79,9 +79,7 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
       },
     );
 
-    Future.microtask(() {
-      controller.dispose();
-    });
+    Future.microtask(controller.dispose);
 
     return result;
   }
