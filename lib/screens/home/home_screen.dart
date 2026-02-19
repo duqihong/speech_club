@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../speaker/speaker_list_screen.dart';
+import '../../features/flashcards/presentation/my_speech_home_page.dart';
 import '../timer/timer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -41,9 +41,10 @@ class HomeScreen extends StatelessWidget {
                   _FeatureButton(
                     label: 'Speaker',
                     onPressed: () {
-                      Navigator.of(context).push(
+                      Navigator.push(
+                        context,
                         MaterialPageRoute<void>(
-                          builder: (_) => const SpeakerListScreen(),
+                          builder: (_) => const MySpeechHomePage(),
                         ),
                       );
                     },
