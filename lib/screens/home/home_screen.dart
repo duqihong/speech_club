@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/flashcards/presentation/my_speech_home_page.dart';
+import '../../features/table_topics/ui/table_topics_setup_screen.dart';
 import '../timer/timer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -50,10 +51,16 @@ class HomeScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 16),
-                  const _FeatureButton(
-                    label: 'Evaluator',
-                    subtitle: 'Coming soon',
-                    enabled: false,
+                  _FeatureButton(
+                    label: 'Table Topics',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => const TableTopicsSetupScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   const _FeatureButton(

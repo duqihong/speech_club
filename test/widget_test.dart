@@ -10,7 +10,7 @@ void main() {
     expect(find.text('Speech Club'), findsWidgets);
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Speaker'), findsOneWidget);
-    expect(find.text('Evaluator'), findsOneWidget);
+    expect(find.text('Table Topics'), findsOneWidget);
     expect(find.text('Toastmaster'), findsOneWidget);
   });
 }
