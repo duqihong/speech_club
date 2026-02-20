@@ -61,6 +61,40 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
     await _autosave();
   }
 
+  Future<void> _pasteMultipleCards() async {
+    final String? rawText = await Navigator.push<String?>(
+      context,
+      MaterialPageRoute<String?>(
+        builder: (_) => const CardEditorPage(
+          title: 'Paste Multiple Cards',
+        ),
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+    if (rawText == null || rawText.trim().isEmpty) {
+      return;
+    }
+
+    final List<String> parts = rawText
+        .split(RegExp(r'\n\s*\n'))
+        .map((String e) => e.trim())
+        .where((String e) => e.isNotEmpty)
+        .toList();
+
+    if (parts.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _deck.cards.addAll(parts);
+    });
+
+    await _autosave();
+  }
+
   Future<void> _editCard(int index) async {
     final String? text = await Navigator.push<String?>(
       context,
@@ -120,6 +154,13 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit My Speech'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.paste),
+            tooltip: 'Paste Multiple Cards',
+            onPressed: _pasteMultipleCards,
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _loading ? null : _addCard,

@@ -76,10 +76,12 @@ class _CardEditorPageState extends State<CardEditorPage> {
                   minLines: null,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontSize: 20, height: 1.3),
-                  decoration: const InputDecoration(
-                    hintText: 'Type your card text...',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.all(16),
+                  decoration: InputDecoration(
+                    hintText: widget.title.contains('Paste')
+                        ? 'Paste your speech here.\n\nUse blank lines to separate cards.'
+                        : 'Type your card text...',
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.all(16),
                   ),
                 ),
               ),
