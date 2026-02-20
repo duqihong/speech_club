@@ -50,23 +50,40 @@ class _CardEditorPageState extends State<CardEditorPage> {
           tooltip: 'Cancel',
         ),
         actions: <Widget>[
-          TextButton(
-            onPressed: _save,
-            child: const Text('Save'),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilledButton(
+              onPressed: _save,
+              child: const Text(
+                'Save',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: TextField(
-          controller: _controller,
-          autofocus: true,
-          maxLines: null,
-          minLines: 6,
-          keyboardType: TextInputType.multiline,
-          decoration: const InputDecoration(
-            hintText: 'Type your card text...',
-            border: OutlineInputBorder(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  autofocus: true,
+                  expands: true,
+                  maxLines: null,
+                  minLines: null,
+                  keyboardType: TextInputType.multiline,
+                  style: const TextStyle(fontSize: 20, height: 1.3),
+                  decoration: const InputDecoration(
+                    hintText: 'Type your card text...',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
