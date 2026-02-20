@@ -24,3 +24,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/sounds/meeting_ding.mp3
+    - assets/table_topics/topics.json
