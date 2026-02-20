@@ -74,19 +74,26 @@ class _PresenterPageState extends State<PresenterPage> {
                 itemCount: widget.cards.length,
                 onPageChanged: (int i) => setState(() => _index = i),
                 itemBuilder: (BuildContext context, int i) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: SingleChildScrollView(
-                        child: Text(
-                          widget.cards[i],
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: fg,
-                            fontSize: 34,
-                            height: 1.3,
-                            fontWeight: FontWeight.w500,
+                  return SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        32,
+                        60,
+                        24,
+                        40,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: SingleChildScrollView(
+                          child: Text(
+                            widget.cards[i],
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              color: fg,
+                              fontSize: 34,
+                              height: 1.35,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
