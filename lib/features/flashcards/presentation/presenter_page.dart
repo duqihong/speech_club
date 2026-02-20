@@ -33,10 +33,6 @@ class _PresenterPageState extends State<PresenterPage> {
     _controller = PageController(initialPage: _index);
 
     WakelockPlus.enable();
-
-    SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-      DeviceOrientation.portraitUp,
-    ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
@@ -45,7 +41,6 @@ class _PresenterPageState extends State<PresenterPage> {
     _controller.dispose();
 
     WakelockPlus.disable();
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     super.dispose();
@@ -75,12 +70,14 @@ class _PresenterPageState extends State<PresenterPage> {
             children: <Widget>[
               PageView.builder(
                 controller: _controller,
+                scrollDirection: Axis.vertical,
                 itemCount: widget.cards.length,
                 onPageChanged: (int i) => setState(() => _index = i),
                 itemBuilder: (BuildContext context, int i) {
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                    child: Center(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+                    child: Align(
+                      alignment: Alignment.topLeft,
                       child: SingleChildScrollView(
                         child: Text(
                           widget.cards[i],
@@ -88,7 +85,7 @@ class _PresenterPageState extends State<PresenterPage> {
                           style: TextStyle(
                             color: fg,
                             fontSize: 34,
-                            height: 1.25,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
