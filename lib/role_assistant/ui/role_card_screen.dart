@@ -81,96 +81,83 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                _buildSectionCard(
-                  title: 'Role Purpose',
-                  child: Text(
-                    widget.role.purpose,
-                    softWrap: true,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _buildSectionCard(
+                title: 'Role Purpose',
+                child: Text(widget.role.purpose,
+                    style: const TextStyle(fontSize: 18)),
+              ),
+              _buildSectionCard(
+                title: 'Checklist',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _buildChecklistSection('before', 'Before'),
+                    _buildChecklistSection('during', 'During'),
+                    _buildChecklistSection('after', 'After'),
+                  ],
                 ),
-                _buildSectionCard(
-                  title: 'Checklist',
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _buildChecklistSection('before', 'Before'),
-                      _buildChecklistSection('during', 'During'),
-                      _buildChecklistSection('after', 'After'),
-                    ],
-                  ),
+              ),
+              _buildSectionCard(
+                title: 'Quick Tips',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: widget.role.tips
+                      .map((String tip) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text('• $tip',
+                                style: const TextStyle(fontSize: 17)),
+                          ))
+                      .toList(growable: false),
                 ),
-                _buildSectionCard(
-                  title: 'Quick Tips',
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: widget.role.tips
-                        .map((String tip) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                '• $tip',
-                                softWrap: true,
-                                style: const TextStyle(fontSize: 17),
-                              ),
-                            ))
-                        .toList(growable: false),
-                  ),
-                ),
-                _buildSectionCard(
-                  title: 'Example Phrasing',
-                  child: Column(
-                    children: widget.role.scripts.map((String script) {
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          script,
-                          softWrap: true,
-                          style: const TextStyle(fontSize: 17),
-                        ),
-                        trailing: const Icon(Icons.copy),
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: script));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Copied')),
-                          );
-                        },
-                      );
-                    }).toList(growable: false),
-                  ),
-                ),
-                if (widget.role.title == 'Speaker') ...<Widget>[
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => const MySpeechHomePage(),
-                          ),
+              ),
+              _buildSectionCard(
+                title: 'Example Phrasing',
+                child: Column(
+                  children: widget.role.scripts.map((String script) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(script, style: const TextStyle(fontSize: 17)),
+                      trailing: const Icon(Icons.copy),
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: script));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied')),
                         );
                       },
-                      icon: const Icon(Icons.note),
-                      label: const Text('Open Speaker Flashcard'),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 24),
-                if (widget.role.deepLink != null)
-                  FilledButton(
+                    );
+                  }).toList(growable: false),
+                ),
+              ),
+              if (widget.role.title == 'Speaker') ...<Widget>[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(widget.role.deepLink!);
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const MySpeechHomePage(),
+                        ),
+                      );
                     },
-                    child: Text(_toolButtonText(widget.role.deepLink!)),
+                    icon: const Icon(Icons.note),
+                    label: const Text('Open Speaker Flashcard'),
                   ),
+                ),
               ],
-            ),
+              const SizedBox(height: 24),
+              if (widget.role.deepLink != null)
+                FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(widget.role.deepLink!);
+                  },
+                  child: Text(_toolButtonText(widget.role.deepLink!)),
+                ),
+            ],
           ),
         ),
       ),
