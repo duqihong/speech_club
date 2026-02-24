@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../shared/topic_dedupe.dart';
 import '../state/table_topics_controller.dart';
 import 'edit_topics_screen.dart';
 import 'presenter_grid_screen.dart';
@@ -26,31 +27,6 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
   bool _hydratedFromController = false;
 
   List<String> _makeBlankTopics() => List<String>.filled(_kTopicCount, '');
-
-  String _normalizeTopic(String s) {
-    return s
-        .trim()
-        .toLowerCase()
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .replaceAll(RegExp(r"""[“”"'’]"""), '')
-        .replaceAll(RegExp(r'[^\w\s]'), '');
-  }
-
-  List<String> _dedupeTopics(List<String> topics) {
-    final Set<String> seen = <String>{};
-    final List<String> result = <String>[];
-    for (final String topic in topics) {
-      final String trimmed = topic.trim();
-      final String key = _normalizeTopic(trimmed);
-      if (key.isEmpty) {
-        continue;
-      }
-      if (seen.add(key)) {
-        result.add(trimmed);
-      }
-    }
-    return result;
-  }
 
   @override
   void initState() {
@@ -122,19 +98,47 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     }
 
     final Random random = Random();
-    final List<String> uniquePool = _dedupeTopics(pool);
+    final List<String> uniquePool = dedupeTopics(pool);
     if (uniquePool.isEmpty) {
       return;
     }
 
+    final List<String> result = <String>[];
+    final Set<String> seen = <String>{};
+    bool addIfUnique(String topic) {
+      final String trimmed = topic.trim();
+      final String key = normalizeTopic(trimmed);
+      if (key.isEmpty) {
+        return false;
+      }
+      if (seen.add(key)) {
+        result.add(trimmed);
+        return true;
+      }
+      return false;
+    }
+
     final List<String> shuffledUnique = List<String>.from(uniquePool)
       ..shuffle(random);
-    final List<String> result = shuffledUnique.length > _kTopicCount
-        ? shuffledUnique.take(_kTopicCount).toList(growable: true)
-        : List<String>.from(shuffledUnique);
+    for (final String topic in shuffledUnique) {
+      addIfUnique(topic);
+      if (result.length >= _kTopicCount) {
+        break;
+      }
+    }
 
-    // Keep the topic set shape stable for downstream screens if a category
-    // happens to have fewer than 10 unique prompts after normalization.
+    int attempts = 0;
+    while (result.length < _kTopicCount && attempts < 5) {
+      attempts++;
+      final List<String> more = List<String>.from(pool)..shuffle(random);
+      for (final String topic in more) {
+        addIfUnique(topic);
+        if (result.length >= _kTopicCount) {
+          break;
+        }
+      }
+    }
+
     while (result.length < _kTopicCount) {
       result.add('');
     }

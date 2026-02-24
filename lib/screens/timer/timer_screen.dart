@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../shared/app_colors.dart';
+import '../../shared/app_sizes.dart';
 import '../../storage/timer_prefs.dart';
 import 'custom_preset_sheet.dart';
 import 'ding_service.dart';
@@ -361,14 +363,14 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 
   Widget _buildGlowingBulbAction({required VoidCallback onPressed}) {
-    const double iconSize = 32;
+    const double iconSize = AppSizes.actionIconLg;
 
     return Padding(
-      padding: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.only(right: AppSizes.appBarIconRightPad),
       child: IconButton(
         onPressed: onPressed,
         iconSize: iconSize,
-        splashRadius: 24,
+        splashRadius: AppSizes.splashRadius,
         tooltip: 'Test panel',
         icon: Stack(
           alignment: Alignment.center,
@@ -380,7 +382,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                 shape: BoxShape.circle,
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                    color: const Color(0xFFFFF59D).withOpacity(0.55),
+                    color: AppColors.glowWarm.withValues(alpha: 0.55),
                     blurRadius: 14,
                     spreadRadius: 2,
                   ),
@@ -390,7 +392,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
             const Icon(
               Icons.lightbulb_outline,
               size: iconSize,
-              color: Colors.white,
+              color: AppColors.white,
             ),
           ],
         ),
@@ -430,7 +432,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                     onPressed: _openCustomPresetSheet,
                                     icon: const Icon(
                                       Icons.edit_outlined,
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       size: 30,
                                     ),
                                     tooltip: 'Edit custom preset',
