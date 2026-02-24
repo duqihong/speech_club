@@ -48,67 +48,12 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
     WakelockPlus.enable();
   }
 
-  Future<void> _confirmReset() async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Reset session?'),
-          content: const Text(
-            'This will clear the current 10 topics and used marks.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Reset'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed != true) {
-      return;
-    }
-
-    widget.controller.resetSession();
-    if (!mounted) {
-      return;
-    }
-    Navigator.of(context).pop();
-  }
-
-  String _preview(String topic) {
-    final String firstLine = topic.split('\n').first.trim();
-    if (firstLine.isEmpty) {
-      return '—';
-    }
-    if (firstLine.length <= 30) {
-      return firstLine;
-    }
-    return '${firstLine.substring(0, 30)}...';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Presenter Mode'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: _confirmReset,
-            child: const Text('Reset'),
-          ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back),
-            tooltip: 'Back',
-          ),
-        ],
+        centerTitle: true,
       ),
       body: SafeArea(
         child: AnimatedBuilder(
@@ -128,44 +73,49 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
             }
 
             return Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 12, 4, 12),
+                    child: Text(
+                      'Long press a tile to toggle used/unused.',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
                   Expanded(
-                    child: GridView.builder(
-                      itemCount: 10,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.95,
-                      ),
-                      itemBuilder: (BuildContext context, int index) {
-                        final bool used = topicSet.used[index];
-                        final String topic = topicSet.topics[index];
+                    child: LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        final bool isWide = constraints.maxWidth >= 700;
+                        final int crossAxisCount = isWide ? 5 : 3;
 
-                        return _GridTopicButton(
-                          number: index + 1,
-                          preview: _preview(topic),
-                          used: used,
-                          onTap: () => _openTopic(index),
-                          onLongPress: () =>
-                              widget.controller.markUsed(index, !used),
+                        return GridView.builder(
+                          itemCount: 10,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.95,
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            final bool used = topicSet.used[index];
+
+                            return _GridTopicButton(
+                              number: index + 1,
+                              used: used,
+                              onTap: () => _openTopic(index),
+                              onLongPress: () =>
+                                  widget.controller.markUsed(index, !used),
+                            );
+                          },
                         );
                       },
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text('Long press a tile to toggle used/unused.'),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: _confirmReset,
-                      child: const Text('Reset Session'),
-                    ),
-                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -179,14 +129,12 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
 class _GridTopicButton extends StatelessWidget {
   const _GridTopicButton({
     required this.number,
-    required this.preview,
     required this.used,
     required this.onTap,
     required this.onLongPress,
   });
 
   final int number;
-  final String preview;
   final bool used;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
@@ -199,46 +147,35 @@ class _GridTopicButton extends StatelessWidget {
       color: used
           ? colors.surfaceContainerHighest.withValues(alpha: 0.7)
           : colors.primaryContainer,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(22),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(22),
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.all(18),
+          child: Stack(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Text(
-                    '$number',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (used)
-                    Icon(
-                      Icons.check_circle,
-                      size: 20,
-                      color: colors.primary,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Expanded(
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Text(
-                  preview,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: used ? colors.onSurfaceVariant : colors.onSurface,
+                  '$number',
+                  style: const TextStyle(
+                    fontSize: 44,
+                    fontWeight: FontWeight.w700,
+                    height: 1.0,
                   ),
                 ),
               ),
+              if (used)
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Icon(
+                    Icons.check_circle,
+                    size: 20,
+                    color: colors.primary,
+                  ),
+                ),
             ],
           ),
         ),

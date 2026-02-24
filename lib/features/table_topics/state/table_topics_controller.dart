@@ -100,6 +100,16 @@ class TableTopicsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setGeneratedTopics(List<String> topics) {
+    if (topics.length != 10) {
+      return;
+    }
+    topicSet = TopicSet.fresh(List<String>.from(topics));
+    isCustomMode = false;
+    persistSession();
+    notifyListeners();
+  }
+
   Future<void> saveCustomTopics(List<String> topics) async {
     final List<String> cleaned = topics
         .map((String e) => e.trim())

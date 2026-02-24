@@ -40,6 +40,30 @@ class TimerPreset {
     overtimeSec: 210,
   );
 
+  static const TimerPreset preset12 = TimerPreset(
+    name: '1–2',
+    greenSec: 60,
+    yellowSec: 90,
+    redSec: 120,
+    overtimeSec: 150,
+  );
+
+  static const TimerPreset preset1012 = TimerPreset(
+    name: '10–12',
+    greenSec: 600,
+    yellowSec: 660,
+    redSec: 720,
+    overtimeSec: 750,
+  );
+
+  static const TimerPreset preset1822 = TimerPreset(
+    name: '18–22',
+    greenSec: 1080,
+    yellowSec: 1200,
+    redSec: 1320,
+    overtimeSec: 1350,
+  );
+
   static const TimerPreset custom = TimerPreset(
     name: 'Custom',
     greenSec: 300,
@@ -49,9 +73,12 @@ class TimerPreset {
   );
 
   static const List<TimerPreset> defaults = <TimerPreset>[
+    preset1822,
+    preset1012,
     preset57,
     preset46,
     preset23,
+    preset12,
     custom,
   ];
 }

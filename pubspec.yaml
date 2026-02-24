@@ -19,9 +19,18 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path: "assets/branding/app_icon_source/icon.png"
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/branding/logo.png
     - assets/sounds/meeting_ding.mp3
     - assets/table_topics/topics.json
+    - assets/role_assistant/roles.json

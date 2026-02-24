@@ -1,76 +1,78 @@
 import 'package:flutter/material.dart';
 
+import '../../app_routes.dart';
 import '../../features/flashcards/presentation/my_speech_home_page.dart';
-import '../../features/table_topics/ui/table_topics_setup_screen.dart';
-import '../timer/timer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final double w = MediaQuery.of(context).size.width;
+    final double logoWidth = (w * 0.58).clamp(220.0, 240.0);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Speech Club')),
+      backgroundColor: const Color(0xFFF6F7FB),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Speech Club',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 24),
-                  _FeatureButton(
-                    label: 'Timer',
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const TimerScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _FeatureButton(
-                    label: 'Speaker',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const MySpeechHomePage(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _FeatureButton(
-                    label: 'Table Topics',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => const TableTopicsSetupScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  const _FeatureButton(
-                    label: 'Toastmaster',
-                    subtitle: 'Coming soon',
-                    enabled: false,
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: <Widget>[
+              const SizedBox(height: 18),
+              Center(
+                child: Image.asset(
+                  'assets/branding/logo.png',
+                  width: logoWidth,
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
+              const SizedBox(height: 22),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: <Widget>[
+                    _HomeCard(
+                      icon: Icons.timer_outlined,
+                      title: 'Timer',
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.timer);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
+                      icon: Icons.mic_none_outlined,
+                      title: 'Speaker',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const MySpeechHomePage(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
+                      icon: Icons.chat_bubble_outline,
+                      title: 'Table Topics',
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.tableTopics);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
+                      icon: Icons.group_outlined,
+                      title: 'Role Assistant',
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(AppRoutes.roleAssistant);
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -78,48 +80,43 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _FeatureButton extends StatelessWidget {
-  const _FeatureButton({
-    required this.label,
-    this.onPressed,
-    this.enabled = true,
-    this.subtitle,
+class _HomeCard extends StatelessWidget {
+  const _HomeCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
   });
 
-  final String label;
-  final VoidCallback? onPressed;
-  final bool enabled;
-  final String? subtitle;
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      height: 96,
-      child: ElevatedButton(
-        onPressed: enabled ? onPressed : null,
-        style: ElevatedButton.styleFrom(
-          textStyle: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          disabledBackgroundColor: colors.surfaceContainerHighest,
-          disabledForegroundColor: colors.onSurfaceVariant,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(label),
-            if (subtitle != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  subtitle!,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
+    return Material(
+      color: Colors.white.withValues(alpha: 0.55),
+      borderRadius: BorderRadius.circular(26),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(26),
+        onTap: onTap,
+        child: Container(
+          height: 92,
+          padding: const EdgeInsets.symmetric(horizontal: 22),
+          alignment: Alignment.centerLeft,
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: 30, color: const Color(0xFF355E86)),
+              const SizedBox(width: 18),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF355E86),
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );

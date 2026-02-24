@@ -61,9 +61,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 
   List<TimerPreset> get _presetOptions => <TimerPreset>[
+        TimerPreset.preset1822,
+        TimerPreset.preset1012,
         TimerPreset.preset57,
         TimerPreset.preset46,
         TimerPreset.preset23,
+        TimerPreset.preset12,
         _customPreset,
       ];
 
@@ -357,6 +360,44 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildGlowingBulbAction({required VoidCallback onPressed}) {
+    const double iconSize = 32;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: IconButton(
+        onPressed: onPressed,
+        iconSize: iconSize,
+        splashRadius: 24,
+        tooltip: 'Test panel',
+        icon: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: const Color(0xFFFFF59D).withOpacity(0.55),
+                    blurRadius: 14,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.lightbulb_outline,
+              size: iconSize,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Color backgroundColor = _previewColor ?? _baseColor;
@@ -397,14 +438,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                 ],
                                 const SizedBox(width: 8),
                                 if (!_isRunning)
-                                  IconButton(
+                                  _buildGlowingBulbAction(
                                     onPressed: _openTestPanel,
-                                    icon: const Icon(
-                                      Icons.science_outlined,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    tooltip: 'Test panel',
                                   )
                                 else
                                   const SizedBox(width: 48),

@@ -1,8 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-import 'custom_topics_screen.dart';
-import 'presenter_grid_screen.dart';
 import '../state/table_topics_controller.dart';
+import 'edit_topics_screen.dart';
+import 'presenter_grid_screen.dart';
 
 class TableTopicsSetupScreen extends StatefulWidget {
   const TableTopicsSetupScreen({super.key});
@@ -12,11 +14,48 @@ class TableTopicsSetupScreen extends StatefulWidget {
 }
 
 class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
+  static const int _kTopicCount = 10;
+  static const TextStyle _titleStyle =
+      TextStyle(fontSize: 20, fontWeight: FontWeight.w700);
+  static const TextStyle _bodyStyle = TextStyle(fontSize: 17);
+  static const TextStyle _smallStyle = TextStyle(fontSize: 15);
+
   late final TableTopicsController _controller;
+  final Set<String> _selectedCategories = <String>{};
+  List<String> _topics = <String>[];
+  bool _hydratedFromController = false;
+
+  List<String> _makeBlankTopics() => List<String>.filled(_kTopicCount, '');
+
+  String _normalizeTopic(String s) {
+    return s
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .replaceAll(RegExp(r"""[“”"'’]"""), '')
+        .replaceAll(RegExp(r'[^\w\s]'), '');
+  }
+
+  List<String> _dedupeTopics(List<String> topics) {
+    final Set<String> seen = <String>{};
+    final List<String> result = <String>[];
+    for (final String topic in topics) {
+      final String trimmed = topic.trim();
+      final String key = _normalizeTopic(trimmed);
+      if (key.isEmpty) {
+        continue;
+      }
+      if (seen.add(key)) {
+        result.add(trimmed);
+      }
+    }
+    return result;
+  }
 
   @override
   void initState() {
     super.initState();
+    _topics = _makeBlankTopics();
     _controller = TableTopicsController();
     _controller.init();
   }
@@ -25,6 +64,221 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _hydrateFromController() {
+    if (_hydratedFromController ||
+        _controller.loading ||
+        _controller.error != null) {
+      return;
+    }
+    _hydratedFromController = true;
+    _selectedCategories
+      ..clear()
+      ..addAll(_controller.selection.selectedCategories);
+    _topics =
+        List<String>.from(_controller.topicSet?.topics ?? _makeBlankTopics());
+  }
+
+  Widget _buildCategoryChip(String category) {
+    final bool selected = _selectedCategories.contains(category);
+    return ChoiceChip(
+      label: Text(
+        category,
+        style: _bodyStyle,
+        overflow: TextOverflow.ellipsis,
+      ),
+      selected: selected,
+      onSelected: (_) {
+        setState(() {
+          if (selected) {
+            _selectedCategories.remove(category);
+          } else {
+            _selectedCategories.add(category);
+          }
+        });
+      },
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  void _generate10Topics() {
+    final library = _controller.library;
+    if (library == null) {
+      return;
+    }
+
+    final List<String> pool = <String>[];
+    final Iterable<String> categoriesToUse = _selectedCategories.isEmpty
+        ? library.categories.keys
+        : _selectedCategories;
+
+    for (final String category in categoriesToUse) {
+      pool.addAll(library.categories[category] ?? const <String>[]);
+    }
+    if (pool.isEmpty) {
+      return;
+    }
+
+    final Random random = Random();
+    final List<String> uniquePool = _dedupeTopics(pool);
+    if (uniquePool.isEmpty) {
+      return;
+    }
+
+    final List<String> shuffledUnique = List<String>.from(uniquePool)
+      ..shuffle(random);
+    final List<String> result = shuffledUnique.length > _kTopicCount
+        ? shuffledUnique.take(_kTopicCount).toList(growable: true)
+        : List<String>.from(shuffledUnique);
+
+    // Keep the topic set shape stable for downstream screens if a category
+    // happens to have fewer than 10 unique prompts after normalization.
+    while (result.length < _kTopicCount) {
+      result.add('');
+    }
+
+    setState(() {
+      _topics = result;
+    });
+    _controller.setGeneratedTopics(result);
+  }
+
+  Future<void> _openEditTopics() async {
+    final List<String>? updated =
+        await Navigator.of(context).push<List<String>>(
+      MaterialPageRoute<List<String>>(
+        builder: (_) =>
+            EditTopicsScreen(initialTopics: List<String>.from(_topics)),
+      ),
+    );
+
+    if (updated == null || updated.length != _kTopicCount) {
+      return;
+    }
+
+    setState(() {
+      _topics = updated;
+    });
+    _controller.setGeneratedTopics(updated);
+  }
+
+  Future<void> _openPresenterMode() async {
+    if (_topics.length == _kTopicCount) {
+      _controller.setGeneratedTopics(_topics);
+    }
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => PresenterGridScreen(controller: _controller),
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _topics =
+          List<String>.from(_controller.topicSet?.topics ?? _makeBlankTopics());
+    });
+  }
+
+  void _resetAll() {
+    setState(() {
+      _selectedCategories.clear();
+      _topics = _makeBlankTopics();
+    });
+  }
+
+  Widget _buildCategoryScroller(List<String> categories) {
+    return SizedBox(
+      height: 44,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: <Widget>[
+            for (final String category in categories) ...<Widget>[
+              _buildCategoryChip(category),
+              const SizedBox(width: 8),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionRows() {
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          height: 52,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: FilledButton(
+                  onPressed: _generate10Topics,
+                  child: const Text(
+                    'Generate 10 Topics',
+                    style: _bodyStyle,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: _openEditTopics,
+                  child: const Text(
+                    'Edit 10 Topics',
+                    style: _bodyStyle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 52,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: FilledButton(
+                  onPressed: _openPresenterMode,
+                  child: const Text(
+                    'Presenter Mode',
+                    style: _bodyStyle,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _resetAll,
+                  child: const Text(
+                    'Reset',
+                    style: _bodyStyle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildTopicList() {
+    return _topics.asMap().entries.map((MapEntry<int, String> entry) {
+      final String text = entry.value.trim();
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          '${entry.key + 1}. ${text.isEmpty ? '' : text}',
+          style: _bodyStyle,
+        ),
+      );
+    }).toList(growable: false);
   }
 
   @override
@@ -45,177 +299,37 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text('Table Topics'),
-                    const SizedBox(height: 8),
                     Text('Error: ${_controller.error}'),
                     const SizedBox(height: 12),
                     FilledButton(
                       onPressed: _controller.init,
-                      child: const Text('Retry'),
+                      child: const Text('Retry', style: _smallStyle),
                     ),
                   ],
                 ),
               );
             }
 
-            final library = _controller.library;
-            final List<String> categories =
-                library?.categoryNames ?? const <String>[];
-            final int totalTopics = library?.totalTopicCount ?? 0;
-            final topicSet = _controller.topicSet;
-            final bool canEnterPresenter =
-                topicSet != null && topicSet.topics.length == 10;
-            final List<String> customPreview =
-                _controller.customTopics.take(3).toList();
+            _hydrateFromController();
 
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Text(
-                    'Table Topics',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Categories=${categories.length} TotalTopics=$totalTopics',
-                  ),
-                  const SizedBox(height: 16),
-                  SegmentedButton<bool>(
-                    segments: const <ButtonSegment<bool>>[
-                      ButtonSegment<bool>(
-                        value: false,
-                        label: Text('Auto Generate'),
-                      ),
-                      ButtonSegment<bool>(
-                        value: true,
-                        label: Text('Custom'),
-                      ),
-                    ],
-                    selected: <bool>{_controller.isCustomMode},
-                    onSelectionChanged: (Set<bool> values) {
-                      _controller.setCustomMode(values.first);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  if (!_controller.isCustomMode) ...<Widget>[
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Random All'),
-                      value: _controller.selection.randomAll,
-                      onChanged: _controller.toggleRandomAll,
-                    ),
-                    if (!_controller.selection.randomAll) ...<Widget>[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: categories.map((String category) {
-                          final bool selected = _controller
-                              .selection.selectedCategories
-                              .contains(category);
-                          return FilterChip(
-                            label: Text(category),
-                            selected: selected,
-                            onSelected: (_) =>
-                                _controller.toggleCategory(category),
-                          );
-                        }).toList(growable: false),
-                      ),
-                    ],
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      onPressed:
-                          library == null ? null : _controller.generate10,
-                      child: const Text('Generate 10 Topics'),
-                    ),
-                  ] else ...<Widget>[
-                    FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => CustomTopicsScreen(
-                              controller: _controller,
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text('Edit Custom Topics'),
-                    ),
-                    const SizedBox(height: 8),
-                    if (_controller.customTopics.isEmpty)
-                      const Text('No saved custom topics yet.')
-                    else
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            'Saved Custom Topics',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 6),
-                          for (int i = 0; i < customPreview.length; i++)
-                            Text('${i + 1}. ${customPreview[i]}'),
-                          if (_controller.customTopics.length >
-                              customPreview.length)
-                            Text(
-                                '+${_controller.customTopics.length - customPreview.length} more'),
-                        ],
-                      ),
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      onPressed: _controller.customTopics.isEmpty
-                          ? null
-                          : () {
-                              _controller
-                                  .useCustomTopics(_controller.customTopics);
-                            },
-                      child: const Text('Use Custom Topics'),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  FilledButton(
-                    onPressed: canEnterPresenter
-                        ? () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => PresenterGridScreen(
-                                    controller: _controller),
-                              ),
-                            );
-                          }
-                        : null,
-                    child: const Text('Presenter Mode'),
-                  ),
-                  const SizedBox(height: 12),
-                  if (topicSet == null)
-                    const Text('No topics generated yet.')
-                  else
-                    const Text(
-                      'Generated Topics',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: topicSet == null
-                        ? const SizedBox.shrink()
-                        : ListView.separated(
-                            itemCount: topicSet.topics.length,
-                            separatorBuilder: (_, __) =>
-                                const Divider(height: 1),
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                    '${index + 1}. ${topicSet.topics[index]}'),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+            final List<String> categories = List<String>.from(
+              _controller.library?.categoryNames ?? const <String>[],
+            )..sort();
+
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+              children: <Widget>[
+                const Text(
+                  'Categories Selection',
+                  style: _titleStyle,
+                ),
+                const SizedBox(height: 10),
+                _buildCategoryScroller(categories),
+                const SizedBox(height: 16),
+                _buildActionRows(),
+                const SizedBox(height: 18),
+                ..._buildTopicList(),
+              ],
             );
           },
         ),

@@ -39,7 +39,7 @@ class _TopicFullscreenViewState extends State<TopicFullscreenView> {
   @override
   Widget build(BuildContext context) {
     final String displayTopic =
-        widget.topic.trim().isEmpty ? '—' : widget.topic;
+        widget.topic.trim().isEmpty ? '(Topic)' : widget.topic;
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -66,24 +66,10 @@ class _TopicFullscreenViewState extends State<TopicFullscreenView> {
             Positioned(
               left: 10,
               top: 6,
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    tooltip: 'Back',
-                  ),
-                  TextButton.icon(
-                    onPressed: () {
-                      widget.controller.markUsed(widget.index, false);
-                    },
-                    icon: const Icon(Icons.undo, color: Colors.white),
-                    label: const Text(
-                      'Undo',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                tooltip: 'Back',
               ),
             ),
           ],

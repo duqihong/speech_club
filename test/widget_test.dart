@@ -11,6 +11,6 @@ void main() {
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Speaker'), findsOneWidget);
     expect(find.text('Table Topics'), findsOneWidget);
-    expect(find.text('Toastmaster'), findsOneWidget);
+    expect(find.text('Role Assistant'), findsOneWidget);
   });
 }
