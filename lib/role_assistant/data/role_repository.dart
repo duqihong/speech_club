@@ -29,9 +29,8 @@ class RoleRepository {
           'roles.json must be a JSON array or an object with a "roles" array');
     }
 
-    _cache = list
-        .map((e) => RoleModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    _cache =
+        list.map((e) => RoleModel.fromJson(e as Map<String, dynamic>)).toList();
 
     return _cache!;
   }
