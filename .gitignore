@@ -71,3 +71,9 @@ macos/Pods/
 
 # Misc
 .DS_Store
+
+# --- Android signing secrets ---
+android/key.properties
+android/keystore/
+*.jks
+*.keystore
