@@ -1,4 +1,4 @@
-package com.example.speech_club
+package com.qihongdu.speechclub
 
 import io.flutter.embedding.android.FlutterActivity
 
