@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../shared/app_colors.dart';
 import '../../shared/app_sizes.dart';
@@ -46,6 +47,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     _closeTestPanel();
     WidgetsBinding.instance.removeObserver(this);
     _ticker?.cancel();
+    unawaited(WakelockPlus.disable());
     SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -101,10 +103,11 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
   }
 
-  void _start() {
+  Future<void> _start() async {
     if (_isRunning) {
       return;
     }
+    await WakelockPlus.enable();
     final DateTime now = DateTime.now();
     _startTime = now.subtract(Duration(seconds: _elapsedSec));
     setState(() {
@@ -121,7 +124,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _stop() {
+  Future<void> _stop() async {
+    await WakelockPlus.disable();
     _ticker?.cancel();
     _ticker = null;
     setState(() {
@@ -129,7 +133,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _resetTimer() {
+  Future<void> _resetTimer() async {
+    await WakelockPlus.disable();
     _closeTestPanel();
     _ticker?.cancel();
     _ticker = null;
@@ -209,11 +214,19 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         ),
       );
       if (ok == true && mounted) {
+        await WakelockPlus.disable();
+        if (!mounted) {
+          return;
+        }
         Navigator.pop(context);
       }
       return;
     }
     if (mounted) {
+      await WakelockPlus.disable();
+      if (!mounted) {
+        return;
+      }
       Navigator.pop(context);
     }
   }
