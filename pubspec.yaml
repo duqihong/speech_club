@@ -37,6 +37,9 @@ flutter:
     - assets/branding/logo.png
     - assets/sounds/meeting_ding.mp3
     - assets/table_topics/topics.json
+    - assets/content/table_topics/table_topics_bilingual.json
+    - assets/content/expressions/expressions_en_source.json
+    - assets/content/expressions/expressions_zh_source.json
     - assets/role_assistant/roles.json
     - assets/role_assistant/roles_en.json
     - assets/role_assistant/roles_zh.json

@@ -18,6 +18,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navSpeaker => '演讲卡片';
 
   @override
+  String get navExpressions => '表达锦囊';
+
+  @override
   String get navTableTopics => '即兴问答';
 
   @override
@@ -335,6 +338,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get roleAssistantTitleGeneralEvaluator => '总点评员';
+
+  @override
+  String get expressionsTitle => '表达锦囊';
+
+  @override
+  String get expressionsEnglishTab => '英语表达';
+
+  @override
+  String get expressionsChineseTab => '中文表达';
+
+  @override
+  String get expressionsSourceLabel => '原文';
+
+  @override
+  String get expressionsTranslationLabel => '译文';
+
+  @override
+  String get expressionsKindIdiom => '习语';
+
+  @override
+  String get expressionsKindSlang => '俚语';
+
+  @override
+  String get expressionsKindProverb => '谚语';
+
+  @override
+  String get expressionsKindPhrase => '短语';
+
+  @override
+  String get expressionsKindChengyu => '成语';
+
+  @override
+  String get expressionsKindSaying => '俗语';
+
+  @override
+  String get expressionsLoadError => '加载表达内容失败';
 
   @override
   String get languageMenuLabel => '语言';

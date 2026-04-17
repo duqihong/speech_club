@@ -1,0 +1,905 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "expr_zh_001",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "勇敢迈出第一步",
+        "en": "Take the first step bravely"
+      }
+    },
+    {
+      "id": "expr_zh_002",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "言语有温度",
+        "en": "Words carry warmth"
+      }
+    },
+    {
+      "id": "expr_zh_003",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把压力变成动力",
+        "en": "Turn pressure into motivation"
+      }
+    },
+    {
+      "id": "expr_zh_004",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "细水长流，终见成效",
+        "en": "Steady effort brings lasting results"
+      }
+    },
+    {
+      "id": "expr_zh_005",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "清楚而自信地表达",
+        "en": "Speak clearly and with confidence"
+      }
+    },
+    {
+      "id": "expr_zh_006",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "一语中的",
+        "en": "Hit the nail on the head"
+      }
+    },
+    {
+      "id": "expr_zh_007",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "循序渐进",
+        "en": "Advance step by step"
+      }
+    },
+    {
+      "id": "expr_zh_008",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "实事求是",
+        "en": "Be realistic and truthful"
+      }
+    },
+    {
+      "id": "expr_zh_009",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "集思广益",
+        "en": "Draw on everyone's wisdom"
+      }
+    },
+    {
+      "id": "expr_zh_010",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "随机应变",
+        "en": "Adapt to the situation"
+      }
+    },
+    {
+      "id": "expr_zh_011",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "胸有成竹",
+        "en": "Be well prepared and confident"
+      }
+    },
+    {
+      "id": "expr_zh_012",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "水到渠成",
+        "en": "Success comes naturally when the time is right"
+      }
+    },
+    {
+      "id": "expr_zh_013",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "融会贯通",
+        "en": "Understand thoroughly and apply flexibly"
+      }
+    },
+    {
+      "id": "expr_zh_014",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "举一反三",
+        "en": "Learn one and infer three"
+      }
+    },
+    {
+      "id": "expr_zh_015",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "言简意赅",
+        "en": "Be concise and to the point"
+      }
+    },
+    {
+      "id": "expr_zh_016",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "事半功倍",
+        "en": "Get twice the result with half the effort"
+      }
+    },
+    {
+      "id": "expr_zh_017",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "持之以恒",
+        "en": "Persevere consistently"
+      }
+    },
+    {
+      "id": "expr_zh_018",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "见贤思齐",
+        "en": "Learn from people better than you"
+      }
+    },
+    {
+      "id": "expr_zh_019",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "脚踏实地",
+        "en": "Keep your feet on the ground"
+      }
+    },
+    {
+      "id": "expr_zh_020",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "相辅相成",
+        "en": "Complement each other"
+      }
+    },
+    {
+      "id": "expr_zh_021",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "温故知新",
+        "en": "Review the old and learn the new"
+      }
+    },
+    {
+      "id": "expr_zh_022",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "厚积薄发",
+        "en": "Build up quietly and shine later"
+      }
+    },
+    {
+      "id": "expr_zh_023",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "迎难而上",
+        "en": "Rise to the challenge"
+      }
+    },
+    {
+      "id": "expr_zh_024",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "张弛有度",
+        "en": "Keep a good balance between effort and rest"
+      }
+    },
+    {
+      "id": "expr_zh_025",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "触类旁通",
+        "en": "Draw connections across topics"
+      }
+    },
+    {
+      "id": "expr_zh_026",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "精益求精",
+        "en": "Keep improving what is already good"
+      }
+    },
+    {
+      "id": "expr_zh_027",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "从容不迫",
+        "en": "Stay calm and unhurried"
+      }
+    },
+    {
+      "id": "expr_zh_028",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "言行一致",
+        "en": "Let actions match words"
+      }
+    },
+    {
+      "id": "expr_zh_029",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "以身作则",
+        "en": "Lead by example"
+      }
+    },
+    {
+      "id": "expr_zh_030",
+      "sourceLocale": "zh",
+      "kind": "chengyu",
+      "text": {
+        "zh": "兼听则明",
+        "en": "Listen widely to see clearly"
+      }
+    },
+    {
+      "id": "expr_zh_031",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "熟能生巧",
+        "en": "Practice makes skill"
+      }
+    },
+    {
+      "id": "expr_zh_032",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "有志者事竟成",
+        "en": "Where there is a will, there is a way"
+      }
+    },
+    {
+      "id": "expr_zh_033",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "三个臭皮匠，胜过诸葛亮",
+        "en": "Two heads are better than one"
+      }
+    },
+    {
+      "id": "expr_zh_034",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "种瓜得瓜，种豆得豆",
+        "en": "You reap what you sow"
+      }
+    },
+    {
+      "id": "expr_zh_035",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "台上一分钟，台下十年功",
+        "en": "A minute on stage takes years of work"
+      }
+    },
+    {
+      "id": "expr_zh_036",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "说到做到",
+        "en": "Do what you say"
+      }
+    },
+    {
+      "id": "expr_zh_037",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "慢工出细活",
+        "en": "Careful work makes fine work"
+      }
+    },
+    {
+      "id": "expr_zh_038",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "先听后说",
+        "en": "Listen first, then speak"
+      }
+    },
+    {
+      "id": "expr_zh_039",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "众人拾柴火焰高",
+        "en": "Many hands make strong results"
+      }
+    },
+    {
+      "id": "expr_zh_040",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "心急吃不了热豆腐",
+        "en": "Haste makes waste"
+      }
+    },
+    {
+      "id": "expr_zh_041",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "百闻不如一见",
+        "en": "Seeing once is better than hearing a hundred times"
+      }
+    },
+    {
+      "id": "expr_zh_042",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "不怕慢，就怕站",
+        "en": "Slow progress is better than no progress"
+      }
+    },
+    {
+      "id": "expr_zh_043",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "良言一句三冬暖",
+        "en": "A kind word warms people deeply"
+      }
+    },
+    {
+      "id": "expr_zh_044",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "失败是成功之母",
+        "en": "Failure is the mother of success"
+      }
+    },
+    {
+      "id": "expr_zh_045",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "磨刀不误砍柴工",
+        "en": "Preparation saves effort later"
+      }
+    },
+    {
+      "id": "expr_zh_046",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "吃一堑，长一智",
+        "en": "A setback makes you wiser"
+      }
+    },
+    {
+      "id": "expr_zh_047",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "独学而无友，则孤陋而寡闻",
+        "en": "Learning alone limits perspective"
+      }
+    },
+    {
+      "id": "expr_zh_048",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "一分耕耘，一分收获",
+        "en": "You reap what you work for"
+      }
+    },
+    {
+      "id": "expr_zh_049",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "路遥知马力，日久见人心",
+        "en": "Time reveals true character"
+      }
+    },
+    {
+      "id": "expr_zh_050",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "近朱者赤，近墨者黑",
+        "en": "The company you keep shapes you"
+      }
+    },
+    {
+      "id": "expr_zh_051",
+      "sourceLocale": "zh",
+      "kind": "proverb",
+      "text": {
+        "zh": "人多力量大",
+        "en": "There is strength in numbers"
+      }
+    },
+    {
+      "id": "expr_zh_052",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "先想清楚，再说清楚",
+        "en": "Think clearly before speaking clearly"
+      }
+    },
+    {
+      "id": "expr_zh_053",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "把复杂的话说简单",
+        "en": "Make complicated ideas simple"
+      }
+    },
+    {
+      "id": "expr_zh_054",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "语气柔和，力量更大",
+        "en": "A gentle tone can be more powerful"
+      }
+    },
+    {
+      "id": "expr_zh_055",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "重点不在多，在准",
+        "en": "The key is not more points, but the right point"
+      }
+    },
+    {
+      "id": "expr_zh_056",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "先共情，再建议",
+        "en": "Show empathy before giving advice"
+      }
+    },
+    {
+      "id": "expr_zh_057",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "先听懂，再回应",
+        "en": "Understand first, then respond"
+      }
+    },
+    {
+      "id": "expr_zh_058",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "一句话说到心里去",
+        "en": "Say something that truly touches the heart"
+      }
+    },
+    {
+      "id": "expr_zh_059",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "把道理讲透，把情绪放缓",
+        "en": "Explain well and keep emotions calm"
+      }
+    },
+    {
+      "id": "expr_zh_060",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "说得慢一点，听得更明白",
+        "en": "Speak a little slower and people understand better"
+      }
+    },
+    {
+      "id": "expr_zh_061",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "提问题，也是在帮对方思考",
+        "en": "A good question helps others think"
+      }
+    },
+    {
+      "id": "expr_zh_062",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "把话留有余地",
+        "en": "Leave room in what you say"
+      }
+    },
+    {
+      "id": "expr_zh_063",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "先肯定，再补充",
+        "en": "Affirm first, then add your point"
+      }
+    },
+    {
+      "id": "expr_zh_064",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "把重点放在前面",
+        "en": "Put the key point first"
+      }
+    },
+    {
+      "id": "expr_zh_065",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "一段话只讲一个重点",
+        "en": "One paragraph, one key point"
+      }
+    },
+    {
+      "id": "expr_zh_066",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "说得真诚，比说得漂亮更重要",
+        "en": "Sincerity matters more than fancy wording"
+      }
+    },
+    {
+      "id": "expr_zh_067",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "让别人听得进去，才算说得好",
+        "en": "Good speaking means people can take it in"
+      }
+    },
+    {
+      "id": "expr_zh_068",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "回应问题，不绕圈子",
+        "en": "Answer directly without going in circles"
+      }
+    },
+    {
+      "id": "expr_zh_069",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "停顿一下，也是一种表达",
+        "en": "A pause is also part of communication"
+      }
+    },
+    {
+      "id": "expr_zh_070",
+      "sourceLocale": "zh",
+      "kind": "saying",
+      "text": {
+        "zh": "会说，也要会收",
+        "en": "Know how to speak and when to stop"
+      }
+    },
+    {
+      "id": "expr_zh_071",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "给力",
+        "en": "Awesome and effective"
+      }
+    },
+    {
+      "id": "expr_zh_072",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "稳了",
+        "en": "Looks solid now"
+      }
+    },
+    {
+      "id": "expr_zh_073",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "靠谱",
+        "en": "Reliable"
+      }
+    },
+    {
+      "id": "expr_zh_074",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "走心",
+        "en": "Heartfelt"
+      }
+    },
+    {
+      "id": "expr_zh_075",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "别硬撑",
+        "en": "Do not force yourself to push through"
+      }
+    },
+    {
+      "id": "expr_zh_076",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "慢慢来，比较快",
+        "en": "Slow down to move faster"
+      }
+    },
+    {
+      "id": "expr_zh_077",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "别给自己太大压力",
+        "en": "Do not put too much pressure on yourself"
+      }
+    },
+    {
+      "id": "expr_zh_078",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "先试试看",
+        "en": "Give it a try first"
+      }
+    },
+    {
+      "id": "expr_zh_079",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "这波可以",
+        "en": "This one works well"
+      }
+    },
+    {
+      "id": "expr_zh_080",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "有点东西",
+        "en": "There is something impressive here"
+      }
+    },
+    {
+      "id": "expr_zh_081",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "说重点",
+        "en": "Get to the point"
+      }
+    },
+    {
+      "id": "expr_zh_082",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "先别急",
+        "en": "Do not rush yet"
+      }
+    },
+    {
+      "id": "expr_zh_083",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "有戏",
+        "en": "There is a good chance"
+      }
+    },
+    {
+      "id": "expr_zh_084",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "挺顺的",
+        "en": "It is going smoothly"
+      }
+    },
+    {
+      "id": "expr_zh_085",
+      "sourceLocale": "zh",
+      "kind": "slang",
+      "text": {
+        "zh": "很在线",
+        "en": "Very sharp and present"
+      }
+    },
+    {
+      "id": "expr_zh_086",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把场子暖起来",
+        "en": "Warm up the room"
+      }
+    },
+    {
+      "id": "expr_zh_087",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把思路理顺",
+        "en": "Sort out your thinking"
+      }
+    },
+    {
+      "id": "expr_zh_088",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把例子讲具体",
+        "en": "Make the example more concrete"
+      }
+    },
+    {
+      "id": "expr_zh_089",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把结尾收干净",
+        "en": "Finish with a clean ending"
+      }
+    },
+    {
+      "id": "expr_zh_090",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "先打个底，再展开",
+        "en": "Set the foundation before expanding"
+      }
+    },
+    {
+      "id": "expr_zh_091",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把问题拆开来看",
+        "en": "Break the problem into parts"
+      }
+    },
+    {
+      "id": "expr_zh_092",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把节奏放稳",
+        "en": "Keep the pace steady"
+      }
+    },
+    {
+      "id": "expr_zh_093",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把握住全场的注意力",
+        "en": "Hold the room's attention"
+      }
+    },
+    {
+      "id": "expr_zh_094",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "给自己一点缓冲时间",
+        "en": "Give yourself a little buffer time"
+      }
+    },
+    {
+      "id": "expr_zh_095",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把过渡说自然",
+        "en": "Make the transition sound natural"
+      }
+    },
+    {
+      "id": "expr_zh_096",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把语气放轻一点",
+        "en": "Soften your tone a little"
+      }
+    },
+    {
+      "id": "expr_zh_097",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把观点落到实际",
+        "en": "Bring the idea down to practice"
+      }
+    },
+    {
+      "id": "expr_zh_098",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把内容讲出层次",
+        "en": "Give the content a clear structure"
+      }
+    },
+    {
+      "id": "expr_zh_099",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把结论放前面",
+        "en": "Put the conclusion up front"
+      }
+    },
+    {
+      "id": "expr_zh_100",
+      "sourceLocale": "zh",
+      "kind": "phrase",
+      "text": {
+        "zh": "把开场说轻松一点",
+        "en": "Open with a lighter tone"
+      }
+    }
+  ]
+}

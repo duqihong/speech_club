@@ -1,0 +1,905 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "expr_en_001",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Break the ice",
+        "zh": "打破僵局"
+      }
+    },
+    {
+      "id": "expr_en_002",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Hit the nail on the head",
+        "zh": "一语中的"
+      }
+    },
+    {
+      "id": "expr_en_003",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Take it one step at a time",
+        "zh": "一步一步来"
+      }
+    },
+    {
+      "id": "expr_en_004",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Practice makes progress",
+        "zh": "熟能生巧，持续进步"
+      }
+    },
+    {
+      "id": "expr_en_005",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Speak from the heart",
+        "zh": "真诚地说出心里话"
+      }
+    },
+    {
+      "id": "expr_en_006",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "On the same page",
+        "zh": "想法一致"
+      }
+    },
+    {
+      "id": "expr_en_007",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Read the room",
+        "zh": "察言观色"
+      }
+    },
+    {
+      "id": "expr_en_008",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Think on your feet",
+        "zh": "临场反应快"
+      }
+    },
+    {
+      "id": "expr_en_009",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Get the ball rolling",
+        "zh": "开始行动"
+      }
+    },
+    {
+      "id": "expr_en_010",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Go the extra mile",
+        "zh": "多付出一点"
+      }
+    },
+    {
+      "id": "expr_en_011",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "A blessing in disguise",
+        "zh": "塞翁失马，焉知非福"
+      }
+    },
+    {
+      "id": "expr_en_012",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Burn the midnight oil",
+        "zh": "开夜车"
+      }
+    },
+    {
+      "id": "expr_en_013",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Call it a day",
+        "zh": "收工吧"
+      }
+    },
+    {
+      "id": "expr_en_014",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Cut to the chase",
+        "zh": "直奔主题"
+      }
+    },
+    {
+      "id": "expr_en_015",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Easy does it",
+        "zh": "慢慢来"
+      }
+    },
+    {
+      "id": "expr_en_016",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Face the music",
+        "zh": "勇于承担后果"
+      }
+    },
+    {
+      "id": "expr_en_017",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Get cold feet",
+        "zh": "临阵退缩"
+      }
+    },
+    {
+      "id": "expr_en_018",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "In hot water",
+        "zh": "陷入麻烦"
+      }
+    },
+    {
+      "id": "expr_en_019",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Keep an open mind",
+        "zh": "保持开放心态"
+      }
+    },
+    {
+      "id": "expr_en_020",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Learn the ropes",
+        "zh": "熟悉门道"
+      }
+    },
+    {
+      "id": "expr_en_021",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Miss the boat",
+        "zh": "错失机会"
+      }
+    },
+    {
+      "id": "expr_en_022",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "No strings attached",
+        "zh": "没有附带条件"
+      }
+    },
+    {
+      "id": "expr_en_023",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Out of the blue",
+        "zh": "突然地"
+      }
+    },
+    {
+      "id": "expr_en_024",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Piece of cake",
+        "zh": "小菜一碟"
+      }
+    },
+    {
+      "id": "expr_en_025",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Pull yourself together",
+        "zh": "振作起来"
+      }
+    },
+    {
+      "id": "expr_en_026",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Rule of thumb",
+        "zh": "经验法则"
+      }
+    },
+    {
+      "id": "expr_en_027",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "See eye to eye",
+        "zh": "意见一致"
+      }
+    },
+    {
+      "id": "expr_en_028",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Sit tight",
+        "zh": "稍安勿躁"
+      }
+    },
+    {
+      "id": "expr_en_029",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Spill the beans",
+        "zh": "说漏嘴"
+      }
+    },
+    {
+      "id": "expr_en_030",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "The bigger picture",
+        "zh": "大局"
+      }
+    },
+    {
+      "id": "expr_en_031",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Under the weather",
+        "zh": "身体不舒服"
+      }
+    },
+    {
+      "id": "expr_en_032",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Up in the air",
+        "zh": "尚未确定"
+      }
+    },
+    {
+      "id": "expr_en_033",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Wrap your head around it",
+        "zh": "把事情想明白"
+      }
+    },
+    {
+      "id": "expr_en_034",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Your guess is as good as mine",
+        "zh": "我也不知道"
+      }
+    },
+    {
+      "id": "expr_en_035",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Bite off more than you can chew",
+        "zh": "贪多嚼不烂"
+      }
+    },
+    {
+      "id": "expr_en_036",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Actions speak louder than words",
+        "zh": "行动胜于空谈"
+      }
+    },
+    {
+      "id": "expr_en_037",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Better late than never",
+        "zh": "迟做总比不做好"
+      }
+    },
+    {
+      "id": "expr_en_038",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Every cloud has a silver lining",
+        "zh": "黑暗中总有一线光明"
+      }
+    },
+    {
+      "id": "expr_en_039",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Honesty is the best policy",
+        "zh": "诚实为上策"
+      }
+    },
+    {
+      "id": "expr_en_040",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Slow and steady wins the race",
+        "zh": "稳扎稳打才能赢"
+      }
+    },
+    {
+      "id": "expr_en_041",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Where there is a will, there is a way",
+        "zh": "有志者事竟成"
+      }
+    },
+    {
+      "id": "expr_en_042",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Two heads are better than one",
+        "zh": "三个臭皮匠，胜过诸葛亮"
+      }
+    },
+    {
+      "id": "expr_en_043",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "The early bird catches the worm",
+        "zh": "早起的鸟儿有虫吃"
+      }
+    },
+    {
+      "id": "expr_en_044",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Time is money",
+        "zh": "时间就是金钱"
+      }
+    },
+    {
+      "id": "expr_en_045",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "When in doubt, ask",
+        "zh": "有疑问就发问"
+      }
+    },
+    {
+      "id": "expr_en_046",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Rome was not built in a day",
+        "zh": "成功不是一蹴而就的"
+      }
+    },
+    {
+      "id": "expr_en_047",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "A good beginning is half the battle",
+        "zh": "好的开始是成功的一半"
+      }
+    },
+    {
+      "id": "expr_en_048",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Many hands make light work",
+        "zh": "人多好办事"
+      }
+    },
+    {
+      "id": "expr_en_049",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Knowledge is power",
+        "zh": "知识就是力量"
+      }
+    },
+    {
+      "id": "expr_en_050",
+      "sourceLocale": "en",
+      "kind": "proverb",
+      "text": {
+        "en": "Practice what you preach",
+        "zh": "以身作则"
+      }
+    },
+    {
+      "id": "expr_en_051",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Let me think about that",
+        "zh": "让我想一想"
+      }
+    },
+    {
+      "id": "expr_en_052",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "That makes a lot of sense",
+        "zh": "这很有道理"
+      }
+    },
+    {
+      "id": "expr_en_053",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Could you say that another way?",
+        "zh": "你可以换个说法吗？"
+      }
+    },
+    {
+      "id": "expr_en_054",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "I see your point",
+        "zh": "我明白你的意思"
+      }
+    },
+    {
+      "id": "expr_en_055",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Here is my takeaway",
+        "zh": "这是我的收获"
+      }
+    },
+    {
+      "id": "expr_en_056",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Let us keep it simple",
+        "zh": "我们尽量说简单一点"
+      }
+    },
+    {
+      "id": "expr_en_057",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "That is a fair question",
+        "zh": "这是个很合理的问题"
+      }
+    },
+    {
+      "id": "expr_en_058",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "I would like to add one point",
+        "zh": "我想补充一点"
+      }
+    },
+    {
+      "id": "expr_en_059",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Thanks for bringing that up",
+        "zh": "谢谢你提到这一点"
+      }
+    },
+    {
+      "id": "expr_en_060",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Let us come back to that later",
+        "zh": "我们稍后再回到这个话题"
+      }
+    },
+    {
+      "id": "expr_en_061",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "What I mean is",
+        "zh": "我的意思是"
+      }
+    },
+    {
+      "id": "expr_en_062",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "To put it another way",
+        "zh": "换句话说"
+      }
+    },
+    {
+      "id": "expr_en_063",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "That is easier said than done",
+        "zh": "说起来容易做起来难"
+      }
+    },
+    {
+      "id": "expr_en_064",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Let me give an example",
+        "zh": "让我举个例子"
+      }
+    },
+    {
+      "id": "expr_en_065",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "The key message is",
+        "zh": "重点信息是"
+      }
+    },
+    {
+      "id": "expr_en_066",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "I appreciate your honesty",
+        "zh": "我很欣赏你的坦诚"
+      }
+    },
+    {
+      "id": "expr_en_067",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "I am still learning",
+        "zh": "我还在学习中"
+      }
+    },
+    {
+      "id": "expr_en_068",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Can we keep this practical?",
+        "zh": "我们可以说得更实际一点吗？"
+      }
+    },
+    {
+      "id": "expr_en_069",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "That sounds promising",
+        "zh": "听起来很有希望"
+      }
+    },
+    {
+      "id": "expr_en_070",
+      "sourceLocale": "en",
+      "kind": "phrase",
+      "text": {
+        "en": "Let us focus on what matters most",
+        "zh": "我们先专注在最重要的部分"
+      }
+    },
+    {
+      "id": "expr_en_071",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "No worries",
+        "zh": "没事，别担心"
+      }
+    },
+    {
+      "id": "expr_en_072",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "You got this",
+        "zh": "你可以的"
+      }
+    },
+    {
+      "id": "expr_en_073",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "That is not my thing",
+        "zh": "那不是我的菜"
+      }
+    },
+    {
+      "id": "expr_en_074",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "Let us keep it low-key",
+        "zh": "我们低调一点"
+      }
+    },
+    {
+      "id": "expr_en_075",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "I am all ears",
+        "zh": "我洗耳恭听"
+      }
+    },
+    {
+      "id": "expr_en_076",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "That is a game changer",
+        "zh": "那会带来很大改变"
+      }
+    },
+    {
+      "id": "expr_en_077",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "It clicked for me",
+        "zh": "我突然明白了"
+      }
+    },
+    {
+      "id": "expr_en_078",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "Let us touch base",
+        "zh": "我们再联系一下"
+      }
+    },
+    {
+      "id": "expr_en_079",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "That is a solid idea",
+        "zh": "那是个很靠谱的主意"
+      }
+    },
+    {
+      "id": "expr_en_080",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "I need a breather",
+        "zh": "我需要喘口气"
+      }
+    },
+    {
+      "id": "expr_en_081",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "That hits different",
+        "zh": "那种感觉很特别"
+      }
+    },
+    {
+      "id": "expr_en_082",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "I am on board",
+        "zh": "我赞成"
+      }
+    },
+    {
+      "id": "expr_en_083",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "Let us call an audible",
+        "zh": "我们临时改方案吧"
+      }
+    },
+    {
+      "id": "expr_en_084",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "That is a long shot",
+        "zh": "那希望不大"
+      }
+    },
+    {
+      "id": "expr_en_085",
+      "sourceLocale": "en",
+      "kind": "slang",
+      "text": {
+        "en": "Do not overthink it",
+        "zh": "别想太多"
+      }
+    },
+    {
+      "id": "expr_en_086",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Keep your cool",
+        "zh": "保持冷静"
+      }
+    },
+    {
+      "id": "expr_en_087",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Put yourself in someone else's shoes",
+        "zh": "设身处地为别人想"
+      }
+    },
+    {
+      "id": "expr_en_088",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Jump the gun",
+        "zh": "操之过急"
+      }
+    },
+    {
+      "id": "expr_en_089",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "By word of mouth",
+        "zh": "口耳相传"
+      }
+    },
+    {
+      "id": "expr_en_090",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "On the tip of my tongue",
+        "zh": "话到嘴边却想不起来"
+      }
+    },
+    {
+      "id": "expr_en_091",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Strike a balance",
+        "zh": "取得平衡"
+      }
+    },
+    {
+      "id": "expr_en_092",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "In the long run",
+        "zh": "从长远来看"
+      }
+    },
+    {
+      "id": "expr_en_093",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Keep something in mind",
+        "zh": "把某事记在心上"
+      }
+    },
+    {
+      "id": "expr_en_094",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "A breath of fresh air",
+        "zh": "令人耳目一新"
+      }
+    },
+    {
+      "id": "expr_en_095",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Make a long story short",
+        "zh": "长话短说"
+      }
+    },
+    {
+      "id": "expr_en_096",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Raise the bar",
+        "zh": "提高标准"
+      }
+    },
+    {
+      "id": "expr_en_097",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Turn the page",
+        "zh": "翻开新的一页"
+      }
+    },
+    {
+      "id": "expr_en_098",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Meet halfway",
+        "zh": "各退一步"
+      }
+    },
+    {
+      "id": "expr_en_099",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Stay on track",
+        "zh": "保持正轨"
+      }
+    },
+    {
+      "id": "expr_en_100",
+      "sourceLocale": "en",
+      "kind": "idiom",
+      "text": {
+        "en": "Open the door to",
+        "zh": "为……打开机会之门"
+      }
+    }
+  ]
+}

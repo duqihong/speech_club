@@ -1,27 +1,140 @@
+import 'dart:math';
+import 'dart:ui';
+
+import 'bilingual_table_topics_repository.dart';
+import 'bilingual_topic_library_adapter.dart';
+import 'models/category_selection.dart';
+import 'models/bilingual_table_topic_content.dart';
+import 'models/table_topic_session_item.dart';
 import 'models/table_topics_session.dart';
 import 'models/topic_library.dart';
+import 'models/topic_set.dart';
 import 'table_topics_storage.dart';
 import 'topic_library_loader.dart';
 
 class TableTopicsRepository {
   TableTopicsRepository({
+    BilingualTableTopicsRepository? bilingualRepository,
+    BilingualTopicLibraryAdapter? bilingualAdapter,
     TopicLibraryLoader? loader,
     TableTopicsStorage? storage,
-  })  : _loader = loader ?? TopicLibraryLoader(),
+  })  : _bilingualRepository =
+            bilingualRepository ?? BilingualTableTopicsRepository(),
+        _bilingualAdapter =
+            bilingualAdapter ?? const BilingualTopicLibraryAdapter(),
+        _loader = loader ?? TopicLibraryLoader(),
         _storage = storage ?? TableTopicsStorage();
 
+  final BilingualTableTopicsRepository _bilingualRepository;
+  final BilingualTopicLibraryAdapter _bilingualAdapter;
   final TopicLibraryLoader _loader;
   final TableTopicsStorage _storage;
 
-  TopicLibrary? _cachedLibrary;
+  final Map<String, TopicLibrary> _cachedLibrariesByLanguageCode =
+      <String, TopicLibrary>{};
+  Map<String, BilingualTableTopicContent>? _cachedBuiltInTopicsById;
+  final Map<String, Map<String, String>> _cachedTopicIdsByTextByLanguageCode =
+      <String, Map<String, String>>{};
 
-  Future<TopicLibrary> getLibrary() async {
-    if (_cachedLibrary != null) {
-      return _cachedLibrary!;
+  Future<TopicLibrary> getLibrary({required Locale locale}) async {
+    final String languageCode = locale.languageCode;
+    final TopicLibrary? cached = _cachedLibrariesByLanguageCode[languageCode];
+    if (cached != null) {
+      return cached;
     }
-    final TopicLibrary loaded = await _loader.load();
-    _cachedLibrary = loaded;
+
+    TopicLibrary loaded;
+    try {
+      final bilingualBundle = await _bilingualRepository.load();
+      loaded = _bilingualAdapter.toTopicLibrary(
+        bundle: bilingualBundle,
+        locale: locale,
+      );
+    } catch (_) {
+      loaded = await _loader.load();
+    }
+
+    _cachedLibrariesByLanguageCode[languageCode] = loaded;
     return loaded;
+  }
+
+  Future<List<TableTopicSessionItem>> buildSessionItemsFromTexts({
+    required List<String> topics,
+    required Locale locale,
+  }) async {
+    final Map<String, String> idsByText =
+        await _getBuiltInTopicIdsByText(locale.languageCode);
+
+    return topics.map((String topic) {
+      final String trimmed = topic.trim();
+      if (trimmed.isEmpty) {
+        return TableTopicSessionItem.custom('');
+      }
+
+      final String? topicId = idsByText[trimmed];
+      if (topicId != null) {
+        return TableTopicSessionItem.builtIn(topicId);
+      }
+
+      return TableTopicSessionItem.custom(trimmed);
+    }).toList(growable: false);
+  }
+
+  Future<TopicSet> generateBuiltInTopicSet({
+    required CategorySelection selection,
+    required Locale locale,
+    Random? random,
+  }) async {
+    final List<BilingualTableTopicContent> pool = await _buildBuiltInTopicPool(
+      selection: selection,
+    );
+    if (pool.isEmpty) {
+      throw ArgumentError('Built-in topic pool cannot be empty.');
+    }
+
+    final Random rng = random ?? Random();
+    final List<BilingualTableTopicContent> uniquePool =
+        _dedupeBuiltInTopicsById(pool);
+    if (uniquePool.isEmpty) {
+      throw ArgumentError(
+          'Built-in topic pool cannot contain only empty topics.');
+    }
+
+    final List<BilingualTableTopicContent> shuffledUnique =
+        List<BilingualTableTopicContent>.from(uniquePool)..shuffle(rng);
+    final List<BilingualTableTopicContent> selected =
+        shuffledUnique.take(10).toList(growable: true);
+
+    while (selected.length < 10) {
+      selected.add(uniquePool[rng.nextInt(uniquePool.length)]);
+    }
+
+    return TopicSet.fromItems(
+      items: selected
+          .map((BilingualTableTopicContent item) =>
+              TableTopicSessionItem.builtIn(item.id))
+          .toList(growable: false),
+      topics: selected
+          .map((BilingualTableTopicContent item) => item.text.forLocale(locale))
+          .toList(growable: false),
+    );
+  }
+
+  Future<List<String>> resolveSessionItemTexts({
+    required List<TableTopicSessionItem> items,
+    required Locale locale,
+  }) async {
+    final Map<String, BilingualTableTopicContent> topicsById =
+        await _getBuiltInTopicsById();
+
+    return items.map((TableTopicSessionItem item) {
+      if (item.isBuiltIn) {
+        final BilingualTableTopicContent? topic = topicsById[item.topicId];
+        return topic?.text.forLocale(locale) ?? '';
+      }
+
+      return item.customText ?? '';
+    }).toList(growable: false);
   }
 
   Future<TableTopicsSession?> loadSession() {
@@ -42,5 +155,94 @@ class TableTopicsRepository {
 
   Future<void> saveCustomTopics(List<String> topics) {
     return _storage.saveCustomTopics(topics);
+  }
+
+  Future<List<BilingualTableTopicContent>> _buildBuiltInTopicPool({
+    required CategorySelection selection,
+  }) async {
+    final Map<String, BilingualTableTopicContent> topicsById =
+        await _getBuiltInTopicsById();
+    final List<BilingualTableTopicContent> allTopics =
+        topicsById.values.toList(growable: false);
+
+    if (selection.randomAll) {
+      return allTopics;
+    }
+
+    final List<BilingualTableTopicContent> selectedPool = allTopics
+        .where((BilingualTableTopicContent item) =>
+            selection.selectedCategories.contains(item.category))
+        .toList(growable: false);
+
+    if (selectedPool.length < 10) {
+      return allTopics;
+    }
+
+    return selectedPool;
+  }
+
+  List<BilingualTableTopicContent> _dedupeBuiltInTopicsById(
+    List<BilingualTableTopicContent> topics,
+  ) {
+    final Set<String> seen = <String>{};
+    final List<BilingualTableTopicContent> out = <BilingualTableTopicContent>[];
+
+    for (final BilingualTableTopicContent topic in topics) {
+      if (topic.id.isEmpty) {
+        continue;
+      }
+      if (seen.add(topic.id)) {
+        out.add(topic);
+      }
+    }
+
+    return out;
+  }
+
+  Future<Map<String, BilingualTableTopicContent>>
+      _getBuiltInTopicsById() async {
+    final Map<String, BilingualTableTopicContent>? cached =
+        _cachedBuiltInTopicsById;
+    if (cached != null) {
+      return cached;
+    }
+
+    try {
+      final bundle = await _bilingualRepository.load();
+      final Map<String, BilingualTableTopicContent> byId =
+          <String, BilingualTableTopicContent>{
+        for (final BilingualTableTopicContent item in bundle.items)
+          item.id: item,
+      };
+      _cachedBuiltInTopicsById = byId;
+      return byId;
+    } catch (_) {
+      _cachedBuiltInTopicsById = <String, BilingualTableTopicContent>{};
+      return _cachedBuiltInTopicsById!;
+    }
+  }
+
+  Future<Map<String, String>> _getBuiltInTopicIdsByText(
+      String languageCode) async {
+    final Map<String, String>? cached =
+        _cachedTopicIdsByTextByLanguageCode[languageCode];
+    if (cached != null) {
+      return cached;
+    }
+
+    final Locale locale = Locale(languageCode);
+    final Map<String, BilingualTableTopicContent> topicsById =
+        await _getBuiltInTopicsById();
+    final Map<String, String> idsByText = <String, String>{};
+
+    for (final BilingualTableTopicContent item in topicsById.values) {
+      final String text = item.text.forLocale(locale).trim();
+      if (text.isNotEmpty) {
+        idsByText[text] = item.id;
+      }
+    }
+
+    _cachedTopicIdsByTextByLanguageCode[languageCode] = idsByText;
+    return idsByText;
   }
 }

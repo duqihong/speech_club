@@ -1,11 +1,13 @@
+import 'table_topic_session_item.dart';
+
 class TableTopicsSession {
-  static const int currentVersion = 1;
+  static const int currentVersion = 2;
 
   TableTopicsSession({
     this.version = currentVersion,
     required this.randomAll,
     required this.selectedCategories,
-    required this.topics,
+    required this.items,
     required this.used,
     this.isCustomMode = false,
   });
@@ -14,30 +16,24 @@ class TableTopicsSession {
     return TableTopicsSession(
       randomAll: true,
       selectedCategories: <String>[],
-      topics: <String>[],
+      items: <TableTopicSessionItem>[],
       used: <bool>[],
       isCustomMode: false,
     );
   }
 
   factory TableTopicsSession.fromJson(Map<String, dynamic> json) {
-    final int parsedVersion =
-        json['version'] is int ? json['version'] as int : currentVersion;
-    if (parsedVersion != currentVersion) {
+    final int parsedVersion = json['version'] is int
+        ? json['version'] as int
+        : int.tryParse(json['version']?.toString() ?? '') ?? 1;
+    if (parsedVersion != 1 && parsedVersion != currentVersion) {
       return TableTopicsSession.empty();
     }
 
-    final List<String> parsedTopics = (json['topics'] is List)
-        ? (json['topics'] as List<dynamic>)
-            .map((dynamic e) => e.toString())
-            .toList()
-        : <String>[];
-    if (parsedTopics.length > 10) {
-      parsedTopics.removeRange(10, parsedTopics.length);
-    }
-    while (parsedTopics.length < 10) {
-      parsedTopics.add('');
-    }
+    final List<TableTopicSessionItem> parsedItems =
+        parsedVersion == currentVersion
+            ? _parseItems(json['items'])
+            : _parseLegacyTopics(json['topics']);
 
     final List<bool> parsedUsed = (json['used'] is List)
         ? (json['used'] as List<dynamic>).map((dynamic e) => e == true).toList()
@@ -57,7 +53,7 @@ class TableTopicsSession {
               .map((dynamic e) => e.toString())
               .toList(growable: false)
           : <String>[],
-      topics: parsedTopics,
+      items: parsedItems,
       used: parsedUsed,
       isCustomMode:
           json['isCustomMode'] is bool ? json['isCustomMode'] as bool : false,
@@ -67,7 +63,7 @@ class TableTopicsSession {
   final int version;
   final bool randomAll;
   final List<String> selectedCategories;
-  final List<String> topics;
+  final List<TableTopicSessionItem> items;
   final List<bool> used;
   final bool isCustomMode;
 
@@ -76,9 +72,43 @@ class TableTopicsSession {
       'version': version,
       'randomAll': randomAll,
       'selectedCategories': selectedCategories,
-      'topics': topics,
+      'items':
+          items.map((TableTopicSessionItem item) => item.toJson()).toList(),
       'used': used,
       'isCustomMode': isCustomMode,
     };
+  }
+
+  static List<TableTopicSessionItem> _parseItems(dynamic rawItems) {
+    final List<TableTopicSessionItem> items = (rawItems is List)
+        ? rawItems
+            .whereType<Map<String, dynamic>>()
+            .map(TableTopicSessionItem.fromJson)
+            .toList()
+        : <TableTopicSessionItem>[];
+
+    if (items.length > 10) {
+      items.removeRange(10, items.length);
+    }
+    while (items.length < 10) {
+      items.add(TableTopicSessionItem.custom(''));
+    }
+    return items;
+  }
+
+  static List<TableTopicSessionItem> _parseLegacyTopics(dynamic rawTopics) {
+    final List<TableTopicSessionItem> items = (rawTopics is List)
+        ? rawTopics
+            .map((dynamic e) => TableTopicSessionItem.custom(e.toString()))
+            .toList()
+        : <TableTopicSessionItem>[];
+
+    if (items.length > 10) {
+      items.removeRange(10, items.length);
+    }
+    while (items.length < 10) {
+      items.add(TableTopicSessionItem.custom(''));
+    }
+    return items;
   }
 }

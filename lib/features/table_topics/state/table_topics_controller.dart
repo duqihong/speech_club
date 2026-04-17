@@ -1,11 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/models/category_selection.dart';
+import '../data/models/table_topic_session_item.dart';
 import '../data/models/table_topics_session.dart';
 import '../data/models/topic_library.dart';
 import '../data/models/topic_set.dart';
 import '../data/table_topics_repository.dart';
-import '../domain/topic_service.dart';
 
 class TableTopicsController extends ChangeNotifier {
   TableTopicsController({TableTopicsRepository? repository})
@@ -20,14 +22,17 @@ class TableTopicsController extends ChangeNotifier {
   TopicSet? topicSet;
   bool isCustomMode = false;
   List<String> customTopics = <String>[];
+  Locale _currentLocale = const Locale('en');
 
-  Future<void> init() async {
+  Future<void> init({Locale? locale}) async {
+    _currentLocale = locale ?? _currentLocale;
     loading = true;
     error = null;
     notifyListeners();
 
     try {
-      final TopicLibrary loadedLibrary = await _repository.getLibrary();
+      final TopicLibrary loadedLibrary =
+          await _repository.getLibrary(locale: _currentLocale);
       final List<String> loadedCustomTopics =
           await _repository.loadCustomTopics();
       final TableTopicsSession? session = await _repository.loadSession();
@@ -42,9 +47,15 @@ class TableTopicsController extends ChangeNotifier {
         );
         isCustomMode = session.isCustomMode;
 
-        if (session.topics.length == 10 && session.used.length == 10) {
-          topicSet = TopicSet(
-            topics: List<String>.from(session.topics),
+        if (session.items.length == 10 && session.used.length == 10) {
+          final List<String> resolvedTopics =
+              await _repository.resolveSessionItemTexts(
+            items: session.items,
+            locale: _currentLocale,
+          );
+          topicSet = TopicSet.fromItems(
+            items: List<TableTopicSessionItem>.from(session.items),
+            topics: resolvedTopics,
             used: List<bool>.from(session.used),
           );
         } else {
@@ -85,28 +96,56 @@ class TableTopicsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void generate10() {
-    final TopicLibrary? currentLibrary = library;
-    if (currentLibrary == null) {
-      return;
-    }
-
-    topicSet = generateTopicSet(
-      library: currentLibrary,
-      selection: selection,
+  Future<void> generate10() async {
+    await generateBuiltInTopics(
+      selectedCategories: selection.selectedCategories,
+      locale: _currentLocale,
     );
+  }
+
+  Future<void> generateBuiltInTopics({
+    required Set<String> selectedCategories,
+    Locale? locale,
+  }) async {
+    _currentLocale = locale ?? _currentLocale;
+    final CategorySelection nextSelection = CategorySelection(
+      selectedCategories: Set<String>.from(selectedCategories),
+      randomAll: selectedCategories.isEmpty,
+    );
+
+    final TopicSet generated = await _repository.generateBuiltInTopicSet(
+      selection: nextSelection,
+      locale: _currentLocale,
+    );
+
+    selection = nextSelection;
+    topicSet = generated;
     isCustomMode = false;
-    persistSession();
+    await persistSession();
     notifyListeners();
   }
 
-  void setGeneratedTopics(List<String> topics) {
+  Future<void> setGeneratedTopics(
+    List<String> topics, {
+    Locale? locale,
+  }) async {
     if (topics.length != 10) {
       return;
     }
-    topicSet = TopicSet.fresh(List<String>.from(topics));
+
+    _currentLocale = locale ?? _currentLocale;
+    final List<TableTopicSessionItem> items =
+        await _repository.buildSessionItemsFromTexts(
+      topics: topics,
+      locale: _currentLocale,
+    );
+
+    topicSet = TopicSet.fromItems(
+      items: items,
+      topics: List<String>.from(topics),
+    );
     isCustomMode = false;
-    persistSession();
+    await persistSession();
     notifyListeners();
   }
 
@@ -138,7 +177,10 @@ class TableTopicsController extends ChangeNotifier {
       padded.add('');
     }
 
-    topicSet = TopicSet.fresh(padded);
+    topicSet = TopicSet.fromItems(
+      items: padded.map(TableTopicSessionItem.custom).toList(growable: false),
+      topics: padded,
+    );
     isCustomMode = true;
     selection = CategorySelection.defaults();
     persistSession();
@@ -177,10 +219,10 @@ class TableTopicsController extends ChangeNotifier {
 
   TableTopicsSession _buildSession() {
     return TableTopicsSession(
-      version: 1,
+      version: TableTopicsSession.currentVersion,
       randomAll: selection.randomAll,
       selectedCategories: selection.selectedCategories.toList(growable: false),
-      topics: topicSet?.topics ?? <String>[],
+      items: topicSet?.items ?? <TableTopicSessionItem>[],
       used: topicSet?.used ?? <bool>[],
       isCustomMode: isCustomMode,
     );

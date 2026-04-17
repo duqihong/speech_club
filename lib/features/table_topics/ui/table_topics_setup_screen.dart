@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/topic_dedupe.dart';
 import '../state/table_topics_controller.dart';
 import 'edit_topics_screen.dart';
 import 'presenter_grid_screen.dart';
@@ -26,6 +23,7 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
   final Set<String> _selectedCategories = <String>{};
   List<String> _topics = <String>[];
   bool _hydratedFromController = false;
+  Locale? _loadedLocale;
 
   List<String> _makeBlankTopics() => List<String>.filled(_kTopicCount, '');
 
@@ -34,7 +32,19 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     super.initState();
     _topics = _makeBlankTopics();
     _controller = TableTopicsController();
-    _controller.init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final Locale locale = Localizations.localeOf(context);
+    if (_loadedLocale?.languageCode == locale.languageCode) {
+      return;
+    }
+
+    _loadedLocale = locale;
+    _hydratedFromController = false;
+    _controller.init(locale: locale);
   }
 
   @override
@@ -81,74 +91,19 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     );
   }
 
-  void _generate10Topics() {
-    final library = _controller.library;
-    if (library == null) {
+  Future<void> _generate10Topics() async {
+    await _controller.generateBuiltInTopics(
+      selectedCategories: _selectedCategories,
+      locale: _loadedLocale,
+    );
+
+    if (!mounted) {
       return;
     }
-
-    final List<String> pool = <String>[];
-    final Iterable<String> categoriesToUse = _selectedCategories.isEmpty
-        ? library.categories.keys
-        : _selectedCategories;
-
-    for (final String category in categoriesToUse) {
-      pool.addAll(library.categories[category] ?? const <String>[]);
-    }
-    if (pool.isEmpty) {
-      return;
-    }
-
-    final Random random = Random();
-    final List<String> uniquePool = dedupeTopics(pool);
-    if (uniquePool.isEmpty) {
-      return;
-    }
-
-    final List<String> result = <String>[];
-    final Set<String> seen = <String>{};
-    bool addIfUnique(String topic) {
-      final String trimmed = topic.trim();
-      final String key = normalizeTopic(trimmed);
-      if (key.isEmpty) {
-        return false;
-      }
-      if (seen.add(key)) {
-        result.add(trimmed);
-        return true;
-      }
-      return false;
-    }
-
-    final List<String> shuffledUnique = List<String>.from(uniquePool)
-      ..shuffle(random);
-    for (final String topic in shuffledUnique) {
-      addIfUnique(topic);
-      if (result.length >= _kTopicCount) {
-        break;
-      }
-    }
-
-    int attempts = 0;
-    while (result.length < _kTopicCount && attempts < 5) {
-      attempts++;
-      final List<String> more = List<String>.from(pool)..shuffle(random);
-      for (final String topic in more) {
-        addIfUnique(topic);
-        if (result.length >= _kTopicCount) {
-          break;
-        }
-      }
-    }
-
-    while (result.length < _kTopicCount) {
-      result.add('');
-    }
-
     setState(() {
-      _topics = result;
+      _topics =
+          List<String>.from(_controller.topicSet?.topics ?? _makeBlankTopics());
     });
-    _controller.setGeneratedTopics(result);
   }
 
   Future<void> _openEditTopics() async {
@@ -167,14 +122,13 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     setState(() {
       _topics = updated;
     });
-    _controller.setGeneratedTopics(updated);
+    await _controller.setGeneratedTopics(
+      updated,
+      locale: _loadedLocale,
+    );
   }
 
   Future<void> _openPresenterMode() async {
-    if (_topics.length == _kTopicCount) {
-      _controller.setGeneratedTopics(_topics);
-    }
-
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => PresenterGridScreen(controller: _controller),
@@ -352,7 +306,7 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
                         '${l10n.tableTopicsErrorPrefix}: ${_controller.error}'),
                     const SizedBox(height: 12),
                     FilledButton(
-                      onPressed: _controller.init,
+                      onPressed: () => _controller.init(locale: _loadedLocale),
                       child: Text(l10n.buttonRetry, style: _smallStyle),
                     ),
                   ],
