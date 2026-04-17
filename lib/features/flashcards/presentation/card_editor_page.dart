@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 class CardEditorPage extends StatefulWidget {
   final String title;
   final String initialText;
+  final bool isPasteMode;
 
   const CardEditorPage({
     super.key,
     required this.title,
     this.initialText = '',
+    this.isPasteMode = false,
   });
 
   @override
@@ -41,21 +45,23 @@ class _CardEditorPageState extends State<CardEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: _cancel,
-          tooltip: 'Cancel',
+          tooltip: l10n.buttonCancel,
         ),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: FilledButton(
               onPressed: _save,
-              child: const Text(
-                'Save',
+              child: Text(
+                l10n.buttonSave,
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -77,9 +83,9 @@ class _CardEditorPageState extends State<CardEditorPage> {
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontSize: 20, height: 1.3),
                   decoration: InputDecoration(
-                    hintText: widget.title.contains('Paste')
-                        ? 'Paste your speech here.\n\nUse blank lines to separate cards.'
-                        : 'Type your card text...',
+                    hintText: widget.isPasteMode
+                        ? l10n.flashcardsPasteHint
+                        : l10n.flashcardsCardHint,
                     border: const OutlineInputBorder(),
                     contentPadding: const EdgeInsets.all(16),
                   ),

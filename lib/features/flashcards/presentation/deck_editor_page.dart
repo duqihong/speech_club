@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../data/my_speech_deck.dart';
 import '../data/my_speech_storage.dart';
 import 'card_editor_page.dart';
@@ -42,10 +43,13 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
   }
 
   Future<void> _addCard() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String? text = await Navigator.push<String?>(
       context,
       MaterialPageRoute<String?>(
-        builder: (_) => const CardEditorPage(title: 'Add Card'),
+        builder: (_) => CardEditorPage(
+          title: l10n.flashcardsAddCard,
+        ),
       ),
     );
     if (!mounted) {
@@ -62,11 +66,13 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
   }
 
   Future<void> _pasteMultipleCards() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String? rawText = await Navigator.push<String?>(
       context,
       MaterialPageRoute<String?>(
-        builder: (_) => const CardEditorPage(
-          title: 'Paste Multiple Cards',
+        builder: (_) => CardEditorPage(
+          title: l10n.flashcardsPasteMultipleCards,
+          isPasteMode: true,
         ),
       ),
     );
@@ -96,12 +102,14 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
   }
 
   Future<void> _editCard(int index) async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String? text = await Navigator.push<String?>(
       context,
       MaterialPageRoute<String?>(
         builder: (_) => CardEditorPage(
-          title: 'Edit Card',
+          title: l10n.flashcardsEditCard,
           initialText: _deck.cards[index],
+          isPasteMode: false,
         ),
       ),
     );
@@ -151,13 +159,15 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit My Speech'),
+        title: Text(l10n.flashcardsEditMySpeech),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.paste),
-            tooltip: 'Paste Multiple Cards',
+            tooltip: l10n.flashcardsPasteMultipleCards,
             onPressed: _pasteMultipleCards,
           ),
         ],
@@ -165,12 +175,12 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _loading ? null : _addCard,
         icon: const Icon(Icons.add),
-        label: const Text('Add Card'),
+        label: Text(l10n.flashcardsAddCard),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _deck.cards.isEmpty
-              ? const _EmptyState()
+              ? _EmptyState(message: l10n.flashcardsEmptyState)
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                   itemCount: _deck.cards.length,
@@ -193,17 +203,19 @@ class _DeckEditorPageState extends State<DeckEditorPage> {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({required this.message});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24.0),
         child: Text(
-          'No cards yet.\nTap "Add Card" to create your first one.',
+          message,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
       ),
     );
@@ -231,6 +243,7 @@ class _CardTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final bool canUp = index > 0;
     final bool canDown = index < total - 1;
 
@@ -275,19 +288,19 @@ class _CardTile extends StatelessWidget {
               Column(
                 children: <Widget>[
                   IconButton(
-                    tooltip: 'Move up',
+                    tooltip: l10n.flashcardsMoveUp,
                     iconSize: 28,
                     onPressed: canUp ? onUp : null,
                     icon: const Icon(Icons.keyboard_arrow_up),
                   ),
                   IconButton(
-                    tooltip: 'Move down',
+                    tooltip: l10n.flashcardsMoveDown,
                     iconSize: 28,
                     onPressed: canDown ? onDown : null,
                     icon: const Icon(Icons.keyboard_arrow_down),
                   ),
                   IconButton(
-                    tooltip: 'Delete',
+                    tooltip: l10n.buttonDelete,
                     iconSize: 26,
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline),

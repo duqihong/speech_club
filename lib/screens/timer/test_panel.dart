@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class TimerTestPanel extends StatelessWidget {
   const TimerTestPanel({
     super.key,
@@ -14,6 +16,8 @@ class TimerTestPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Positioned.fill(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -41,11 +45,11 @@ class TimerTestPanel extends StatelessWidget {
                       children: <Widget>[
                         Row(
                           children: <Widget>[
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                'Test Panel',
+                                l10n.timerTestPanel,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -72,23 +76,23 @@ class TimerTestPanel extends StatelessWidget {
                             child: Column(
                               children: <Widget>[
                                 _PanelButton(
-                                  label: 'Green',
+                                  label: l10n.timerStageGreen,
                                   onPressed: () => onPreviewColor(Colors.green),
                                 ),
                                 const SizedBox(height: 10),
                                 _PanelButton(
-                                  label: 'Yellow',
+                                  label: l10n.timerStageYellow,
                                   onPressed: () =>
                                       onPreviewColor(Colors.yellow),
                                 ),
                                 const SizedBox(height: 10),
                                 _PanelButton(
-                                  label: 'Red',
+                                  label: l10n.timerStageRed,
                                   onPressed: () => onPreviewColor(Colors.red),
                                 ),
                                 const SizedBox(height: 10),
                                 _PanelButton(
-                                  label: 'Ding',
+                                  label: l10n.timerDing,
                                   onPressed: onPreviewDing,
                                 ),
                               ],

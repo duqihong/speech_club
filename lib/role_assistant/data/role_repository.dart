@@ -1,17 +1,22 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
 import '../models/role_model.dart';
 
 class RoleRepository {
-  List<RoleModel>? _cache;
+  static final Map<String, List<RoleModel>> _cacheByAsset =
+      <String, List<RoleModel>>{};
 
-  Future<List<RoleModel>> loadRoles() async {
-    if (_cache != null) return _cache!;
+  Future<List<RoleModel>> loadRoles({required Locale locale}) async {
+    final String assetPath = _assetPathForLocale(locale);
+    final List<RoleModel>? cached = _cacheByAsset[assetPath];
+    if (cached != null) {
+      return cached;
+    }
 
-    final jsonStr =
-        await rootBundle.loadString('assets/role_assistant/roles.json');
+    final String jsonStr = await rootBundle.loadString(assetPath);
 
     final dynamic decoded = jsonDecode(jsonStr);
 
@@ -26,12 +31,21 @@ class RoleRepository {
       list = decoded['roles'] as List<dynamic>;
     } else {
       throw Exception(
-          'roles.json must be a JSON array or an object with a "roles" array');
+          '$assetPath must be a JSON array or an object with a "roles" array');
     }
 
-    _cache =
+    final List<RoleModel> roles =
         list.map((e) => RoleModel.fromJson(e as Map<String, dynamic>)).toList();
+    _cacheByAsset[assetPath] = roles;
 
-    return _cache!;
+    return roles;
+  }
+
+  String _assetPathForLocale(Locale locale) {
+    if (locale.languageCode == 'zh') {
+      return 'assets/role_assistant/roles_zh.json';
+    }
+
+    return 'assets/role_assistant/roles_en.json';
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../state/table_topics_controller.dart';
 import 'presenter_grid_screen.dart';
 
@@ -50,6 +51,7 @@ class _CustomTopicsScreenState extends State<CustomTopicsScreen> {
   }
 
   Future<void> _save() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     setState(() => _saving = true);
     await widget.controller.saveCustomTopics(_collectNonEmptyTopics());
     if (!mounted) {
@@ -57,15 +59,16 @@ class _CustomTopicsScreenState extends State<CustomTopicsScreen> {
     }
     setState(() => _saving = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Custom topics saved.')),
+      SnackBar(content: Text(l10n.tableTopicsCustomTopicsSaved)),
     );
   }
 
   Future<void> _useTheseTopics() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final List<String> topics = _collectNonEmptyTopics();
     if (topics.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add at least one topic.')),
+        SnackBar(content: Text(l10n.tableTopicsAddAtLeastOne)),
       );
       return;
     }
@@ -87,13 +90,15 @@ class _CustomTopicsScreenState extends State<CustomTopicsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Custom Topics')),
+      appBar: AppBar(title: Text(l10n.tableTopicsCustomTopics)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: <Widget>[
-            const Text('Enter up to 10 custom topics.'),
+            Text(l10n.tableTopicsEnterCustomTopics),
             const SizedBox(height: 12),
             for (int i = 0; i < _fieldCount; i++) ...<Widget>[
               TextField(
@@ -102,19 +107,19 @@ class _CustomTopicsScreenState extends State<CustomTopicsScreen> {
                 maxLines: 2,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  labelText: 'Topic ${i + 1}',
+                  labelText: l10n.tableTopicsTopicLabel(i + 1),
                 ),
               ),
               const SizedBox(height: 10),
             ],
             FilledButton(
               onPressed: _saving ? null : _save,
-              child: const Text('Save'),
+              child: Text(l10n.buttonSave),
             ),
             const SizedBox(height: 8),
             FilledButton(
               onPressed: _saving ? null : _useTheseTopics,
-              child: const Text('Use These Topics'),
+              child: Text(l10n.tableTopicsUseTheseTopics),
             ),
           ],
         ),

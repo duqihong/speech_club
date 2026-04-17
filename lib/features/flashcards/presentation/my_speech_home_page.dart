@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../data/my_speech_storage.dart';
 import 'deck_editor_page.dart';
 import 'presenter_page.dart';
@@ -15,6 +16,7 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
   final MySpeechStorage _storage = MySpeechStorage();
 
   Future<void> _startPresentation() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final deck = await _storage.load();
     if (!mounted) {
       return;
@@ -22,7 +24,7 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
 
     if (deck.cards.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No cards yet. Please add cards first.')),
+        SnackBar(content: Text(l10n.flashcardsNoCardsYet)),
       );
       return;
     }
@@ -37,9 +39,11 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Speech'),
+        title: Text(l10n.flashcardsMySpeech),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -58,8 +62,8 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
                     ),
                   );
                 },
-                child: const Text(
-                  'Edit Cards',
+                child: Text(
+                  l10n.flashcardsEditCards,
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -70,8 +74,8 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
               height: 64,
               child: ElevatedButton(
                 onPressed: _startPresentation,
-                child: const Text(
-                  'Start Presentation',
+                child: Text(
+                  l10n.flashcardsStartPresentation,
                   style: TextStyle(fontSize: 20),
                 ),
               ),

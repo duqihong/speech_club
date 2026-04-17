@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../data/role_repository.dart';
 import '../models/role_model.dart';
 import 'role_card_screen.dart';
@@ -20,6 +21,7 @@ class RoleAssistantScreen extends StatelessWidget {
     BuildContext context, {
     required RoleModel role,
   }) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Material(
       color: Colors.grey.shade100,
       borderRadius: BorderRadius.circular(18),
@@ -50,7 +52,7 @@ class RoleAssistantScreen extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    role.title,
+                    _roleTitleLabel(l10n, role.id),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -70,14 +72,17 @@ class RoleAssistantScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Locale locale = Localizations.localeOf(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Role Assistant'),
+        title: Text(l10n.navRoleAssistant),
         centerTitle: true,
       ),
       body: SafeArea(
         child: FutureBuilder<List<RoleModel>>(
-          future: RoleRepository().loadRoles(),
+          future: RoleRepository().loadRoles(locale: locale),
           builder:
               (BuildContext context, AsyncSnapshot<List<RoleModel>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -86,13 +91,15 @@ class RoleAssistantScreen extends StatelessWidget {
             if (snapshot.hasError) {
               return Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Failed to load roles: ${snapshot.error}'),
+                child: Text(
+                  l10n.roleAssistantFailedToLoad(snapshot.error.toString()),
+                ),
               );
             }
 
             final List<RoleModel> roles = snapshot.data ?? const <RoleModel>[];
             if (roles.isEmpty) {
-              return const Center(child: Text('No roles found.'));
+              return Center(child: Text(l10n.roleAssistantNoRolesFound));
             }
 
             return Padding(
@@ -135,5 +142,28 @@ class RoleAssistantScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _roleTitleLabel(AppLocalizations l10n, String roleId) {
+    switch (roleId) {
+      case 'toastmaster_of_the_day':
+        return l10n.roleAssistantTitleToastmasterOfTheDay;
+      case 'timer':
+        return l10n.roleAssistantTitleTimer;
+      case 'table_topics_master':
+        return l10n.roleAssistantTitleTableTopicsMaster;
+      case 'evaluator':
+        return l10n.roleAssistantTitleEvaluator;
+      case 'language_evaluator':
+        return l10n.roleAssistantTitleLanguageEvaluator;
+      case 'ah_counter':
+        return l10n.roleAssistantTitleAhCounter;
+      case 'speaker':
+        return l10n.roleAssistantTitleSpeaker;
+      case 'general_evaluator':
+        return l10n.roleAssistantTitleGeneralEvaluator;
+      default:
+        return roleId;
+    }
   }
 }

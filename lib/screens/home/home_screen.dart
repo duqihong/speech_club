@@ -2,17 +2,47 @@ import 'package:flutter/material.dart';
 
 import '../../app_routes.dart';
 import '../../features/flashcards/presentation/my_speech_home_page.dart';
+import '../../l10n/app_localizations.dart';
+import '../../localization/app_locale_controller.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.localeController,
+  });
+
+  final AppLocaleController localeController;
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double w = MediaQuery.of(context).size.width;
     final double logoWidth = (w * 0.58).clamp(220.0, 240.0);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7FB),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF6F7FB),
+        elevation: 0,
+        title: Text(l10n.appTitle),
+        actions: <Widget>[
+          PopupMenuButton<Locale>(
+            tooltip: l10n.languageMenuLabel,
+            icon: const Icon(Icons.language),
+            onSelected: localeController.setLocale,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Locale>>[
+              PopupMenuItem<Locale>(
+                value: AppLocaleController.english,
+                child: Text(l10n.languageEnglish),
+              ),
+              PopupMenuItem<Locale>(
+                value: AppLocaleController.simplifiedChinese,
+                child: Text(l10n.languageSimplifiedChinese),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -33,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                   children: <Widget>[
                     _HomeCard(
                       icon: Icons.timer_outlined,
-                      title: 'Timer',
+                      title: l10n.navTimer,
                       onTap: () {
                         Navigator.of(context).pushNamed(AppRoutes.timer);
                       },
@@ -41,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _HomeCard(
                       icon: Icons.mic_none_outlined,
-                      title: 'Speaker',
+                      title: l10n.navSpeaker,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -54,7 +84,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _HomeCard(
                       icon: Icons.chat_bubble_outline,
-                      title: 'Table Topics',
+                      title: l10n.navTableTopics,
                       onTap: () {
                         Navigator.of(context).pushNamed(AppRoutes.tableTopics);
                       },
@@ -62,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _HomeCard(
                       icon: Icons.group_outlined,
-                      title: 'Role Assistant',
+                      title: l10n.navRoleAssistant,
                       onTap: () {
                         Navigator.of(context)
                             .pushNamed(AppRoutes.roleAssistant);

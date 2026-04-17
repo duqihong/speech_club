@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 class EditTopicsScreen extends StatefulWidget {
   const EditTopicsScreen({
     super.key,
@@ -48,13 +50,15 @@ class _EditTopicsScreenState extends State<EditTopicsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Topics'),
+        title: Text(l10n.tableTopicsEditTopics),
         actions: <Widget>[
           TextButton(
             onPressed: _save,
-            child: const Text('Save'),
+            child: Text(l10n.buttonSave),
           ),
         ],
       ),
@@ -69,7 +73,7 @@ class _EditTopicsScreenState extends State<EditTopicsScreen> {
                 controller: _controllers[i],
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: 'Topic ${i + 1}',
+                  labelText: l10n.tableTopicsTopicLabel(i + 1),
                   border: const OutlineInputBorder(),
                 ),
               ),

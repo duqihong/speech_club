@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class SpeakerListScreen extends StatelessWidget {
   const SpeakerListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -12,12 +16,12 @@ class SpeakerListScreen extends StatelessWidget {
           iconSize: 28,
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('My Speeches'),
+        title: Text(l10n.flashcardsMySpeeches),
       ),
-      body: const Center(
+      body: Center(
         child: Text(
-          'My Speeches',
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
+          l10n.flashcardsMySpeeches,
+          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
         ),
       ),
     );

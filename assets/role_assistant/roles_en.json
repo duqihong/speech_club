@@ -1,0 +1,261 @@
+{
+  "roles": [
+    {
+      "id": "toastmaster_of_the_day",
+      "title": "Toastmaster of the Day",
+      "icon": "🎤",
+      "priority": "High",
+      "purpose": "You are the conductor of the meeting. You keep the flow smooth and the energy warm.",
+      "checklist": {
+        "before": [
+          "Confirm agenda and roles",
+          "Prepare opening and transitions",
+          "Check with Timer and Table Topics Master"
+        ],
+        "during": [
+          "Start on time and set a friendly tone",
+          "Introduce each segment clearly",
+          "Keep the meeting flowing (move forward gently)"
+        ],
+        "after": [
+          "Close the meeting confidently",
+          "Thank guests, role takers, and speakers"
+        ]
+      },
+      "tips": [
+        "Smile first. People relax when you do 😊",
+        "Short transitions are better than perfect transitions.",
+        "If you forget something, pause and continue. Everyone is on your side."
+      ],
+      "scripts": [
+        "Good evening everyone, welcome to our meeting!",
+        "Tonight, our theme is __________.",
+        "Now we will move to our next segment: __________.",
+        "Thank you everyone for your wonderful participation. See you next time!"
+      ]
+    },
+    {
+      "id": "timer",
+      "title": "Timer",
+      "icon": "⏱️",
+      "priority": "High",
+      "purpose": "You protect fairness and rhythm. Timing helps everyone improve and keeps the meeting on track.",
+      "checklist": {
+        "before": [
+          "Set the timing rules (green/yellow/red)",
+          "Test the timer device/app",
+          "Confirm special timing (if any)"
+        ],
+        "during": [
+          "Start timing when the speaker begins",
+          "Show signals at the correct milestones",
+          "Record times clearly"
+        ],
+        "after": [
+          "Report each timing result calmly",
+          "Thank the speakers"
+        ]
+      },
+      "tips": [
+        "Be consistent. The club trusts your accuracy.",
+        "If you miss a signal, stay calm and continue."
+      ],
+      "scripts": [
+        "For this segment, the time is __________ minutes.",
+        "Timing results: Speaker 1: ____, Speaker 2: ____."
+      ],
+      "deepLink": "/timer"
+    },
+    {
+      "id": "table_topics_master",
+      "title": "Table Topics Master",
+      "icon": "💬",
+      "priority": "High",
+      "purpose": "You create fun, safe, short speaking opportunities. You help members practice thinking on their feet.",
+      "checklist": {
+        "before": [
+          "Prepare 8–12 topics (simple and friendly)",
+          "Check if there are guests (make it extra easy)",
+          "Confirm timing with Timer"
+        ],
+        "during": [
+          "Explain the rules and time limit",
+          "Call one person at a time",
+          "Encourage applause and keep it light"
+        ],
+        "after": [
+          "Thank all participants",
+          "Hand back to Toastmaster"
+        ]
+      },
+      "tips": [
+        "Choose topics that are easy to start.",
+        "If someone is nervous, offer a simpler question."
+      ],
+      "scripts": [
+        "Now we begin Table Topics. This is a 1–2 minute impromptu speaking segment.",
+        "Our next speaker is __________. Please come up!",
+        "Your topic is: __________.",
+        "Thank you! Let’s give __________ a big hand."
+      ],
+      "deepLink": "/table-topics"
+    },
+    {
+      "id": "evaluator",
+      "title": "Evaluator",
+      "icon": "📝",
+      "priority": "High",
+      "purpose": "You help the speaker grow with supportive feedback. Your job is to encourage first, then guide.",
+      "checklist": {
+        "before": [
+          "Read the speaker objectives / project goals",
+          "Ask the speaker what feedback they want",
+          "Prepare a simple note-taking format"
+        ],
+        "during": [
+          "Observe structure, clarity, and delivery",
+          "Write strengths and 1–2 improvement ideas",
+          "Note one memorable moment"
+        ],
+        "after": [
+          "Start with positives",
+          "Give 1–2 clear suggestions",
+          "End with encouragement"
+        ]
+      },
+      "tips": [
+        "Be kind and specific. Specific helps more than strong opinions.",
+        "One improvement is enough. Don’t overload.",
+        "Smile. Your tone matters more than your words."
+      ],
+      "scripts": [
+        "Thank you, __________. I really enjoyed your speech, especially __________.",
+        "One strength I noticed is __________.",
+        "One suggestion to make it even stronger is __________.",
+        "Overall, great job — keep going!"
+      ]
+    },
+    {
+      "id": "language_evaluator",
+      "title": "Language Evaluator",
+      "icon": "📚",
+      "priority": "Medium",
+      "purpose": "You help the club speak better by noticing good words, grammar, and clear expressions.",
+      "checklist": {
+        "before": [
+          "Prepare 'Word of the Day' (optional)",
+          "Decide what to observe (grammar, vocabulary, clarity)"
+        ],
+        "during": [
+          "Note strong phrases and good vocabulary",
+          "Note common language issues gently"
+        ],
+        "after": [
+          "Share 3 good language examples",
+          "Share 1–2 improvement reminders"
+        ]
+      },
+      "tips": [
+        "Focus on learning, not judging.",
+        "Praise good usage first."
+      ],
+      "scripts": [
+        "Today’s Word of the Day is: __________ (meaning: __________).",
+        "Great phrases I heard today include: __________.",
+        "One small reminder for us: __________."
+      ]
+    },
+    {
+      "id": "ah_counter",
+      "title": "Ah-Counter",
+      "icon": "🔍",
+      "priority": "Medium",
+      "purpose": "You help speakers become more confident by reducing filler words and distracting habits.",
+      "checklist": {
+        "before": [
+          "Decide what to track (ah/um, repeats, filler, habits)",
+          "Prepare a simple tally method"
+        ],
+        "during": [
+          "Track each speaker fairly and quietly",
+          "Note one helpful observation per speaker"
+        ],
+        "after": [
+          "Report results calmly",
+          "Keep the tone light and encouraging"
+        ]
+      },
+      "tips": [
+        "Be factual, not funny at someone’s expense.",
+        "We all have fillers — this role helps everyone."
+      ],
+      "scripts": [
+        "Ah-counter report: I noted filler words such as ah/um, repeated words, and pauses.",
+        "Today’s results: __________."
+      ]
+    },
+    {
+      "id": "speaker",
+      "title": "Speaker",
+      "icon": "🎙️",
+      "priority": "Medium",
+      "purpose": "You share an idea and practice communication. Your goal is progress, not perfection.",
+      "checklist": {
+        "before": [
+          "Know your opening and closing",
+          "Practice once out loud",
+          "Prepare 3 key points"
+        ],
+        "during": [
+          "Speak a bit slower than normal",
+          "Pause between points",
+          "Look up and connect"
+        ],
+        "after": [
+          "Thank the audience",
+          "Listen to feedback with an open mind"
+        ]
+      },
+      "tips": [
+        "Nervous is normal. It means you care.",
+        "A pause feels long to you, but it feels confident to the audience."
+      ],
+      "scripts": [
+        "Good evening everyone. Today I’d like to share __________.",
+        "The first point is __________.",
+        "To conclude, __________. Thank you."
+      ]
+    },
+    {
+      "id": "general_evaluator",
+      "title": "General Evaluator",
+      "icon": "✅",
+      "priority": "Medium",
+      "purpose": "You help the whole meeting improve — structure, timing, energy, and quality of evaluations.",
+      "checklist": {
+        "before": [
+          "Confirm meeting agenda and evaluation flow",
+          "Brief role takers if needed"
+        ],
+        "during": [
+          "Observe meeting flow and timing",
+          "Observe how evaluations support growth",
+          "Note 2 strengths and 1 improvement for the meeting"
+        ],
+        "after": [
+          "Deliver overall meeting evaluation",
+          "Thank role takers and encourage improvement"
+        ]
+      },
+      "tips": [
+        "Focus on the meeting system, not individuals.",
+        "Keep it balanced: praise + one suggestion."
+      ],
+      "scripts": [
+        "Overall, the meeting was strong because __________.",
+        "One suggestion to improve our next meeting is __________.",
+        "Thank you everyone for serving and participating."
+      ]
+    }
+  ]
+}

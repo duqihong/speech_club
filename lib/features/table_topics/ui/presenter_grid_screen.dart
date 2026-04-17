@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../state/table_topics_controller.dart';
 import 'topic_fullscreen_view.dart';
 
@@ -50,9 +51,11 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Presenter Mode'),
+        title: Text(l10n.tableTopicsPresenterMode),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -61,11 +64,11 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
           builder: (BuildContext context, _) {
             final topicSet = widget.controller.topicSet;
             if (topicSet == null || topicSet.topics.length != 10) {
-              return const Center(
+              return Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
                   child: Text(
-                    'No 10-topic set found. Return to setup and generate topics.',
+                    l10n.tableTopicsNoSetFound,
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -77,10 +80,10 @@ class _PresenterGridScreenState extends State<PresenterGridScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.fromLTRB(4, 12, 4, 12),
                     child: Text(
-                      'Long press a tile to toggle used/unused.',
+                      l10n.tableTopicsToggleUsedHint,
                       style: TextStyle(fontSize: 16),
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import 'timer_models.dart';
 
 class CustomPresetSheet extends StatefulWidget {
@@ -80,6 +81,7 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
   }
 
   void _save() {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final int green = _toSeconds(_greenMinController, _greenSecController);
     final int yellow = _toSeconds(_yellowMinController, _yellowSecController);
     final int red = _toSeconds(_redMinController, _redSecController);
@@ -90,7 +92,7 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
         green > 0 && green < yellow && yellow < red && red < overtime;
     if (!valid) {
       setState(() {
-        _errorText = 'Must be Green < Yellow < Red < Overtime';
+        _errorText = l10n.timerPresetOrderError;
       });
       return;
     }
@@ -108,6 +110,8 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -119,31 +123,31 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text(
-              'Custom Preset',
+            Text(
+              l10n.timerCustomPreset,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
             _TimeRow(
-              label: 'Green',
+              label: l10n.timerStageGreen,
               minController: _greenMinController,
               secController: _greenSecController,
             ),
             const SizedBox(height: 8),
             _TimeRow(
-              label: 'Yellow',
+              label: l10n.timerStageYellow,
               minController: _yellowMinController,
               secController: _yellowSecController,
             ),
             const SizedBox(height: 8),
             _TimeRow(
-              label: 'Red',
+              label: l10n.timerStageRed,
               minController: _redMinController,
               secController: _redSecController,
             ),
             const SizedBox(height: 8),
             _TimeRow(
-              label: 'Overtime',
+              label: l10n.timerStageOvertime,
               minController: _overtimeMinController,
               secController: _overtimeSecController,
             ),
@@ -167,7 +171,7 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
                     height: 48,
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.buttonCancel),
                     ),
                   ),
                 ),
@@ -177,7 +181,7 @@ class _CustomPresetSheetState extends State<CustomPresetSheet> {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: _save,
-                      child: const Text('Save'),
+                      child: Text(l10n.buttonSave),
                     ),
                   ),
                 ),
@@ -203,6 +207,8 @@ class _TimeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: <Widget>[
         SizedBox(
@@ -217,8 +223,8 @@ class _TimeRow extends StatelessWidget {
           child: TextField(
             controller: minController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Min',
+            decoration: InputDecoration(
+              labelText: l10n.timerUnitMin,
               border: OutlineInputBorder(),
             ),
           ),
@@ -234,8 +240,8 @@ class _TimeRow extends StatelessWidget {
           child: TextField(
             controller: secController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Sec',
+            decoration: InputDecoration(
+              labelText: l10n.timerUnitSec,
               border: OutlineInputBorder(),
             ),
           ),

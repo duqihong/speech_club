@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_routes.dart';
 import '../../features/flashcards/presentation/my_speech_home_page.dart';
+import '../../l10n/app_localizations.dart';
 import '../models/role_model.dart';
 
 class RoleCardScreen extends StatefulWidget {
@@ -18,14 +19,14 @@ class RoleCardScreen extends StatefulWidget {
 }
 
 class _RoleCardScreenState extends State<RoleCardScreen> {
-  String _toolButtonText(String deepLink) {
+  String _toolButtonText(AppLocalizations l10n, String deepLink) {
     if (deepLink == AppRoutes.timer) {
-      return 'Open Timer Tool';
+      return l10n.roleAssistantOpenTimerTool;
     }
     if (deepLink == AppRoutes.tableTopics) {
-      return 'Open Table Topics';
+      return l10n.roleAssistantOpenTableTopics;
     }
-    return 'Open Tool';
+    return l10n.roleAssistantOpenTool;
   }
 
   Widget _buildSectionCard({required String title, required Widget child}) {
@@ -75,9 +76,12 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.role.icon} ${widget.role.title}'),
+        title: Text(
+            '${widget.role.icon} ${_roleTitleLabel(l10n, widget.role.id)}'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -86,23 +90,23 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildSectionCard(
-                title: 'Role Purpose',
+                title: l10n.roleAssistantRolePurpose,
                 child: Text(widget.role.purpose,
                     style: const TextStyle(fontSize: 18)),
               ),
               _buildSectionCard(
-                title: 'Checklist',
+                title: l10n.roleAssistantChecklist,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    _buildChecklistSection('before', 'Before'),
-                    _buildChecklistSection('during', 'During'),
-                    _buildChecklistSection('after', 'After'),
+                    _buildChecklistSection('before', l10n.roleAssistantBefore),
+                    _buildChecklistSection('during', l10n.roleAssistantDuring),
+                    _buildChecklistSection('after', l10n.roleAssistantAfter),
                   ],
                 ),
               ),
               _buildSectionCard(
-                title: 'Quick Tips',
+                title: l10n.roleAssistantQuickTips,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: widget.role.tips
@@ -115,7 +119,7 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
                 ),
               ),
               _buildSectionCard(
-                title: 'Example Phrasing',
+                title: l10n.roleAssistantExamplePhrasing,
                 child: Column(
                   children: widget.role.scripts.map((String script) {
                     return ListTile(
@@ -125,14 +129,14 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: script));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Copied')),
+                          SnackBar(content: Text(l10n.roleAssistantCopied)),
                         );
                       },
                     );
                   }).toList(growable: false),
                 ),
               ),
-              if (widget.role.title == 'Speaker') ...<Widget>[
+              if (widget.role.id == 'speaker') ...<Widget>[
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -145,7 +149,7 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
                       );
                     },
                     icon: const Icon(Icons.note),
-                    label: const Text('Open Speaker Flashcard'),
+                    label: Text(l10n.roleAssistantOpenSpeakerFlashcard),
                   ),
                 ),
               ],
@@ -155,12 +159,35 @@ class _RoleCardScreenState extends State<RoleCardScreen> {
                   onPressed: () {
                     Navigator.of(context).pushNamed(widget.role.deepLink!);
                   },
-                  child: Text(_toolButtonText(widget.role.deepLink!)),
+                  child: Text(_toolButtonText(l10n, widget.role.deepLink!)),
                 ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _roleTitleLabel(AppLocalizations l10n, String roleId) {
+    switch (roleId) {
+      case 'toastmaster_of_the_day':
+        return l10n.roleAssistantTitleToastmasterOfTheDay;
+      case 'timer':
+        return l10n.roleAssistantTitleTimer;
+      case 'table_topics_master':
+        return l10n.roleAssistantTitleTableTopicsMaster;
+      case 'evaluator':
+        return l10n.roleAssistantTitleEvaluator;
+      case 'language_evaluator':
+        return l10n.roleAssistantTitleLanguageEvaluator;
+      case 'ah_counter':
+        return l10n.roleAssistantTitleAhCounter;
+      case 'speaker':
+        return l10n.roleAssistantTitleSpeaker;
+      case 'general_evaluator':
+        return l10n.roleAssistantTitleGeneralEvaluator;
+      default:
+        return roleId;
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../state/table_topics_controller.dart';
 
 class TopicFullscreenView extends StatefulWidget {
@@ -38,8 +39,10 @@ class _TopicFullscreenViewState extends State<TopicFullscreenView> {
 
   @override
   Widget build(BuildContext context) {
-    final String displayTopic =
-        widget.topic.trim().isEmpty ? '(Topic)' : widget.topic;
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final String displayTopic = widget.topic.trim().isEmpty
+        ? l10n.tableTopicsPlaceholderTopic
+        : widget.topic;
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -69,7 +72,7 @@ class _TopicFullscreenViewState extends State<TopicFullscreenView> {
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                tooltip: 'Back',
+                tooltip: l10n.buttonBack,
               ),
             ),
           ],

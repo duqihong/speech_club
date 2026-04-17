@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/topic_dedupe.dart';
 import '../state/table_topics_controller.dart';
 import 'edit_topics_screen.dart';
@@ -58,9 +59,10 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
 
   Widget _buildCategoryChip(String category) {
     final bool selected = _selectedCategories.contains(category);
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return ChoiceChip(
       label: Text(
-        category,
+        _categoryLabel(l10n, category),
         style: _bodyStyle,
         overflow: TextOverflow.ellipsis,
       ),
@@ -213,6 +215,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
   }
 
   Widget _buildActionRows() {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: <Widget>[
         SizedBox(
@@ -222,8 +226,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
               Expanded(
                 child: FilledButton(
                   onPressed: _generate10Topics,
-                  child: const Text(
-                    'Generate 10 Topics',
+                  child: Text(
+                    l10n.tableTopicsGenerate10,
                     style: _bodyStyle,
                   ),
                 ),
@@ -232,8 +236,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
               Expanded(
                 child: FilledButton(
                   onPressed: _openEditTopics,
-                  child: const Text(
-                    'Edit 10 Topics',
+                  child: Text(
+                    l10n.tableTopicsEdit10,
                     style: _bodyStyle,
                   ),
                 ),
@@ -249,8 +253,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
               Expanded(
                 child: FilledButton(
                   onPressed: _openPresenterMode,
-                  child: const Text(
-                    'Presenter Mode',
+                  child: Text(
+                    l10n.tableTopicsPresenterMode,
                     style: _bodyStyle,
                   ),
                 ),
@@ -259,8 +263,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _resetAll,
-                  child: const Text(
-                    'Reset',
+                  child: Text(
+                    l10n.buttonReset,
                     style: _bodyStyle,
                   ),
                 ),
@@ -285,10 +289,51 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     }).toList(growable: false);
   }
 
+  String _categoryLabel(AppLocalizations l10n, String category) {
+    switch (category) {
+      case 'Daily Life':
+        return l10n.tableTopicsCategoryDailyLife;
+      case 'Family':
+        return l10n.tableTopicsCategoryFamily;
+      case 'Travel':
+        return l10n.tableTopicsCategoryTravel;
+      case 'Work & Career':
+        return l10n.tableTopicsCategoryWorkCareer;
+      case 'Friendship':
+        return l10n.tableTopicsCategoryFriendship;
+      case 'Health & Fitness':
+        return l10n.tableTopicsCategoryHealthFitness;
+      case 'Food':
+        return l10n.tableTopicsCategoryFood;
+      case 'Technology':
+        return l10n.tableTopicsCategoryTechnology;
+      case 'Money':
+        return l10n.tableTopicsCategoryMoney;
+      case 'Education':
+        return l10n.tableTopicsCategoryEducation;
+      case 'Hobbies':
+        return l10n.tableTopicsCategoryHobbies;
+      case 'Leadership':
+        return l10n.tableTopicsCategoryLeadership;
+      case 'Communication':
+        return l10n.tableTopicsCategoryCommunication;
+      case 'Values':
+        return l10n.tableTopicsCategoryValues;
+      case 'Culture':
+        return l10n.tableTopicsCategoryCulture;
+      case 'Fun & Humor':
+        return l10n.tableTopicsCategoryFunHumor;
+      default:
+        return category;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Table Topics')),
+      appBar: AppBar(title: Text(l10n.tableTopicsTitle)),
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,
@@ -303,11 +348,12 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('Error: ${_controller.error}'),
+                    Text(
+                        '${l10n.tableTopicsErrorPrefix}: ${_controller.error}'),
                     const SizedBox(height: 12),
                     FilledButton(
                       onPressed: _controller.init,
-                      child: const Text('Retry', style: _smallStyle),
+                      child: Text(l10n.buttonRetry, style: _smallStyle),
                     ),
                   ],
                 ),
@@ -323,8 +369,8 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
               children: <Widget>[
-                const Text(
-                  'Categories Selection',
+                Text(
+                  l10n.tableTopicsCategoriesSelection,
                   style: _titleStyle,
                 ),
                 const SizedBox(height: 10),

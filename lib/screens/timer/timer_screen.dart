@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../shared/app_colors.dart';
 import '../../shared/app_sizes.dart';
 import '../../storage/timer_prefs.dart';
@@ -196,19 +197,20 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   Future<void> _handleBackPressed() async {
     if (_isRunning) {
+      final AppLocalizations l10n = AppLocalizations.of(context)!;
       final bool? ok = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Exit Timer?'),
-          content: const Text('Timer is running. Exit anyway?'),
+          title: Text(l10n.dialogExitTimerTitle),
+          content: Text(l10n.dialogExitTimerMessage),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.buttonCancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Exit'),
+              child: Text(l10n.buttonExit),
             ),
           ],
         ),
@@ -285,6 +287,16 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     await TimerPrefs.saveCustomPreset(updatedPreset);
   }
 
+  String _presetLabel(BuildContext context, TimerPreset preset) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
+    if (preset.isCustom) {
+      return l10n.timerCustomPreset;
+    }
+
+    return preset.name;
+  }
+
   Widget _buildPresetDropdown() {
     return DropdownButtonFormField<TimerPreset>(
       key: ValueKey<String>(
@@ -307,7 +319,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
             (TimerPreset preset) => DropdownMenuItem<TimerPreset>(
               value: preset,
               child: Text(
-                preset.name,
+                _presetLabel(context, preset),
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
                 maxLines: 1,
@@ -325,7 +337,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
               (TimerPreset preset) => Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  preset.name,
+                  _presetLabel(context, preset),
                   overflow: TextOverflow.ellipsis,
                   softWrap: false,
                   maxLines: 1,
@@ -384,7 +396,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         onPressed: onPressed,
         iconSize: iconSize,
         splashRadius: AppSizes.splashRadius,
-        tooltip: 'Test panel',
+        tooltip: AppLocalizations.of(context)!.timerTestPanel,
         icon: Stack(
           alignment: Alignment.center,
           children: <Widget>[
@@ -415,6 +427,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final Color backgroundColor = _previewColor ?? _baseColor;
     final bool canReset = _stage == TimerStage.overtime;
 
@@ -448,7 +461,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                       color: AppColors.white,
                                       size: 30,
                                     ),
-                                    tooltip: 'Edit custom preset',
+                                    tooltip: l10n.timerEditCustomPreset,
                                   ),
                                 ],
                                 const SizedBox(width: 8),
@@ -475,12 +488,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                               ),
                             ),
                             if (canReset)
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.fromLTRB(16, 0, 16, 88),
                                 child: Text(
-                                  'Overtime reached. Tap anywhere to reset.',
+                                  l10n.timerOvertimeReachedHint,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 24,
                                     fontWeight: FontWeight.w600,
@@ -503,11 +516,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                               children: <Widget>[
                                 _buildActionButton(
                                   onPressed: _isRunning ? _stop : _start,
-                                  label: _isRunning ? 'Stop' : 'Start',
+                                  label: _isRunning
+                                      ? l10n.buttonStop
+                                      : l10n.buttonStart,
                                 ),
                                 _buildActionButton(
                                   onPressed: _resetTimer,
-                                  label: 'Reset',
+                                  label: l10n.buttonReset,
                                 ),
                               ],
                             ),

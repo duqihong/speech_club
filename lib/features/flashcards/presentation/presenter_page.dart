@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 class PresenterPage extends StatefulWidget {
   final List<String> cards;
   final int initialIndex;
@@ -48,11 +50,13 @@ class _PresenterPageState extends State<PresenterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     if (widget.cards.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Presenter')),
-        body: const Center(
-          child: Text('No cards to present.'),
+        appBar: AppBar(title: Text(l10n.flashcardsPresenter)),
+        body: Center(
+          child: Text(l10n.flashcardsNoCardsToPresent),
         ),
       );
     }
@@ -111,7 +115,7 @@ class _PresenterPageState extends State<PresenterPage> {
                       IconButton(
                         icon: Icon(Icons.arrow_back, color: fg),
                         onPressed: () => Navigator.of(context).pop(),
-                        tooltip: 'Back',
+                        tooltip: l10n.buttonBack,
                       ),
                       const Spacer(),
                       IconButton(
@@ -120,7 +124,7 @@ class _PresenterPageState extends State<PresenterPage> {
                           color: fg,
                         ),
                         onPressed: () => setState(() => _dark = !_dark),
-                        tooltip: 'Toggle theme',
+                        tooltip: l10n.flashcardsToggleTheme,
                       ),
                     ],
                   ),
