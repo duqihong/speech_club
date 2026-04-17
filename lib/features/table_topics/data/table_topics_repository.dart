@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import '../../expressions/data/expression_content_repository.dart';
 import 'bilingual_table_topics_repository.dart';
-import 'bilingual_topic_library_adapter.dart';
 import 'models/category_selection.dart';
 import 'models/bilingual_table_topic_content.dart';
 import 'models/table_topic_session_item.dart';
@@ -13,20 +13,25 @@ import 'table_topics_storage.dart';
 import 'topic_library_loader.dart';
 
 class TableTopicsRepository {
+  static const String englishSourceExpressionsCategory =
+      'english_source_expressions';
+  static const String chineseSourceExpressionsCategory =
+      'chinese_source_expressions';
+
   TableTopicsRepository({
     BilingualTableTopicsRepository? bilingualRepository,
-    BilingualTopicLibraryAdapter? bilingualAdapter,
+    ExpressionContentRepository? expressionRepository,
     TopicLibraryLoader? loader,
     TableTopicsStorage? storage,
   })  : _bilingualRepository =
             bilingualRepository ?? BilingualTableTopicsRepository(),
-        _bilingualAdapter =
-            bilingualAdapter ?? const BilingualTopicLibraryAdapter(),
+        _expressionRepository =
+            expressionRepository ?? ExpressionContentRepository(),
         _loader = loader ?? TopicLibraryLoader(),
         _storage = storage ?? TableTopicsStorage();
 
   final BilingualTableTopicsRepository _bilingualRepository;
-  final BilingualTopicLibraryAdapter _bilingualAdapter;
+  final ExpressionContentRepository _expressionRepository;
   final TopicLibraryLoader _loader;
   final TableTopicsStorage _storage;
 
@@ -45,9 +50,10 @@ class TableTopicsRepository {
 
     TopicLibrary loaded;
     try {
-      final bilingualBundle = await _bilingualRepository.load();
-      loaded = _bilingualAdapter.toTopicLibrary(
-        bundle: bilingualBundle,
+      final Map<String, BilingualTableTopicContent> topicsById =
+          await _getBuiltInTopicsById();
+      loaded = _buildTopicLibrary(
+        items: topicsById.values,
         locale: locale,
       );
     } catch (_) {
@@ -115,7 +121,7 @@ class TableTopicsRepository {
               TableTopicSessionItem.builtIn(item.id))
           .toList(growable: false),
       topics: selected
-          .map((BilingualTableTopicContent item) => item.text.forLocale(locale))
+          .map((BilingualTableTopicContent item) => _displayText(item, locale))
           .toList(growable: false),
     );
   }
@@ -130,7 +136,7 @@ class TableTopicsRepository {
     return items.map((TableTopicSessionItem item) {
       if (item.isBuiltIn) {
         final BilingualTableTopicContent? topic = topicsById[item.topicId];
-        return topic?.text.forLocale(locale) ?? '';
+        return topic == null ? '' : _displayText(topic, locale);
       }
 
       return item.customText ?? '';
@@ -164,9 +170,11 @@ class TableTopicsRepository {
         await _getBuiltInTopicsById();
     final List<BilingualTableTopicContent> allTopics =
         topicsById.values.toList(growable: false);
+    final List<BilingualTableTopicContent> defaultPool =
+        _buildDefaultTopicPool(allTopics, selection);
 
     if (selection.randomAll) {
-      return allTopics;
+      return defaultPool;
     }
 
     final List<BilingualTableTopicContent> selectedPool = allTopics
@@ -175,10 +183,23 @@ class TableTopicsRepository {
         .toList(growable: false);
 
     if (selectedPool.length < 10) {
-      return allTopics;
+      return defaultPool;
     }
 
     return selectedPool;
+  }
+
+  List<BilingualTableTopicContent> _buildDefaultTopicPool(
+    List<BilingualTableTopicContent> allTopics,
+    CategorySelection selection,
+  ) {
+    return allTopics.where((BilingualTableTopicContent item) {
+      if (!_isExpressionCategory(item.category)) {
+        return true;
+      }
+
+      return selection.selectedCategories.contains(item.category);
+    }).toList(growable: false);
   }
 
   List<BilingualTableTopicContent> _dedupeBuiltInTopicsById(
@@ -208,11 +229,17 @@ class TableTopicsRepository {
     }
 
     try {
-      final bundle = await _bilingualRepository.load();
+      final tableTopicsBundle = await _bilingualRepository.load();
+      final List<BilingualTableTopicContent> expressionItems =
+          await _loadExpressionTopics();
+      final List<BilingualTableTopicContent> items =
+          <BilingualTableTopicContent>[
+        ...tableTopicsBundle.items,
+        ...expressionItems,
+      ];
       final Map<String, BilingualTableTopicContent> byId =
           <String, BilingualTableTopicContent>{
-        for (final BilingualTableTopicContent item in bundle.items)
-          item.id: item,
+        for (final BilingualTableTopicContent item in items) item.id: item,
       };
       _cachedBuiltInTopicsById = byId;
       return byId;
@@ -236,7 +263,7 @@ class TableTopicsRepository {
     final Map<String, String> idsByText = <String, String>{};
 
     for (final BilingualTableTopicContent item in topicsById.values) {
-      final String text = item.text.forLocale(locale).trim();
+      final String text = _displayText(item, locale).trim();
       if (text.isNotEmpty) {
         idsByText[text] = item.id;
       }
@@ -244,5 +271,83 @@ class TableTopicsRepository {
 
     _cachedTopicIdsByTextByLanguageCode[languageCode] = idsByText;
     return idsByText;
+  }
+
+  Future<List<BilingualTableTopicContent>> _loadExpressionTopics() async {
+    final englishBundle = await _expressionRepository.loadEnglishSource();
+    final chineseBundle = await _expressionRepository.loadChineseSource();
+
+    return <BilingualTableTopicContent>[
+      ...englishBundle.items.map(
+        (item) => BilingualTableTopicContent(
+          id: item.id,
+          category: englishSourceExpressionsCategory,
+          text: item.text,
+        ),
+      ),
+      ...chineseBundle.items.map(
+        (item) => BilingualTableTopicContent(
+          id: item.id,
+          category: chineseSourceExpressionsCategory,
+          text: item.text,
+        ),
+      ),
+    ];
+  }
+
+  TopicLibrary _buildTopicLibrary({
+    required Iterable<BilingualTableTopicContent> items,
+    required Locale locale,
+  }) {
+    final Map<String, List<String>> categories = <String, List<String>>{};
+
+    for (final BilingualTableTopicContent item in items) {
+      final String text = _displayText(item, locale).trim();
+      if (text.isEmpty) {
+        continue;
+      }
+
+      categories.putIfAbsent(item.category, () => <String>[]).add(text);
+    }
+
+    return TopicLibrary(categories: categories);
+  }
+
+  String _displayText(BilingualTableTopicContent item, Locale locale) {
+    switch (item.category) {
+      case englishSourceExpressionsCategory:
+        return _formatPairedText(
+          source: item.text.en,
+          translation: item.text.zh,
+        );
+      case chineseSourceExpressionsCategory:
+        return _formatPairedText(
+          source: item.text.zh,
+          translation: item.text.en,
+        );
+      default:
+        return item.text.forLocale(locale);
+    }
+  }
+
+  bool _isExpressionCategory(String category) {
+    return category == englishSourceExpressionsCategory ||
+        category == chineseSourceExpressionsCategory;
+  }
+
+  String _formatPairedText({
+    required String source,
+    required String translation,
+  }) {
+    final String trimmedSource = source.trim();
+    final String trimmedTranslation = translation.trim();
+    if (trimmedSource.isEmpty) {
+      return trimmedTranslation;
+    }
+    if (trimmedTranslation.isEmpty) {
+      return trimmedSource;
+    }
+
+    return '$trimmedSource\n$trimmedTranslation';
   }
 }

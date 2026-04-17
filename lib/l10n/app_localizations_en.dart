@@ -18,9 +18,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSpeaker => 'Speaker';
 
   @override
-  String get navExpressions => 'Expressions';
-
-  @override
   String get navTableTopics => 'Table Topics';
 
   @override
@@ -224,6 +221,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tableTopicsCategoryFunHumor => 'Fun & Humor';
 
   @override
+  String get tableTopicsCategoryEnglishSourceExpressions =>
+      'English Source Expressions';
+
+  @override
+  String get tableTopicsCategoryChineseSourceExpressions =>
+      'Chinese Source Expressions';
+
+  @override
   String get flashcardsMySpeech => 'My Speech';
 
   @override
@@ -343,42 +348,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleAssistantTitleGeneralEvaluator => 'General Evaluator';
-
-  @override
-  String get expressionsTitle => 'Expressions';
-
-  @override
-  String get expressionsEnglishTab => 'English Expressions';
-
-  @override
-  String get expressionsChineseTab => 'Chinese Expressions';
-
-  @override
-  String get expressionsSourceLabel => 'Source';
-
-  @override
-  String get expressionsTranslationLabel => 'Translation';
-
-  @override
-  String get expressionsKindIdiom => 'Idiom';
-
-  @override
-  String get expressionsKindSlang => 'Slang';
-
-  @override
-  String get expressionsKindProverb => 'Proverb';
-
-  @override
-  String get expressionsKindPhrase => 'Phrase';
-
-  @override
-  String get expressionsKindChengyu => 'Chengyu';
-
-  @override
-  String get expressionsKindSaying => 'Saying';
-
-  @override
-  String get expressionsLoadError => 'Failed to load expressions';
 
   @override
   String get languageMenuLabel => 'Language';

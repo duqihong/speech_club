@@ -201,9 +201,11 @@ class TableTopicsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetSession() {
+  Future<void> resetSession() async {
+    selection = CategorySelection.defaults();
     topicSet = null;
-    persistSession();
+    isCustomMode = false;
+    await _repository.clearSession();
     notifyListeners();
   }
 

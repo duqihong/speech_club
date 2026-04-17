@@ -144,7 +144,11 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
     });
   }
 
-  void _resetAll() {
+  Future<void> _resetAll() async {
+    await _controller.resetSession();
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _selectedCategories.clear();
       _topics = _makeBlankTopics();
@@ -277,6 +281,10 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
         return l10n.tableTopicsCategoryCulture;
       case 'Fun & Humor':
         return l10n.tableTopicsCategoryFunHumor;
+      case 'english_source_expressions':
+        return l10n.tableTopicsCategoryEnglishSourceExpressions;
+      case 'chinese_source_expressions':
+        return l10n.tableTopicsCategoryChineseSourceExpressions;
       default:
         return category;
     }

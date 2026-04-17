@@ -3,7 +3,8 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:speech_club/features/table_topics/data/models/table_topics_session.dart';
+import 'package:speech_club/features/table_topics/data/models/category_selection.dart';
+import 'package:speech_club/features/table_topics/data/table_topics_repository.dart';
 import 'package:speech_club/features/table_topics/data/table_topics_storage.dart';
 import 'package:speech_club/features/table_topics/state/table_topics_controller.dart';
 
@@ -104,6 +105,145 @@ void main() {
       controller.topicSet?.items.every((item) => item.isBuiltIn),
       isTrue,
     );
+    expect(
+      controller.topicSet?.items
+          .map((item) => item.topicId!)
+          .every((String id) => id.startsWith('tt_')),
+      isTrue,
+    );
+  });
+
+  test('generate10 includes only selected English source expressions',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    await controller.generateBuiltInTopics(
+      selectedCategories: <String>{
+        TableTopicsRepository.englishSourceExpressionsCategory,
+      },
+      locale: const Locale('en'),
+    );
+
+    expect(
+      controller.topicSet?.items
+          .map((item) => item.topicId!)
+          .every((String id) => id.startsWith('expr_en_')),
+      isTrue,
+    );
+  });
+
+  test('generate10 includes only selected Chinese source expressions',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('zh'));
+    await controller.generateBuiltInTopics(
+      selectedCategories: <String>{
+        TableTopicsRepository.chineseSourceExpressionsCategory,
+      },
+      locale: const Locale('zh'),
+    );
+
+    expect(
+      controller.topicSet?.items
+          .map((item) => item.topicId!)
+          .every((String id) => id.startsWith('expr_zh_')),
+      isTrue,
+    );
+  });
+
+  test('reset clears generated topic set and leaves a clean empty state',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    await controller.generate10();
+
+    expect(controller.topicSet?.topics.length, 10);
+
+    await controller.resetSession();
+
+    expect(controller.topicSet, isNull);
+    expect(controller.selection.selectedCategories, isEmpty);
+    expect(controller.selection.randomAll, isTrue);
+    expect(controller.isCustomMode, isFalse);
+  });
+
+  test('reset clears persisted generated session so old topics do not reload',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    await controller.generate10();
+    final String previousFirstTopic = controller.topicSet!.topics.first;
+
+    await controller.resetSession();
+    await controller.init(locale: const Locale('en'));
+
+    expect(controller.topicSet, isNull);
+    expect(controller.selection.selectedCategories, isEmpty);
+    expect(controller.selection.randomAll, isTrue);
+    expect(previousFirstTopic, isNotEmpty);
+  });
+
+  test('generate still works normally after reset', () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    await controller.generate10();
+    await controller.resetSession();
+    await controller.generate10();
+
+    expect(controller.topicSet?.topics.length, 10);
+    expect(controller.topicSet?.items.every((item) => item.isBuiltIn), isTrue);
+  });
+
+  test(
+      'expression built-ins keep source-first paired display across locale switches',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    await controller.generateBuiltInTopics(
+      selectedCategories: <String>{
+        TableTopicsRepository.englishSourceExpressionsCategory,
+      },
+      locale: const Locale('en'),
+    );
+
+    final String firstTopic = controller.topicSet!.topics.first;
+    final String firstId = controller.topicSet!.items.first.topicId!;
+
+    expect(firstId.startsWith('expr_en_'), isTrue);
+    expect(firstTopic, contains('\n'));
+
+    await controller.init(locale: const Locale('zh'));
+
+    expect(controller.topicSet?.items.first.topicId, firstId);
+    expect(controller.topicSet?.topics.first, firstTopic);
+  });
+
+  test('selected expression categories persist safely in session state',
+      () async {
+    final TableTopicsController controller = TableTopicsController();
+
+    await controller.init(locale: const Locale('en'));
+    controller.selection = CategorySelection(
+      selectedCategories: <String>{
+        TableTopicsRepository.chineseSourceExpressionsCategory,
+      },
+      randomAll: false,
+    );
+    await controller.persistSession();
+
+    await controller.init(locale: const Locale('zh'));
+
+    expect(
+      controller.selection.selectedCategories,
+      contains(TableTopicsRepository.chineseSourceExpressionsCategory),
+    );
+    expect(controller.selection.randomAll, isFalse);
   });
 
   test('edited built-in text converts safely to custom text', () async {

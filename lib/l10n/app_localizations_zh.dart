@@ -18,10 +18,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navSpeaker => '演讲卡片';
 
   @override
-  String get navExpressions => '表达锦囊';
-
-  @override
-  String get navTableTopics => '即兴问答';
+  String get navTableTopics => '即席演讲';
 
   @override
   String get navRoleAssistant => '角色助手';
@@ -123,7 +120,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get timerPresetOrderError => '必须满足 绿灯 < 黄灯 < 红灯 < 超时';
 
   @override
-  String get tableTopicsTitle => '即兴问答';
+  String get tableTopicsTitle => '即席演讲';
 
   @override
   String get tableTopicsGenerate10 => '生成 10 个题目';
@@ -221,6 +218,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tableTopicsCategoryFunHumor => '趣味幽默';
 
   @override
+  String get tableTopicsCategoryEnglishSourceExpressions => '英语来源表达';
+
+  @override
+  String get tableTopicsCategoryChineseSourceExpressions => '中文来源表达';
+
+  @override
   String get flashcardsMySpeech => '我的演讲';
 
   @override
@@ -316,64 +319,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get roleAssistantOpenSpeakerFlashcard => '打开演讲卡片';
 
   @override
-  String get roleAssistantTitleToastmasterOfTheDay => '大会主持人';
+  String get roleAssistantTitleToastmasterOfTheDay => '司仪';
 
   @override
   String get roleAssistantTitleTimer => '计时员';
 
   @override
-  String get roleAssistantTitleTableTopicsMaster => '即兴问答主持';
+  String get roleAssistantTitleTableTopicsMaster => '即席演讲主持';
 
   @override
-  String get roleAssistantTitleEvaluator => '点评员';
+  String get roleAssistantTitleEvaluator => '评论员';
 
   @override
-  String get roleAssistantTitleLanguageEvaluator => '语言点评员';
+  String get roleAssistantTitleLanguageEvaluator => '语言评论';
 
   @override
-  String get roleAssistantTitleAhCounter => '语助词记录员';
+  String get roleAssistantTitleAhCounter => '尾音记录员';
 
   @override
   String get roleAssistantTitleSpeaker => '演讲者';
 
   @override
-  String get roleAssistantTitleGeneralEvaluator => '总点评员';
-
-  @override
-  String get expressionsTitle => '表达锦囊';
-
-  @override
-  String get expressionsEnglishTab => '英语表达';
-
-  @override
-  String get expressionsChineseTab => '中文表达';
-
-  @override
-  String get expressionsSourceLabel => '原文';
-
-  @override
-  String get expressionsTranslationLabel => '译文';
-
-  @override
-  String get expressionsKindIdiom => '习语';
-
-  @override
-  String get expressionsKindSlang => '俚语';
-
-  @override
-  String get expressionsKindProverb => '谚语';
-
-  @override
-  String get expressionsKindPhrase => '短语';
-
-  @override
-  String get expressionsKindChengyu => '成语';
-
-  @override
-  String get expressionsKindSaying => '俗语';
-
-  @override
-  String get expressionsLoadError => '加载表达内容失败';
+  String get roleAssistantTitleGeneralEvaluator => '总评论';
 
   @override
   String get languageMenuLabel => '语言';

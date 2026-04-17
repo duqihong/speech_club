@@ -116,12 +116,6 @@ abstract class AppLocalizations {
   /// **'Speaker'**
   String get navSpeaker;
 
-  /// No description provided for @navExpressions.
-  ///
-  /// In en, this message translates to:
-  /// **'Expressions'**
-  String get navExpressions;
-
   /// No description provided for @navTableTopics.
   ///
   /// In en, this message translates to:
@@ -518,6 +512,18 @@ abstract class AppLocalizations {
   /// **'Fun & Humor'**
   String get tableTopicsCategoryFunHumor;
 
+  /// No description provided for @tableTopicsCategoryEnglishSourceExpressions.
+  ///
+  /// In en, this message translates to:
+  /// **'English Source Expressions'**
+  String get tableTopicsCategoryEnglishSourceExpressions;
+
+  /// No description provided for @tableTopicsCategoryChineseSourceExpressions.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese Source Expressions'**
+  String get tableTopicsCategoryChineseSourceExpressions;
+
   /// No description provided for @flashcardsMySpeech.
   ///
   /// In en, this message translates to:
@@ -751,78 +757,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'General Evaluator'**
   String get roleAssistantTitleGeneralEvaluator;
-
-  /// No description provided for @expressionsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Expressions'**
-  String get expressionsTitle;
-
-  /// No description provided for @expressionsEnglishTab.
-  ///
-  /// In en, this message translates to:
-  /// **'English Expressions'**
-  String get expressionsEnglishTab;
-
-  /// No description provided for @expressionsChineseTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese Expressions'**
-  String get expressionsChineseTab;
-
-  /// No description provided for @expressionsSourceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Source'**
-  String get expressionsSourceLabel;
-
-  /// No description provided for @expressionsTranslationLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation'**
-  String get expressionsTranslationLabel;
-
-  /// No description provided for @expressionsKindIdiom.
-  ///
-  /// In en, this message translates to:
-  /// **'Idiom'**
-  String get expressionsKindIdiom;
-
-  /// No description provided for @expressionsKindSlang.
-  ///
-  /// In en, this message translates to:
-  /// **'Slang'**
-  String get expressionsKindSlang;
-
-  /// No description provided for @expressionsKindProverb.
-  ///
-  /// In en, this message translates to:
-  /// **'Proverb'**
-  String get expressionsKindProverb;
-
-  /// No description provided for @expressionsKindPhrase.
-  ///
-  /// In en, this message translates to:
-  /// **'Phrase'**
-  String get expressionsKindPhrase;
-
-  /// No description provided for @expressionsKindChengyu.
-  ///
-  /// In en, this message translates to:
-  /// **'Chengyu'**
-  String get expressionsKindChengyu;
-
-  /// No description provided for @expressionsKindSaying.
-  ///
-  /// In en, this message translates to:
-  /// **'Saying'**
-  String get expressionsKindSaying;
-
-  /// No description provided for @expressionsLoadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load expressions'**
-  String get expressionsLoadError;
 
   /// No description provided for @languageMenuLabel.
   ///

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speech_club/features/table_topics/data/bilingual_table_topics_repository.dart';
 import 'package:speech_club/features/table_topics/data/models/category_selection.dart';
+import 'package:speech_club/features/table_topics/data/models/table_topic_session_item.dart';
 import 'package:speech_club/features/table_topics/data/table_topics_repository.dart';
 import 'package:speech_club/features/table_topics/domain/topic_service.dart';
 
@@ -45,8 +46,26 @@ void main() {
     final library = await repository.getLibrary(locale: const Locale('zh'));
 
     expect(library.categoryNames, contains('Daily Life'));
-    expect(library.totalTopicCount, 200);
+    expect(
+      library.categoryNames,
+      contains(TableTopicsRepository.englishSourceExpressionsCategory),
+    );
+    expect(
+      library.categoryNames,
+      contains(TableTopicsRepository.chineseSourceExpressionsCategory),
+    );
+    expect(library.totalTopicCount, 400);
     expect(library.categories['Daily Life']?.first, '请描述你理想中的平日作息。');
+    expect(
+      library.categories[TableTopicsRepository.englishSourceExpressionsCategory]
+          ?.first,
+      'Break the ice\n打破僵局',
+    );
+    expect(
+      library.categories[TableTopicsRepository.chineseSourceExpressionsCategory]
+          ?.first,
+      '勇敢迈出第一步\nTake the first step bravely',
+    );
   });
 
   test('existing generation flow still returns 10 topics from built-in content',
@@ -76,5 +95,130 @@ void main() {
     expect(topicSet.items.length, 10);
     expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
     expect(topicSet.items.every((item) => item.topicId != null), isTrue);
+  });
+
+  test(
+      'default built-in generation excludes expression categories when none are selected',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection.defaults(),
+      locale: const Locale('en'),
+    );
+
+    expect(
+      topicSet.items
+          .map((TableTopicSessionItem item) => item.topicId!)
+          .every((String id) => id.startsWith('tt_')),
+      isTrue,
+    );
+    expect(
+      topicSet.topics.every((String topic) => !topic.contains('\n')),
+      isTrue,
+    );
+  });
+
+  test(
+      'english source expressions category generates built-in expression items',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection(
+        selectedCategories: <String>{
+          TableTopicsRepository.englishSourceExpressionsCategory,
+        },
+        randomAll: false,
+      ),
+      locale: const Locale('zh'),
+    );
+
+    expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
+    expect(
+      topicSet.items.every((item) => item.topicId!.startsWith('expr_en_')),
+      isTrue,
+    );
+    expect(
+      topicSet.topics.every(
+        (topic) => topic.contains('\n') && topic.indexOf('\n') > 0,
+      ),
+      isTrue,
+    );
+  });
+
+  test(
+      'selected English source expressions do not pull in unselected Chinese source expressions',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection(
+        selectedCategories: <String>{
+          'Daily Life',
+          TableTopicsRepository.englishSourceExpressionsCategory,
+        },
+        randomAll: false,
+      ),
+      locale: const Locale('en'),
+    );
+
+    expect(
+      topicSet.items
+          .map((TableTopicSessionItem item) => item.topicId!)
+          .every((String id) => !id.startsWith('expr_zh_')),
+      isTrue,
+    );
+  });
+
+  test(
+      'chinese source expressions category generates built-in expression items',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection(
+        selectedCategories: <String>{
+          TableTopicsRepository.chineseSourceExpressionsCategory,
+        },
+        randomAll: false,
+      ),
+      locale: const Locale('en'),
+    );
+
+    expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
+    expect(
+      topicSet.items.every((item) => item.topicId!.startsWith('expr_zh_')),
+      isTrue,
+    );
+    expect(
+      topicSet.topics.every(
+        (topic) => topic.contains('\n') && topic.indexOf('\n') > 0,
+      ),
+      isTrue,
+    );
+  });
+
+  test(
+      'selected Chinese source expressions do not pull in unselected English source expressions',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection(
+        selectedCategories: <String>{
+          'Daily Life',
+          TableTopicsRepository.chineseSourceExpressionsCategory,
+        },
+        randomAll: false,
+      ),
+      locale: const Locale('zh'),
+    );
+
+    expect(
+      topicSet.items
+          .map((TableTopicSessionItem item) => item.topicId!)
+          .every((String id) => !id.startsWith('expr_en_')),
+      isTrue,
+    );
   });
 }
