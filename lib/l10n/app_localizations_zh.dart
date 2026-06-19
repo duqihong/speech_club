@@ -30,6 +30,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navCommittees => '委员职责';
 
   @override
+  String get navPathways => '学习路径';
+
+  @override
   String get buttonStart => '开始';
 
   @override
@@ -380,6 +383,31 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get topicSelectionOpeningLines => '开场句参考';
+
+  @override
+  String get pathwaysTitle => '学习路径';
+
+  @override
+  String get pathwaysIntro => '学习路径帮助你一步一步提升演讲、自信、领导力和沟通能力。';
+
+  @override
+  String get pathwaysBaseCampNote =>
+      '这是俱乐部内使用的简明参考。正式项目要求请以 Toastmasters Base Camp 为准。';
+
+  @override
+  String get pathwaysWhatThisPathBuilds => '这条路径训练什么';
+
+  @override
+  String get pathwaysGoodForMembers => '适合这样的会员';
+
+  @override
+  String get pathwaysTypicalSpeechFocus => '常见演讲重点';
+
+  @override
+  String get pathwaysHowToStart => '如何开始';
+
+  @override
+  String get pathwaysMentorTips => '导师提示';
 
   @override
   String get languageMenuLabel => '语言';

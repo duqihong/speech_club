@@ -5,4 +5,5 @@ class AppRoutes {
   static const String tableTopics = '/table-topics';
   static const String roleAssistant = '/role-assistant';
   static const String committees = '/committees';
+  static const String pathways = '/pathways';
 }

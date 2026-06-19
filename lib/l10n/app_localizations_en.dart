@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navCommittees => 'Committees';
 
   @override
+  String get navPathways => 'Pathways';
+
+  @override
   String get buttonStart => 'Start';
 
   @override
@@ -388,6 +391,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get topicSelectionOpeningLines => 'Opening Lines';
+
+  @override
+  String get pathwaysTitle => 'Pathways';
+
+  @override
+  String get pathwaysIntro =>
+      'Pathways helps you grow step by step in speaking, confidence, leadership, and communication.';
+
+  @override
+  String get pathwaysBaseCampNote =>
+      'Use this as a simple club guide. For official project details, check Toastmasters Base Camp.';
+
+  @override
+  String get pathwaysWhatThisPathBuilds => 'What This Path Builds';
+
+  @override
+  String get pathwaysGoodForMembers => 'Good For Members Who Want To';
+
+  @override
+  String get pathwaysTypicalSpeechFocus => 'Typical Speech Focus';
+
+  @override
+  String get pathwaysHowToStart => 'How to Start';
+
+  @override
+  String get pathwaysMentorTips => 'Mentor Tips';
 
   @override
   String get languageMenuLabel => 'Language';

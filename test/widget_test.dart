@@ -25,5 +25,11 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     expect(find.text('Committees'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Pathways'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Pathways'), findsOneWidget);
   });
 }

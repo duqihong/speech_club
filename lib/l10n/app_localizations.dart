@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Committees'**
   String get navCommittees;
 
+  /// No description provided for @navPathways.
+  ///
+  /// In en, this message translates to:
+  /// **'Pathways'**
+  String get navPathways;
+
   /// No description provided for @buttonStart.
   ///
   /// In en, this message translates to:
@@ -835,6 +841,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Opening Lines'**
   String get topicSelectionOpeningLines;
+
+  /// No description provided for @pathwaysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pathways'**
+  String get pathwaysTitle;
+
+  /// No description provided for @pathwaysIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pathways helps you grow step by step in speaking, confidence, leadership, and communication.'**
+  String get pathwaysIntro;
+
+  /// No description provided for @pathwaysBaseCampNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this as a simple club guide. For official project details, check Toastmasters Base Camp.'**
+  String get pathwaysBaseCampNote;
+
+  /// No description provided for @pathwaysWhatThisPathBuilds.
+  ///
+  /// In en, this message translates to:
+  /// **'What This Path Builds'**
+  String get pathwaysWhatThisPathBuilds;
+
+  /// No description provided for @pathwaysGoodForMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Good For Members Who Want To'**
+  String get pathwaysGoodForMembers;
+
+  /// No description provided for @pathwaysTypicalSpeechFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical Speech Focus'**
+  String get pathwaysTypicalSpeechFocus;
+
+  /// No description provided for @pathwaysHowToStart.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Start'**
+  String get pathwaysHowToStart;
+
+  /// No description provided for @pathwaysMentorTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentor Tips'**
+  String get pathwaysMentorTips;
 
   /// No description provided for @languageMenuLabel.
   ///
