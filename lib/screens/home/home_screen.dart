@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final MediaQueryData mediaQuery = MediaQuery.of(context);
-    final double logoWidth = (mediaQuery.size.width * 0.34).clamp(116.0, 148.0);
+    final double logoWidth = (mediaQuery.size.width * 0.30).clamp(104.0, 128.0);
 
     final List<_HomeDestination> destinations = <_HomeDestination>[
       _HomeDestination(
@@ -94,9 +94,10 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 8),
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -106,7 +107,7 @@ class HomeScreen extends StatelessWidget {
                 height: logoWidth,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 8),
               GridView.builder(
                 itemCount: destinations.length,
                 shrinkWrap: true,
@@ -115,7 +116,7 @@ class HomeScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  mainAxisExtent: 132,
+                  mainAxisExtent: 128,
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   final _HomeDestination destination = destinations[index];
@@ -160,6 +161,30 @@ class _HomeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isChinese = Localizations.localeOf(context).languageCode == 'zh';
+    final TextStyle titleStyle = TextStyle(
+      fontSize: isChinese ? 28 : 22,
+      fontWeight: FontWeight.w600,
+      height: 1.08,
+      color: const Color(0xFF355E86),
+    );
+    final bool isSingleEnglishWord = !isChinese && !title.contains(' ');
+    final Widget titleText = isSingleEnglishWord
+        ? FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              title,
+              maxLines: 2,
+              softWrap: false,
+              style: titleStyle,
+            ),
+          )
+        : Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: titleStyle,
+          );
 
     return Material(
       color: Colors.white.withValues(alpha: 0.55),
@@ -168,26 +193,16 @@ class _HomeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Icon(icon, size: 30, color: const Color(0xFF355E86)),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: isChinese ? 28 : 24,
-                      fontWeight: FontWeight.w600,
-                      height: 1.08,
-                      color: const Color(0xFF355E86),
-                    ),
-                  ),
+                  child: titleText,
                 ),
               ),
             ],
