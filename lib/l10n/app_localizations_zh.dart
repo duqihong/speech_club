@@ -349,49 +349,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get committeesTitle => '委员会';
 
   @override
-  String get committeesHelpText => '简单记录俱乐部干部和帮手名单，保存在本机。';
+  String get committeesRolePurpose => '角色职责';
 
   @override
-  String get committeesNotAssigned => '暂未安排';
+  String get committeesKeyResponsibilities => '主要责任';
 
   @override
-  String get committeesAddRole => '添加角色';
-
-  @override
-  String get committeesResetDefaultRoles => '重置默认角色';
-
-  @override
-  String get committeesResetDialogTitle => '重置默认角色？';
-
-  @override
-  String get committeesResetDialogMessage => '这会用默认角色替换当前委员会名单。';
-
-  @override
-  String get committeesRoleTitle => '角色名称';
-
-  @override
-  String get committeesMemberName => '成员姓名';
-
-  @override
-  String get committeesPhoneOrEmail => '电话或邮箱';
-
-  @override
-  String get committeesNote => '备注';
-
-  @override
-  String get committeesEditTitle => '编辑委员会角色';
-
-  @override
-  String get committeesAddTitle => '添加委员会角色';
-
-  @override
-  String get committeesRoleTitleRequired => '请输入角色名称。';
-
-  @override
-  String get committeesSaved => '委员会角色已保存。';
-
-  @override
-  String get committeesDefaultsRestored => '默认角色已恢复。';
+  String get committeesQuickTips => '小贴士';
 
   @override
   String get languageMenuLabel => '语言';

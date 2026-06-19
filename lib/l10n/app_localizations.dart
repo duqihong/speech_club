@@ -770,95 +770,23 @@ abstract class AppLocalizations {
   /// **'Committees'**
   String get committeesTitle;
 
-  /// No description provided for @committeesHelpText.
+  /// No description provided for @committeesRolePurpose.
   ///
   /// In en, this message translates to:
-  /// **'Keep a simple local list of club officers and helpers.'**
-  String get committeesHelpText;
+  /// **'Role Purpose'**
+  String get committeesRolePurpose;
 
-  /// No description provided for @committeesNotAssigned.
+  /// No description provided for @committeesKeyResponsibilities.
   ///
   /// In en, this message translates to:
-  /// **'Not assigned'**
-  String get committeesNotAssigned;
+  /// **'Key Responsibilities'**
+  String get committeesKeyResponsibilities;
 
-  /// No description provided for @committeesAddRole.
+  /// No description provided for @committeesQuickTips.
   ///
   /// In en, this message translates to:
-  /// **'Add Role'**
-  String get committeesAddRole;
-
-  /// No description provided for @committeesResetDefaultRoles.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Default Roles'**
-  String get committeesResetDefaultRoles;
-
-  /// No description provided for @committeesResetDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset default roles?'**
-  String get committeesResetDialogTitle;
-
-  /// No description provided for @committeesResetDialogMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'This will replace your committee list with the default roles.'**
-  String get committeesResetDialogMessage;
-
-  /// No description provided for @committeesRoleTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Role title'**
-  String get committeesRoleTitle;
-
-  /// No description provided for @committeesMemberName.
-  ///
-  /// In en, this message translates to:
-  /// **'Member name'**
-  String get committeesMemberName;
-
-  /// No description provided for @committeesPhoneOrEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Phone or email'**
-  String get committeesPhoneOrEmail;
-
-  /// No description provided for @committeesNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Note'**
-  String get committeesNote;
-
-  /// No description provided for @committeesEditTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Committee Role'**
-  String get committeesEditTitle;
-
-  /// No description provided for @committeesAddTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Committee Role'**
-  String get committeesAddTitle;
-
-  /// No description provided for @committeesRoleTitleRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a role title.'**
-  String get committeesRoleTitleRequired;
-
-  /// No description provided for @committeesSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Committee role saved.'**
-  String get committeesSaved;
-
-  /// No description provided for @committeesDefaultsRestored.
-  ///
-  /// In en, this message translates to:
-  /// **'Default roles restored.'**
-  String get committeesDefaultsRestored;
+  /// **'Quick Tips'**
+  String get committeesQuickTips;
 
   /// No description provided for @languageMenuLabel.
   ///

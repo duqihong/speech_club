@@ -55,7 +55,7 @@ class SpeechClubApp extends StatelessWidget {
             AppRoutes.timer: (_) => const TimerScreen(),
             AppRoutes.tableTopics: (_) => const TableTopicsSetupScreen(),
             AppRoutes.roleAssistant: (_) => const RoleAssistantScreen(),
-            AppRoutes.committees: (_) => CommitteesScreen(),
+            AppRoutes.committees: (_) => const CommitteesScreen(),
           },
         );
       },

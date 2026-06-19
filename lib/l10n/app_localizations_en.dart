@@ -356,51 +356,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get committeesTitle => 'Committees';
 
   @override
-  String get committeesHelpText =>
-      'Keep a simple local list of club officers and helpers.';
+  String get committeesRolePurpose => 'Role Purpose';
 
   @override
-  String get committeesNotAssigned => 'Not assigned';
+  String get committeesKeyResponsibilities => 'Key Responsibilities';
 
   @override
-  String get committeesAddRole => 'Add Role';
-
-  @override
-  String get committeesResetDefaultRoles => 'Reset Default Roles';
-
-  @override
-  String get committeesResetDialogTitle => 'Reset default roles?';
-
-  @override
-  String get committeesResetDialogMessage =>
-      'This will replace your committee list with the default roles.';
-
-  @override
-  String get committeesRoleTitle => 'Role title';
-
-  @override
-  String get committeesMemberName => 'Member name';
-
-  @override
-  String get committeesPhoneOrEmail => 'Phone or email';
-
-  @override
-  String get committeesNote => 'Note';
-
-  @override
-  String get committeesEditTitle => 'Edit Committee Role';
-
-  @override
-  String get committeesAddTitle => 'Add Committee Role';
-
-  @override
-  String get committeesRoleTitleRequired => 'Please enter a role title.';
-
-  @override
-  String get committeesSaved => 'Committee role saved.';
-
-  @override
-  String get committeesDefaultsRestored => 'Default roles restored.';
+  String get committeesQuickTips => 'Quick Tips';
 
   @override
   String get languageMenuLabel => 'Language';
