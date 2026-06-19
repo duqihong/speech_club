@@ -21,6 +21,10 @@ class CommitteesScreen extends StatelessWidget {
     BuildContext context, {
     required CommitteeGuide guide,
   }) {
+    final Locale locale = Localizations.localeOf(context);
+    final String title = guide.titleForLocale(locale);
+    final String? subtitle = guide.subtitleForLocale(locale);
+
     return Material(
       color: Colors.grey.shade100,
       borderRadius: BorderRadius.circular(18),
@@ -50,15 +54,35 @@ class CommitteesScreen extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    guide.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      height: 1.15,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        title,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                        ),
+                      ),
+                      if (subtitle != null) ...<Widget>[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black54,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),

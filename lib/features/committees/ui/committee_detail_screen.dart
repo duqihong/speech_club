@@ -63,10 +63,16 @@ class CommitteeDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Locale locale = Localizations.localeOf(context);
+    final String title = guide.titleForLocale(locale);
+    final String rolePurpose = guide.rolePurposeForLocale(locale);
+    final List<CommitteeResponsibilitySection> sections =
+        guide.sectionsForLocale(locale);
+    final List<String> quickTips = guide.quickTipsForLocale(locale);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${guide.icon} ${guide.title}'),
+        title: Text('${guide.icon} $title'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -77,7 +83,7 @@ class CommitteeDetailScreen extends StatelessWidget {
               _buildSectionCard(
                 title: l10n.committeesRolePurpose,
                 child: Text(
-                  guide.rolePurpose,
+                  rolePurpose,
                   style: const TextStyle(fontSize: 18),
                 ),
               ),
@@ -85,7 +91,7 @@ class CommitteeDetailScreen extends StatelessWidget {
                 title: l10n.committeesKeyResponsibilities,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: guide.responsibilitySections
+                  children: sections
                       .map(_buildResponsibilitySection)
                       .toList(growable: false),
                 ),
@@ -94,7 +100,7 @@ class CommitteeDetailScreen extends StatelessWidget {
                 title: l10n.committeesQuickTips,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: guide.quickTips
+                  children: quickTips
                       .map(
                         (String tip) => Padding(
                           padding: const EdgeInsets.only(bottom: 4),

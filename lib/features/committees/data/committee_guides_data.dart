@@ -3,11 +3,13 @@ import 'models/committee_guide.dart';
 const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'president',
-    title: 'President',
+    titleEn: 'President',
+    titleZh: '主席',
     icon: '🧭',
-    rolePurpose:
+    rolePurposeEn:
         'You guide the club, support the committee, and keep the club moving in a healthy direction.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你带领俱乐部，支持委员团队，让俱乐部保持健康、温暖、有方向地发展。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -33,19 +35,53 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '确认重要会议角色已经安排。',
+          '必要时支持例会主持人。',
+          '欢迎会员和来宾。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会中',
+        items: <String>[
+          '需要时开场或总结会议。',
+          '保持会议温暖、尊重、准时。',
+          '认可会员和来宾的参与。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '每月',
+        items: <String>[
+          '主持或参与委员会议。',
+          '跟进俱乐部目标和会员需要。',
+          '支持需要帮助的委员。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Listen more than you speak.',
       'Encourage new leaders.',
       'Keep the club atmosphere positive.',
     ],
+    quickTipsZh: <String>[
+      '多听，少急着决定。',
+      '鼓励新领导者成长。',
+      '保持俱乐部气氛积极。',
+    ],
   ),
   CommitteeGuide(
     id: 'vpe',
-    title: 'VPE',
+    titleEn: 'Vice President Education',
+    titleZh: '教育副主席',
+    abbreviation: 'VPE',
     icon: '🎓',
-    rolePurpose:
+    rolePurposeEn:
         'You help members grow by planning speeches, roles, mentoring, and education progress.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你帮助会员成长，安排演讲、角色、导师和教育进度。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -71,19 +107,53 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '确认演讲者和点评者。',
+          '协助安排会议角色。',
+          '了解会员的学习进度。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会中',
+        items: <String>[
+          '支持会议流程顺利进行。',
+          '留意需要演讲机会的会员。',
+          '适当向来宾介绍教育项目。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '每月',
+        items: <String>[
+          '规划例会安排。',
+          '鼓励会员继续完成项目。',
+          '必要时协调比赛或特别会议。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Keep the agenda ready early.',
       'Balance experienced and new members.',
       'Encourage progress gently.',
     ],
+    quickTipsZh: <String>[
+      '尽早准备议程。',
+      '平衡新会员和资深会员的机会。',
+      '用鼓励的方式推动进步。',
+    ],
   ),
   CommitteeGuide(
     id: 'vpm',
-    title: 'VPM',
+    titleEn: 'Vice President Membership',
+    titleZh: '会员副主席',
+    abbreviation: 'VPM',
     icon: '🤝',
-    rolePurpose:
+    rolePurposeEn:
         'You welcome guests and help them become comfortable members of the club.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你欢迎来宾，帮助他们了解俱乐部，并逐步成为舒适的会员。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -109,19 +179,53 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '准备欢迎来宾。',
+          '确认是否有来宾需要介绍。',
+          '帮助来宾了解会议流程。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会中',
+        items: <String>[
+          '热情接待来宾。',
+          '用简单语言说明俱乐部如何运作。',
+          '适当邀请来宾分享感受。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会后',
+        items: <String>[
+          '跟进来宾。',
+          '回答入会问题。',
+          '鼓励合适的来宾再次参加。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'A warm welcome is more powerful than a hard sell.',
       'Remember guest names.',
       'Make joining feel simple and friendly.',
     ],
+    quickTipsZh: <String>[
+      '温暖欢迎比强力推销更有效。',
+      '尽量记住来宾姓名。',
+      '让入会感觉简单、友好。',
+    ],
   ),
   CommitteeGuide(
     id: 'vppr',
-    title: 'VPPR',
+    titleEn: 'Vice President Public Relations',
+    titleZh: '公关副主席',
+    abbreviation: 'VPPR',
     icon: '📣',
-    rolePurpose:
+    rolePurposeEn:
         'You help people outside the club understand the club’s value and activities.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你帮助俱乐部对外展示价值，让更多人了解俱乐部活动和会员成长。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -147,18 +251,51 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '准备简单清楚的宣传内容。',
+          '留意特别演讲或活动。',
+          '合适时协调照片或宣传素材。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会后',
+        items: <String>[
+          '分享会议亮点。',
+          '宣传下一次活动。',
+          '保持俱乐部形象友好、活跃。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '每月',
+        items: <String>[
+          '维护对外沟通渠道。',
+          '支持会员招募活动。',
+          '收集会员成长故事。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Use clear and simple messages.',
       'Show real member growth.',
       'Avoid over-promising.',
     ],
+    quickTipsZh: <String>[
+      '信息要简单清楚。',
+      '展示真实的会员成长。',
+      '不要过度承诺。',
+    ],
   ),
   CommitteeGuide(
     id: 'secretary',
-    title: 'Secretary',
+    titleEn: 'Secretary',
+    titleZh: '秘书',
     icon: '📝',
-    rolePurpose: 'You keep club records clear, organized, and easy to find.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeEn: 'You keep club records clear, organized, and easy to find.',
+    rolePurposeZh: '你让俱乐部记录清楚、有序，方便日后查找和延续。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -182,19 +319,50 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '必要时准备会议记录资料。',
+          '检查重要文件。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会中',
+        items: <String>[
+          '记录重要决定。',
+          '必要时记录出席或重要事项。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会后',
+        items: <String>[
+          '整理并分享会议记录。',
+          '更新俱乐部资料。',
+          '帮助委员查找过去决定。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Write clearly and simply.',
       'Record decisions, not every word.',
       'Keep files organized.',
     ],
+    quickTipsZh: <String>[
+      '记录要清楚简单。',
+      '重点记录决定，不必记录每一句话。',
+      '文件保持有序。',
+    ],
   ),
   CommitteeGuide(
     id: 'treasurer',
-    title: 'Treasurer',
+    titleEn: 'Treasurer',
+    titleZh: '财务',
     icon: '💰',
-    rolePurpose:
+    rolePurposeEn:
         'You help the club manage money responsibly and transparently.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你帮助俱乐部负责任、透明地管理财务。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Monthly',
         items: <String>[
@@ -212,19 +380,44 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '每月',
+        items: <String>[
+          '记录收入和支出。',
+          '更新付款记录。',
+          '向委员团队报告财务状况。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '需要时',
+        items: <String>[
+          '协助收取会员费用。',
+          '支付已批准的俱乐部开支。',
+          '提醒团队注意预算限制。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Keep records simple and accurate.',
       'Report early if there is an issue.',
       'Make money matters transparent.',
     ],
+    quickTipsZh: <String>[
+      '记录简单但准确。',
+      '有问题要尽早报告。',
+      '财务事项要透明。',
+    ],
   ),
   CommitteeGuide(
     id: 'sergeant_at_arms',
-    title: 'Sergeant at Arms',
+    titleEn: 'Sergeant at Arms',
+    titleZh: '事务官',
     icon: '🛠️',
-    rolePurpose:
+    rolePurposeEn:
         'You prepare the meeting environment and help the meeting start smoothly.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你准备会议环境，帮助会议顺利开始和进行。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
         items: <String>[
@@ -250,19 +443,52 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '会前',
+        items: <String>[
+          '准备会议场地或线上设备。',
+          '检查器材。',
+          '欢迎会员和来宾。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会中',
+        items: <String>[
+          '协助处理现场事务。',
+          '支持流程顺利转换。',
+          '安静处理实际问题。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '会后',
+        items: <String>[
+          '收拾器材。',
+          '确认场地整洁。',
+          '反馈任何设备或场地问题。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Arrive early.',
       'Check equipment before people arrive.',
       'A smooth setup helps everyone relax.',
     ],
+    quickTipsZh: <String>[
+      '尽量早到。',
+      '在大家到达前检查设备。',
+      '顺畅的准备会让大家更放松。',
+    ],
   ),
   CommitteeGuide(
     id: 'immediate_past_president',
-    title: 'Immediate Past President',
+    titleEn: 'Immediate Past President',
+    titleZh: '前任主席',
     icon: '🌟',
-    rolePurpose:
+    rolePurposeEn:
         'You provide experience, continuity, and quiet support to the current committee.',
-    responsibilitySections: <CommitteeResponsibilitySection>[
+    rolePurposeZh: '你提供经验、延续性和安静的支持，帮助现任委员团队成长。',
+    responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Monthly',
         items: <String>[
@@ -280,10 +506,33 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         ],
       ),
     ],
-    quickTips: <String>[
+    responsibilitySectionsZh: <CommitteeResponsibilitySection>[
+      CommitteeResponsibilitySection(
+        title: '每月',
+        items: <String>[
+          '在需要时给主席建议。',
+          '支持委员团队的延续。',
+          '分享过去经验，但不代替现任团队。',
+        ],
+      ),
+      CommitteeResponsibilitySection(
+        title: '需要时',
+        items: <String>[
+          '协助处理敏感问题。',
+          '鼓励新委员。',
+          '支持俱乐部稳定发展。',
+        ],
+      ),
+    ],
+    quickTipsEn: <String>[
       'Guide, don’t control.',
       'Share lessons from experience.',
       'Help new leaders grow.',
+    ],
+    quickTipsZh: <String>[
+      '引导，但不要控制。',
+      '分享经验中的教训。',
+      '帮助新领导者成长。',
     ],
   ),
 ];

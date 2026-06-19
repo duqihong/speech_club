@@ -24,7 +24,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navRoleAssistant => '角色助手';
 
   @override
-  String get navCommittees => '委员会';
+  String get navCommittees => '委员职责';
 
   @override
   String get buttonStart => '开始';
@@ -346,16 +346,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get roleAssistantTitleGeneralEvaluator => '总评论';
 
   @override
-  String get committeesTitle => '委员会';
+  String get committeesTitle => '委员职责';
 
   @override
-  String get committeesRolePurpose => '角色职责';
+  String get committeesRolePurpose => '角色定位';
 
   @override
   String get committeesKeyResponsibilities => '主要责任';
 
   @override
-  String get committeesQuickTips => '小贴士';
+  String get committeesQuickTips => '小提示';
 
   @override
   String get languageMenuLabel => '语言';
