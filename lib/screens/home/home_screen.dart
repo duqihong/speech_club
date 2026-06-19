@@ -98,6 +98,14 @@ class HomeScreen extends StatelessWidget {
                             .pushNamed(AppRoutes.roleAssistant);
                       },
                     ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
+                      icon: Icons.badge_outlined,
+                      title: l10n.navCommittees,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.committees);
+                      },
+                    ),
                     const SizedBox(height: 10),
                   ],
                 ),

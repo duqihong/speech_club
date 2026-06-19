@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:speech_club/localization/app_locale_controller.dart';
@@ -17,5 +18,8 @@ void main() {
     expect(find.text('Expressions'), findsNothing);
     expect(find.text('Table Topics'), findsOneWidget);
     expect(find.text('Role Assistant'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    expect(find.text('Committees'), findsOneWidget);
   });
 }
