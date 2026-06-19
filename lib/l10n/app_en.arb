@@ -8,6 +8,7 @@
   "navRoleAssistant": "Role Assistant",
   "navCommittees": "Committees",
   "navPathways": "Pathways",
+  "navVoteBests": "Vote Bests",
   "buttonStart": "Start",
   "buttonStop": "Stop",
   "buttonReset": "Reset",
@@ -146,6 +147,48 @@
   "pathwaysTypicalSpeechFocus": "Typical Speech Focus",
   "pathwaysHowToStart": "How to Start",
   "pathwaysMentorTips": "Mentor Tips",
+  "voteBestsTitle": "Vote Bests",
+  "voteBestsIntro": "Use this as a simple local tally tool for meeting awards. It does not collect online votes.",
+  "voteBestsAwardSummary": "{candidateCount} candidates · {voteCount} votes",
+  "@voteBestsAwardSummary": {
+    "placeholders": {
+      "candidateCount": {
+        "type": "int"
+      },
+      "voteCount": {
+        "type": "int"
+      }
+    }
+  },
+  "voteBestsResetMeetingVotes": "Reset Meeting Votes",
+  "voteBestsResetConfirmMessage": "Reset all candidates and votes for this meeting?",
+  "voteBestsDetailHelp": "Add candidates, then tap +1 when a vote is counted.",
+  "voteBestsCandidates": "Candidates",
+  "voteBestsResults": "Current Results",
+  "voteBestsAddCandidate": "Add Candidate",
+  "voteBestsCandidateName": "Candidate name",
+  "voteBestsPleaseEnterName": "Please enter a name.",
+  "voteBestsDuplicateName": "This name already exists.",
+  "voteBestsRemoveCandidateMessage": "Remove this candidate?",
+  "voteBestsVotesLabel": "Votes: {votes}",
+  "@voteBestsVotesLabel": {
+    "placeholders": {
+      "votes": {
+        "type": "int"
+      }
+    }
+  },
+  "voteBestsNoCandidatesYet": "No candidates yet.",
+  "voteBestsNoVotesYet": "No votes counted yet.",
+  "voteBestsCurrentLeader": "Current leader: {name}",
+  "@voteBestsCurrentLeader": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voteBestsCurrentTie": "Current tie",
   "languageMenuLabel": "Language",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "Simplified Chinese"

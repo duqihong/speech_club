@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Pathways'**
   String get navPathways;
 
+  /// No description provided for @navVoteBests.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote Bests'**
+  String get navVoteBests;
+
   /// No description provided for @buttonStart.
   ///
   /// In en, this message translates to:
@@ -889,6 +895,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mentor Tips'**
   String get pathwaysMentorTips;
+
+  /// No description provided for @voteBestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote Bests'**
+  String get voteBestsTitle;
+
+  /// No description provided for @voteBestsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this as a simple local tally tool for meeting awards. It does not collect online votes.'**
+  String get voteBestsIntro;
+
+  /// No description provided for @voteBestsAwardSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{candidateCount} candidates · {voteCount} votes'**
+  String voteBestsAwardSummary(int candidateCount, int voteCount);
+
+  /// No description provided for @voteBestsResetMeetingVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Meeting Votes'**
+  String get voteBestsResetMeetingVotes;
+
+  /// No description provided for @voteBestsResetConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all candidates and votes for this meeting?'**
+  String get voteBestsResetConfirmMessage;
+
+  /// No description provided for @voteBestsDetailHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates, then tap +1 when a vote is counted.'**
+  String get voteBestsDetailHelp;
+
+  /// No description provided for @voteBestsCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates'**
+  String get voteBestsCandidates;
+
+  /// No description provided for @voteBestsResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Results'**
+  String get voteBestsResults;
+
+  /// No description provided for @voteBestsAddCandidate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Candidate'**
+  String get voteBestsAddCandidate;
+
+  /// No description provided for @voteBestsCandidateName.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidate name'**
+  String get voteBestsCandidateName;
+
+  /// No description provided for @voteBestsPleaseEnterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name.'**
+  String get voteBestsPleaseEnterName;
+
+  /// No description provided for @voteBestsDuplicateName.
+  ///
+  /// In en, this message translates to:
+  /// **'This name already exists.'**
+  String get voteBestsDuplicateName;
+
+  /// No description provided for @voteBestsRemoveCandidateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this candidate?'**
+  String get voteBestsRemoveCandidateMessage;
+
+  /// No description provided for @voteBestsVotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Votes: {votes}'**
+  String voteBestsVotesLabel(int votes);
+
+  /// No description provided for @voteBestsNoCandidatesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No candidates yet.'**
+  String get voteBestsNoCandidatesYet;
+
+  /// No description provided for @voteBestsNoVotesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No votes counted yet.'**
+  String get voteBestsNoVotesYet;
+
+  /// No description provided for @voteBestsCurrentLeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Current leader: {name}'**
+  String voteBestsCurrentLeader(String name);
+
+  /// No description provided for @voteBestsCurrentTie.
+  ///
+  /// In en, this message translates to:
+  /// **'Current tie'**
+  String get voteBestsCurrentTie;
 
   /// No description provided for @languageMenuLabel.
   ///

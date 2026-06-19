@@ -8,6 +8,7 @@
   "navRoleAssistant": "角色助手",
   "navCommittees": "委员职责",
   "navPathways": "学习路径",
+  "navVoteBests": "最佳投票",
   "buttonStart": "开始",
   "buttonStop": "停止",
   "buttonReset": "重置",
@@ -146,6 +147,48 @@
   "pathwaysTypicalSpeechFocus": "常见演讲重点",
   "pathwaysHowToStart": "如何开始",
   "pathwaysMentorTips": "导师提示",
+  "voteBestsTitle": "最佳投票",
+  "voteBestsIntro": "这是一个本地计票工具，用来记录例会奖项投票。它不会收集线上投票。",
+  "voteBestsAwardSummary": "{candidateCount} 位候选人 · {voteCount} 票",
+  "@voteBestsAwardSummary": {
+    "placeholders": {
+      "candidateCount": {
+        "type": "int"
+      },
+      "voteCount": {
+        "type": "int"
+      }
+    }
+  },
+  "voteBestsResetMeetingVotes": "重置本场投票",
+  "voteBestsResetConfirmMessage": "确定要清空本场所有候选人和票数吗？",
+  "voteBestsDetailHelp": "先添加候选人，计到一票时点击 +1。",
+  "voteBestsCandidates": "候选人",
+  "voteBestsResults": "当前结果",
+  "voteBestsAddCandidate": "添加候选人",
+  "voteBestsCandidateName": "候选人姓名",
+  "voteBestsPleaseEnterName": "请输入姓名。",
+  "voteBestsDuplicateName": "这个姓名已经存在。",
+  "voteBestsRemoveCandidateMessage": "删除这位候选人吗？",
+  "voteBestsVotesLabel": "票数：{votes}",
+  "@voteBestsVotesLabel": {
+    "placeholders": {
+      "votes": {
+        "type": "int"
+      }
+    }
+  },
+  "voteBestsNoCandidatesYet": "还没有候选人。",
+  "voteBestsNoVotesYet": "还没有计票。",
+  "voteBestsCurrentLeader": "当前领先：{name}",
+  "@voteBestsCurrentLeader": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voteBestsCurrentTie": "当前并列",
   "languageMenuLabel": "语言",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "简体中文"

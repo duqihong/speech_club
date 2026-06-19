@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navPathways => 'Pathways';
 
   @override
+  String get navVoteBests => 'Vote Bests';
+
+  @override
   String get buttonStart => 'Start';
 
   @override
@@ -417,6 +420,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pathwaysMentorTips => 'Mentor Tips';
+
+  @override
+  String get voteBestsTitle => 'Vote Bests';
+
+  @override
+  String get voteBestsIntro =>
+      'Use this as a simple local tally tool for meeting awards. It does not collect online votes.';
+
+  @override
+  String voteBestsAwardSummary(int candidateCount, int voteCount) {
+    return '$candidateCount candidates · $voteCount votes';
+  }
+
+  @override
+  String get voteBestsResetMeetingVotes => 'Reset Meeting Votes';
+
+  @override
+  String get voteBestsResetConfirmMessage =>
+      'Reset all candidates and votes for this meeting?';
+
+  @override
+  String get voteBestsDetailHelp =>
+      'Add candidates, then tap +1 when a vote is counted.';
+
+  @override
+  String get voteBestsCandidates => 'Candidates';
+
+  @override
+  String get voteBestsResults => 'Current Results';
+
+  @override
+  String get voteBestsAddCandidate => 'Add Candidate';
+
+  @override
+  String get voteBestsCandidateName => 'Candidate name';
+
+  @override
+  String get voteBestsPleaseEnterName => 'Please enter a name.';
+
+  @override
+  String get voteBestsDuplicateName => 'This name already exists.';
+
+  @override
+  String get voteBestsRemoveCandidateMessage => 'Remove this candidate?';
+
+  @override
+  String voteBestsVotesLabel(int votes) {
+    return 'Votes: $votes';
+  }
+
+  @override
+  String get voteBestsNoCandidatesYet => 'No candidates yet.';
+
+  @override
+  String get voteBestsNoVotesYet => 'No votes counted yet.';
+
+  @override
+  String voteBestsCurrentLeader(String name) {
+    return 'Current leader: $name';
+  }
+
+  @override
+  String get voteBestsCurrentTie => 'Current tie';
 
   @override
   String get languageMenuLabel => 'Language';

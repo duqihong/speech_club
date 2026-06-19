@@ -123,6 +123,14 @@ class HomeScreen extends StatelessWidget {
                         Navigator.of(context).pushNamed(AppRoutes.pathways);
                       },
                     ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
+                      icon: Icons.emoji_events_outlined,
+                      title: l10n.navVoteBests,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.voteBests);
+                      },
+                    ),
                     const SizedBox(height: 10),
                   ],
                 ),

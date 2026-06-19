@@ -33,6 +33,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navPathways => '学习路径';
 
   @override
+  String get navVoteBests => '最佳投票';
+
+  @override
   String get buttonStart => '开始';
 
   @override
@@ -408,6 +411,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pathwaysMentorTips => '导师提示';
+
+  @override
+  String get voteBestsTitle => '最佳投票';
+
+  @override
+  String get voteBestsIntro => '这是一个本地计票工具，用来记录例会奖项投票。它不会收集线上投票。';
+
+  @override
+  String voteBestsAwardSummary(int candidateCount, int voteCount) {
+    return '$candidateCount 位候选人 · $voteCount 票';
+  }
+
+  @override
+  String get voteBestsResetMeetingVotes => '重置本场投票';
+
+  @override
+  String get voteBestsResetConfirmMessage => '确定要清空本场所有候选人和票数吗？';
+
+  @override
+  String get voteBestsDetailHelp => '先添加候选人，计到一票时点击 +1。';
+
+  @override
+  String get voteBestsCandidates => '候选人';
+
+  @override
+  String get voteBestsResults => '当前结果';
+
+  @override
+  String get voteBestsAddCandidate => '添加候选人';
+
+  @override
+  String get voteBestsCandidateName => '候选人姓名';
+
+  @override
+  String get voteBestsPleaseEnterName => '请输入姓名。';
+
+  @override
+  String get voteBestsDuplicateName => '这个姓名已经存在。';
+
+  @override
+  String get voteBestsRemoveCandidateMessage => '删除这位候选人吗？';
+
+  @override
+  String voteBestsVotesLabel(int votes) {
+    return '票数：$votes';
+  }
+
+  @override
+  String get voteBestsNoCandidatesYet => '还没有候选人。';
+
+  @override
+  String get voteBestsNoVotesYet => '还没有计票。';
+
+  @override
+  String voteBestsCurrentLeader(String name) {
+    return '当前领先：$name';
+  }
+
+  @override
+  String get voteBestsCurrentTie => '当前并列';
 
   @override
   String get languageMenuLabel => '语言';
