@@ -803,44 +803,38 @@ abstract class AppLocalizations {
   /// No description provided for @topicSelectionIntro.
   ///
   /// In en, this message translates to:
-  /// **'Choose a topic you care about. A good speech starts with a real thought, story, or lesson.'**
+  /// **'Almost any topic can become a speech if it connects to your experience, feeling, or point of view.'**
   String get topicSelectionIntro;
 
-  /// No description provided for @topicSelectionAll.
+  /// No description provided for @topicSelectionCategoryPurpose.
   ///
   /// In en, this message translates to:
-  /// **'All'**
-  String get topicSelectionAll;
+  /// **'Category Purpose'**
+  String get topicSelectionCategoryPurpose;
 
-  /// No description provided for @topicSelectionStyleLabel.
+  /// No description provided for @topicSelectionTopicIdeas.
   ///
   /// In en, this message translates to:
-  /// **'Style: {style}'**
-  String topicSelectionStyleLabel(String style);
+  /// **'Topic Ideas'**
+  String get topicSelectionTopicIdeas;
 
-  /// No description provided for @topicSelectionWhyItWorks.
+  /// No description provided for @topicSelectionHowToChoose.
   ///
   /// In en, this message translates to:
-  /// **'Why this topic works'**
-  String get topicSelectionWhyItWorks;
+  /// **'How to Choose'**
+  String get topicSelectionHowToChoose;
 
-  /// No description provided for @topicSelectionPossibleStructure.
+  /// No description provided for @topicSelectionSpeechStructure.
   ///
   /// In en, this message translates to:
-  /// **'Possible structure'**
-  String get topicSelectionPossibleStructure;
+  /// **'Speech Structure'**
+  String get topicSelectionSpeechStructure;
 
-  /// No description provided for @topicSelectionStarterQuestions.
+  /// No description provided for @topicSelectionOpeningLines.
   ///
   /// In en, this message translates to:
-  /// **'Starter questions'**
-  String get topicSelectionStarterQuestions;
-
-  /// No description provided for @topicSelectionOpeningLine.
-  ///
-  /// In en, this message translates to:
-  /// **'Opening line'**
-  String get topicSelectionOpeningLine;
+  /// **'Opening Lines'**
+  String get topicSelectionOpeningLines;
 
   /// No description provided for @languageMenuLabel.
   ///

@@ -372,27 +372,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get topicSelectionIntro =>
-      'Choose a topic you care about. A good speech starts with a real thought, story, or lesson.';
+      'Almost any topic can become a speech if it connects to your experience, feeling, or point of view.';
 
   @override
-  String get topicSelectionAll => 'All';
+  String get topicSelectionCategoryPurpose => 'Category Purpose';
 
   @override
-  String topicSelectionStyleLabel(String style) {
-    return 'Style: $style';
-  }
+  String get topicSelectionTopicIdeas => 'Topic Ideas';
 
   @override
-  String get topicSelectionWhyItWorks => 'Why this topic works';
+  String get topicSelectionHowToChoose => 'How to Choose';
 
   @override
-  String get topicSelectionPossibleStructure => 'Possible structure';
+  String get topicSelectionSpeechStructure => 'Speech Structure';
 
   @override
-  String get topicSelectionStarterQuestions => 'Starter questions';
-
-  @override
-  String get topicSelectionOpeningLine => 'Opening line';
+  String get topicSelectionOpeningLines => 'Opening Lines';
 
   @override
   String get languageMenuLabel => 'Language';

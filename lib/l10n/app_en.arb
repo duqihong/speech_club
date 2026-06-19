@@ -131,20 +131,12 @@
   "committeesKeyResponsibilities": "Key Responsibilities",
   "committeesQuickTips": "Quick Tips",
   "topicSelectionTitle": "Topic Selection",
-  "topicSelectionIntro": "Choose a topic you care about. A good speech starts with a real thought, story, or lesson.",
-  "topicSelectionAll": "All",
-  "topicSelectionStyleLabel": "Style: {style}",
-  "@topicSelectionStyleLabel": {
-    "placeholders": {
-      "style": {
-        "type": "String"
-      }
-    }
-  },
-  "topicSelectionWhyItWorks": "Why this topic works",
-  "topicSelectionPossibleStructure": "Possible structure",
-  "topicSelectionStarterQuestions": "Starter questions",
-  "topicSelectionOpeningLine": "Opening line",
+  "topicSelectionIntro": "Almost any topic can become a speech if it connects to your experience, feeling, or point of view.",
+  "topicSelectionCategoryPurpose": "Category Purpose",
+  "topicSelectionTopicIdeas": "Topic Ideas",
+  "topicSelectionHowToChoose": "How to Choose",
+  "topicSelectionSpeechStructure": "Speech Structure",
+  "topicSelectionOpeningLines": "Opening Lines",
   "languageMenuLabel": "Language",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "Simplified Chinese"

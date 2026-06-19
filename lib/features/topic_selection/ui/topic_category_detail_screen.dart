@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../data/speech_topic.dart';
+import '../data/topic_category_guide.dart';
 
-class TopicDetailScreen extends StatelessWidget {
-  const TopicDetailScreen({
+class TopicCategoryDetailScreen extends StatelessWidget {
+  const TopicCategoryDetailScreen({
     super.key,
-    required this.topic,
+    required this.guide,
   });
 
-  final SpeechTopic topic;
+  final TopicCategoryGuide guide;
 
   Widget _buildSectionCard({
     required String title,
     required Widget child,
   }) {
     return Card(
-      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -40,7 +39,7 @@ class TopicDetailScreen extends StatelessWidget {
       children: <Widget>[
         for (final String item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(bottom: 4),
             child: Text('• $item', style: const TextStyle(fontSize: 17)),
           ),
       ],
@@ -51,12 +50,11 @@ class TopicDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final Locale locale = Localizations.localeOf(context);
+    final String title = guide.titleForLocale(locale);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF6F7FB),
-        title: Text(topic.titleForLocale(locale)),
+        title: Text('${guide.icon} $title'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -65,32 +63,27 @@ class TopicDetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildSectionCard(
-                title: l10n.topicSelectionWhyItWorks,
+                title: l10n.topicSelectionCategoryPurpose,
                 child: Text(
-                  topic.whyItWorksForLocale(locale),
+                  guide.purposeForLocale(locale),
                   style: const TextStyle(fontSize: 18, height: 1.35),
                 ),
               ),
               _buildSectionCard(
-                title: l10n.topicSelectionPossibleStructure,
-                child: _buildBulletList(topic.structureForLocale(locale)),
+                title: l10n.topicSelectionTopicIdeas,
+                child: _buildBulletList(guide.topicIdeasForLocale(locale)),
               ),
               _buildSectionCard(
-                title: l10n.topicSelectionStarterQuestions,
-                child: _buildBulletList(
-                  topic.starterQuestionsForLocale(locale),
-                ),
+                title: l10n.topicSelectionHowToChoose,
+                child: _buildBulletList(guide.choosingTipsForLocale(locale)),
               ),
               _buildSectionCard(
-                title: l10n.topicSelectionOpeningLine,
-                child: Text(
-                  topic.openingLineForLocale(locale),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    height: 1.35,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+                title: l10n.topicSelectionSpeechStructure,
+                child: _buildBulletList(guide.structureForLocale(locale)),
+              ),
+              _buildSectionCard(
+                title: l10n.topicSelectionOpeningLines,
+                child: _buildBulletList(guide.openingLinesForLocale(locale)),
               ),
             ],
           ),

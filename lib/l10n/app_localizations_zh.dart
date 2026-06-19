@@ -364,27 +364,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get topicSelectionTitle => '选题助手';
 
   @override
-  String get topicSelectionIntro => '选择一个你真正在意的话题。好的演讲，通常来自一个真实的想法、故事或体会。';
+  String get topicSelectionIntro => '基本上什么题目都可以讲，只要它连接到你的经历、感受或观点。';
 
   @override
-  String get topicSelectionAll => '全部';
+  String get topicSelectionCategoryPurpose => '这类题目适合什么';
 
   @override
-  String topicSelectionStyleLabel(String style) {
-    return '形式：$style';
-  }
+  String get topicSelectionTopicIdeas => '可以讲这些题目';
 
   @override
-  String get topicSelectionWhyItWorks => '为什么这个题目适合演讲';
+  String get topicSelectionHowToChoose => '怎样选一个好题目';
 
   @override
-  String get topicSelectionPossibleStructure => '可以这样组织';
+  String get topicSelectionSpeechStructure => '可以这样组织';
 
   @override
-  String get topicSelectionStarterQuestions => '启发问题';
-
-  @override
-  String get topicSelectionOpeningLine => '开场句参考';
+  String get topicSelectionOpeningLines => '开场句参考';
 
   @override
   String get languageMenuLabel => '语言';
