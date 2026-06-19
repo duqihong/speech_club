@@ -18,6 +18,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSpeaker => 'Speaker';
 
   @override
+  String get navTopicSelection => 'Topic Selection';
+
+  @override
   String get navTableTopics => 'Table Topics';
 
   @override
@@ -363,6 +366,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get committeesQuickTips => 'Quick Tips';
+
+  @override
+  String get topicSelectionTitle => 'Topic Selection';
+
+  @override
+  String get topicSelectionIntro =>
+      'Choose a topic you care about. A good speech starts with a real thought, story, or lesson.';
+
+  @override
+  String get topicSelectionAll => 'All';
+
+  @override
+  String topicSelectionStyleLabel(String style) {
+    return 'Style: $style';
+  }
+
+  @override
+  String get topicSelectionWhyItWorks => 'Why this topic works';
+
+  @override
+  String get topicSelectionPossibleStructure => 'Possible structure';
+
+  @override
+  String get topicSelectionStarterQuestions => 'Starter questions';
+
+  @override
+  String get topicSelectionOpeningLine => 'Opening line';
 
   @override
   String get languageMenuLabel => 'Language';

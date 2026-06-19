@@ -83,6 +83,15 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _HomeCard(
+                      icon: Icons.lightbulb_outline,
+                      title: l10n.navTopicSelection,
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(AppRoutes.topicSelection);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _HomeCard(
                       icon: Icons.chat_bubble_outline,
                       title: l10n.navTableTopics,
                       onTap: () {

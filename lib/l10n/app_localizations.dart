@@ -116,6 +116,12 @@ abstract class AppLocalizations {
   /// **'Speaker'**
   String get navSpeaker;
 
+  /// No description provided for @navTopicSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic Selection'**
+  String get navTopicSelection;
+
   /// No description provided for @navTableTopics.
   ///
   /// In en, this message translates to:
@@ -787,6 +793,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick Tips'**
   String get committeesQuickTips;
+
+  /// No description provided for @topicSelectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic Selection'**
+  String get topicSelectionTitle;
+
+  /// No description provided for @topicSelectionIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a topic you care about. A good speech starts with a real thought, story, or lesson.'**
+  String get topicSelectionIntro;
+
+  /// No description provided for @topicSelectionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get topicSelectionAll;
+
+  /// No description provided for @topicSelectionStyleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Style: {style}'**
+  String topicSelectionStyleLabel(String style);
+
+  /// No description provided for @topicSelectionWhyItWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this topic works'**
+  String get topicSelectionWhyItWorks;
+
+  /// No description provided for @topicSelectionPossibleStructure.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible structure'**
+  String get topicSelectionPossibleStructure;
+
+  /// No description provided for @topicSelectionStarterQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Starter questions'**
+  String get topicSelectionStarterQuestions;
+
+  /// No description provided for @topicSelectionOpeningLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening line'**
+  String get topicSelectionOpeningLine;
 
   /// No description provided for @languageMenuLabel.
   ///

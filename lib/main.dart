@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'app_routes.dart';
 import 'features/committees/ui/committees_screen.dart';
 import 'features/table_topics/ui/table_topics_setup_screen.dart';
+import 'features/topic_selection/ui/topic_selection_screen.dart';
 import 'l10n/app_localizations.dart';
 import 'localization/app_locale_controller.dart';
 import 'role_assistant/ui/role_assistant_screen.dart';
@@ -53,6 +54,7 @@ class SpeechClubApp extends StatelessWidget {
             AppRoutes.home: (_) =>
                 HomeScreen(localeController: localeController),
             AppRoutes.timer: (_) => const TimerScreen(),
+            AppRoutes.topicSelection: (_) => const TopicSelectionScreen(),
             AppRoutes.tableTopics: (_) => const TableTopicsSetupScreen(),
             AppRoutes.roleAssistant: (_) => const RoleAssistantScreen(),
             AppRoutes.committees: (_) => const CommitteesScreen(),

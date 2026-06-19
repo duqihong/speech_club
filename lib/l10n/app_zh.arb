@@ -3,6 +3,7 @@
   "appTitle": "演讲俱乐部",
   "navTimer": "计时器",
   "navSpeaker": "演讲卡片",
+  "navTopicSelection": "选题助手",
   "navTableTopics": "即席演讲",
   "navRoleAssistant": "角色助手",
   "navCommittees": "委员职责",
@@ -129,6 +130,21 @@
   "committeesRolePurpose": "角色定位",
   "committeesKeyResponsibilities": "主要责任",
   "committeesQuickTips": "小提示",
+  "topicSelectionTitle": "选题助手",
+  "topicSelectionIntro": "选择一个你真正在意的话题。好的演讲，通常来自一个真实的想法、故事或体会。",
+  "topicSelectionAll": "全部",
+  "topicSelectionStyleLabel": "形式：{style}",
+  "@topicSelectionStyleLabel": {
+    "placeholders": {
+      "style": {
+        "type": "String"
+      }
+    }
+  },
+  "topicSelectionWhyItWorks": "为什么这个题目适合演讲",
+  "topicSelectionPossibleStructure": "可以这样组织",
+  "topicSelectionStarterQuestions": "启发问题",
+  "topicSelectionOpeningLine": "开场句参考",
   "languageMenuLabel": "语言",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "简体中文"

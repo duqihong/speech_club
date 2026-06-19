@@ -18,6 +18,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navSpeaker => '演讲卡片';
 
   @override
+  String get navTopicSelection => '选题助手';
+
+  @override
   String get navTableTopics => '即席演讲';
 
   @override
@@ -356,6 +359,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get committeesQuickTips => '小提示';
+
+  @override
+  String get topicSelectionTitle => '选题助手';
+
+  @override
+  String get topicSelectionIntro => '选择一个你真正在意的话题。好的演讲，通常来自一个真实的想法、故事或体会。';
+
+  @override
+  String get topicSelectionAll => '全部';
+
+  @override
+  String topicSelectionStyleLabel(String style) {
+    return '形式：$style';
+  }
+
+  @override
+  String get topicSelectionWhyItWorks => '为什么这个题目适合演讲';
+
+  @override
+  String get topicSelectionPossibleStructure => '可以这样组织';
+
+  @override
+  String get topicSelectionStarterQuestions => '启发问题';
+
+  @override
+  String get topicSelectionOpeningLine => '开场句参考';
 
   @override
   String get languageMenuLabel => '语言';

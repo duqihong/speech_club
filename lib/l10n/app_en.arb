@@ -3,6 +3,7 @@
   "appTitle": "Speech Club",
   "navTimer": "Timer",
   "navSpeaker": "Speaker",
+  "navTopicSelection": "Topic Selection",
   "navTableTopics": "Table Topics",
   "navRoleAssistant": "Role Assistant",
   "navCommittees": "Committees",
@@ -129,6 +130,21 @@
   "committeesRolePurpose": "Role Purpose",
   "committeesKeyResponsibilities": "Key Responsibilities",
   "committeesQuickTips": "Quick Tips",
+  "topicSelectionTitle": "Topic Selection",
+  "topicSelectionIntro": "Choose a topic you care about. A good speech starts with a real thought, story, or lesson.",
+  "topicSelectionAll": "All",
+  "topicSelectionStyleLabel": "Style: {style}",
+  "@topicSelectionStyleLabel": {
+    "placeholders": {
+      "style": {
+        "type": "String"
+      }
+    }
+  },
+  "topicSelectionWhyItWorks": "Why this topic works",
+  "topicSelectionPossibleStructure": "Possible structure",
+  "topicSelectionStarterQuestions": "Starter questions",
+  "topicSelectionOpeningLine": "Opening line",
   "languageMenuLabel": "Language",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "Simplified Chinese"

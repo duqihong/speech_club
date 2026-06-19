@@ -16,10 +16,14 @@ void main() {
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Speaker'), findsOneWidget);
     expect(find.text('Expressions'), findsNothing);
+    expect(find.text('Topic Selection'), findsOneWidget);
     expect(find.text('Table Topics'), findsOneWidget);
     expect(find.text('Role Assistant'), findsOneWidget);
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
-    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Committees'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Committees'), findsOneWidget);
   });
 }
