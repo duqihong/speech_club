@@ -76,7 +76,6 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
     id: 'vpe',
     titleEn: 'Vice President Education',
     titleZh: '教育副主席',
-    abbreviation: 'VPE',
     icon: '🎓',
     rolePurposeEn:
         'You help members grow by planning speeches, roles, mentoring, and education progress.',
@@ -148,7 +147,6 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
     id: 'vpm',
     titleEn: 'Vice President Membership',
     titleZh: '会员副主席',
-    abbreviation: 'VPM',
     icon: '🤝',
     rolePurposeEn:
         'You welcome guests and help them become comfortable members of the club.',
@@ -220,7 +218,6 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
     id: 'vppr',
     titleEn: 'Vice President Public Relations',
     titleZh: '公关副主席',
-    abbreviation: 'VPPR',
     icon: '📣',
     rolePurposeEn:
         'You help people outside the club understand the club’s value and activities.',
@@ -412,7 +409,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'sergeant_at_arms',
     titleEn: 'Sergeant at Arms',
-    titleZh: '事务官',
+    titleZh: '礼宾司',
     icon: '🛠️',
     rolePurposeEn:
         'You prepare the meeting environment and help the meeting start smoothly.',

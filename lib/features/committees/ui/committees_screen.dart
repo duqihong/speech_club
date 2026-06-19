@@ -23,7 +23,6 @@ class CommitteesScreen extends StatelessWidget {
   }) {
     final Locale locale = Localizations.localeOf(context);
     final String title = guide.titleForLocale(locale);
-    final String? subtitle = guide.subtitleForLocale(locale);
 
     return Material(
       color: Colors.grey.shade100,
@@ -68,20 +67,6 @@ class CommitteesScreen extends StatelessWidget {
                           height: 1.15,
                         ),
                       ),
-                      if (subtitle != null) ...<Widget>[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black54,
-                            height: 1.1,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),

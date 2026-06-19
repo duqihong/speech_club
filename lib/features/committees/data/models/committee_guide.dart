@@ -12,13 +12,11 @@ class CommitteeGuide {
     required this.responsibilitySectionsZh,
     required this.quickTipsEn,
     required this.quickTipsZh,
-    this.abbreviation,
   });
 
   final String id;
   final String titleEn;
   final String titleZh;
-  final String? abbreviation;
   final String icon;
   final String rolePurposeEn;
   final String rolePurposeZh;
@@ -29,13 +27,6 @@ class CommitteeGuide {
 
   String titleForLocale(Locale locale) {
     return locale.languageCode == 'zh' ? titleZh : titleEn;
-  }
-
-  String? subtitleForLocale(Locale locale) {
-    if (locale.languageCode != 'zh') {
-      return null;
-    }
-    return abbreviation;
   }
 
   String rolePurposeForLocale(Locale locale) {

@@ -66,9 +66,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
-    await tester.pumpAndSettle();
-
     expect(find.text('委员职责'), findsOneWidget);
   });
 
@@ -90,9 +87,11 @@ void main() {
     expect(find.text('教育副主席'), findsOneWidget);
     expect(find.text('会员副主席'), findsOneWidget);
     expect(find.text('公关副主席'), findsOneWidget);
-    expect(find.text('VPE'), findsOneWidget);
-    expect(find.text('VPM'), findsOneWidget);
-    expect(find.text('VPPR'), findsOneWidget);
+    expect(find.text('礼宾司'), findsOneWidget);
+    expect(find.text('事务官'), findsNothing);
+    expect(find.text('VPE'), findsNothing);
+    expect(find.text('VPM'), findsNothing);
+    expect(find.text('VPPR'), findsNothing);
   });
 
   testWidgets('tapping Chinese President opens localized detail screen',

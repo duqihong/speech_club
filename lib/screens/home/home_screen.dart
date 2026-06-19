@@ -16,8 +16,58 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final double w = MediaQuery.of(context).size.width;
-    final double logoWidth = (w * 0.58).clamp(220.0, 240.0);
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+    final double logoWidth = (mediaQuery.size.width * 0.34).clamp(116.0, 148.0);
+
+    final List<_HomeDestination> destinations = <_HomeDestination>[
+      _HomeDestination(
+        icon: Icons.timer_outlined,
+        title: l10n.navTimer,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.timer),
+      ),
+      _HomeDestination(
+        icon: Icons.mic_none_outlined,
+        title: l10n.navSpeaker,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => const MySpeechHomePage(),
+            ),
+          );
+        },
+      ),
+      _HomeDestination(
+        icon: Icons.lightbulb_outline,
+        title: l10n.navTopicSelection,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.topicSelection),
+      ),
+      _HomeDestination(
+        icon: Icons.chat_bubble_outline,
+        title: l10n.navTableTopics,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.tableTopics),
+      ),
+      _HomeDestination(
+        icon: Icons.group_outlined,
+        title: l10n.navRoleAssistant,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.roleAssistant),
+      ),
+      _HomeDestination(
+        icon: Icons.badge_outlined,
+        title: l10n.navCommittees,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.committees),
+      ),
+      _HomeDestination(
+        icon: Icons.route_outlined,
+        title: l10n.navPathways,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.pathways),
+      ),
+      _HomeDestination(
+        icon: Icons.emoji_events_outlined,
+        title: l10n.navVoteBests,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.voteBests),
+      ),
+    ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7FB),
@@ -44,96 +94,37 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const SizedBox(height: 18),
-              Center(
-                child: Image.asset(
-                  'assets/branding/logo.png',
-                  width: logoWidth,
-                  fit: BoxFit.contain,
-                ),
+              Image.asset(
+                'assets/branding/logo.png',
+                width: logoWidth,
+                height: logoWidth,
+                fit: BoxFit.contain,
               ),
-              const SizedBox(height: 22),
-              Expanded(
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: <Widget>[
-                    _HomeCard(
-                      icon: Icons.timer_outlined,
-                      title: l10n.navTimer,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.timer);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.mic_none_outlined,
-                      title: l10n.navSpeaker,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (_) => const MySpeechHomePage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.lightbulb_outline,
-                      title: l10n.navTopicSelection,
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed(AppRoutes.topicSelection);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.chat_bubble_outline,
-                      title: l10n.navTableTopics,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.tableTopics);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.group_outlined,
-                      title: l10n.navRoleAssistant,
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed(AppRoutes.roleAssistant);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.badge_outlined,
-                      title: l10n.navCommittees,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.committees);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.route_outlined,
-                      title: l10n.navPathways,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.pathways);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _HomeCard(
-                      icon: Icons.emoji_events_outlined,
-                      title: l10n.navVoteBests,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.voteBests);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+              const SizedBox(height: 14),
+              GridView.builder(
+                itemCount: destinations.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  mainAxisExtent: 132,
                 ),
+                itemBuilder: (BuildContext context, int index) {
+                  final _HomeDestination destination = destinations[index];
+                  return _HomeCard(
+                    icon: destination.icon,
+                    title: destination.title,
+                    onTap: destination.onTap,
+                  );
+                },
               ),
             ],
           ),
@@ -141,6 +132,18 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _HomeDestination {
+  const _HomeDestination({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
 }
 
 class _HomeCard extends StatelessWidget {
@@ -156,26 +159,35 @@ class _HomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isChinese = Localizations.localeOf(context).languageCode == 'zh';
+
     return Material(
       color: Colors.white.withValues(alpha: 0.55),
-      borderRadius: BorderRadius.circular(26),
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(18),
         onTap: onTap,
-        child: Container(
-          height: 92,
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          alignment: Alignment.centerLeft,
-          child: Row(
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Icon(icon, size: 30, color: const Color(0xFF355E86)),
-              const SizedBox(width: 18),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF355E86),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: isChinese ? 28 : 24,
+                      fontWeight: FontWeight.w600,
+                      height: 1.08,
+                      color: const Color(0xFF355E86),
+                    ),
+                  ),
                 ),
               ),
             ],
