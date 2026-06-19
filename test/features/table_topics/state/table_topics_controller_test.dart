@@ -21,27 +21,26 @@ void main() {
     await controller.init(locale: const Locale('en'));
     await controller.setGeneratedTopics(
       <String>[
-        'Describe your ideal weekday routine.',
-        'What is one small habit that improves your day?',
-        'How do you usually relax after work or school?',
-        'What chore do you dislike the most and why?',
-        'What is your favorite part of the day?',
-        'How do you stay organized during a busy week?',
-        'What is something simple you enjoy doing alone?',
-        'Describe a daily routine from your childhood.',
-        'What is one thing you always carry with you?',
-        'How has your morning routine changed over time?',
+        'Ideal Weekday Routine',
+        'A Better Daily Habit',
+        'Relaxing After Work',
+        'Least Favorite Chore',
+        'Favorite Time of Day',
+        'Staying Organized',
+        'Joy of Time Alone',
+        'Childhood Daily Routine',
+        'Everyday Carry',
+        'Changing Morning Routine',
       ],
       locale: const Locale('en'),
     );
 
-    expect(controller.topicSet?.topics.first,
-        'Describe your ideal weekday routine.');
+    expect(controller.topicSet?.topics.first, 'Ideal Weekday Routine');
     expect(controller.topicSet?.items.first.isBuiltIn, isTrue);
 
     await controller.init(locale: const Locale('zh'));
 
-    expect(controller.topicSet?.topics.first, '请描述你理想中的平日作息。');
+    expect(controller.topicSet?.topics.first, '理想平日作息');
     expect(controller.topicSet?.items.first.topicId, 'tt_001');
   });
 
@@ -252,16 +251,16 @@ void main() {
     await controller.init(locale: const Locale('en'));
     await controller.setGeneratedTopics(
       <String>[
-        'Describe your ideal weekday routine.',
+        'Ideal Weekday Routine',
         'Edited freeform topic',
-        'How do you usually relax after work or school?',
-        'What chore do you dislike the most and why?',
-        'What is your favorite part of the day?',
-        'How do you stay organized during a busy week?',
-        'What is something simple you enjoy doing alone?',
-        'Describe a daily routine from your childhood.',
-        'What is one thing you always carry with you?',
-        'How has your morning routine changed over time?',
+        'Relaxing After Work',
+        'Least Favorite Chore',
+        'Favorite Time of Day',
+        'Staying Organized',
+        'Joy of Time Alone',
+        'Childhood Daily Routine',
+        'Everyday Carry',
+        'Changing Morning Routine',
       ],
       locale: const Locale('en'),
     );

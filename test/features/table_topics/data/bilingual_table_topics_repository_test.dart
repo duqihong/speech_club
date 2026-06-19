@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speech_club/features/table_topics/data/bilingual_table_topics_repository.dart';
+import 'package:speech_club/features/table_topics/data/models/bilingual_table_topic_content.dart';
 import 'package:speech_club/features/table_topics/data/models/category_selection.dart';
 import 'package:speech_club/features/table_topics/data/models/table_topic_session_item.dart';
 import 'package:speech_club/features/table_topics/data/table_topics_repository.dart';
@@ -9,6 +10,10 @@ import 'package:speech_club/features/table_topics/domain/topic_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  int countChineseCharacters(String text) {
+    return RegExp(r'[\u4E00-\u9FFF]').allMatches(text).length;
+  }
 
   test('loads bilingual table topics content from assets', () async {
     final BilingualTableTopicsRepository repository =
@@ -31,12 +36,89 @@ void main() {
 
     expect(
       firstItem.text.forLocale(const Locale('en')),
-      'Describe your ideal weekday routine.',
+      'Ideal Weekday Routine',
     );
     expect(
       firstItem.text.forLocale(const Locale('zh')),
-      '请描述你理想中的平日作息。',
+      '理想平日作息',
     );
+  });
+
+  test('all Chinese topics have 4 to 10 Chinese characters', () async {
+    final BilingualTableTopicsRepository repository =
+        BilingualTableTopicsRepository();
+
+    final bundle = await repository.load();
+
+    for (final BilingualTableTopicContent item in bundle.items) {
+      final int count = countChineseCharacters(item.text.zh);
+      expect(
+        count,
+        inInclusiveRange(4, 10),
+        reason: '${item.id} has $count Chinese characters: ${item.text.zh}',
+      );
+    }
+  });
+
+  test('every category has matching non-empty Chinese and English topics',
+      () async {
+    final BilingualTableTopicsRepository repository =
+        BilingualTableTopicsRepository();
+
+    final bundle = await repository.load();
+    final Map<String, List<BilingualTableTopicContent>> itemsByCategory =
+        <String, List<BilingualTableTopicContent>>{};
+
+    for (final BilingualTableTopicContent item in bundle.items) {
+      final List<BilingualTableTopicContent> categoryItems =
+          itemsByCategory.putIfAbsent(
+        item.category,
+        () => <BilingualTableTopicContent>[],
+      );
+      categoryItems.add(item);
+    }
+
+    expect(itemsByCategory, isNotEmpty);
+    for (final MapEntry<String, List<BilingualTableTopicContent>> entry
+        in itemsByCategory.entries) {
+      final List<String> englishTopics = entry.value
+          .map((BilingualTableTopicContent item) => item.text.en.trim())
+          .where((String text) => text.isNotEmpty)
+          .toList(growable: false);
+      final List<String> chineseTopics = entry.value
+          .map((BilingualTableTopicContent item) => item.text.zh.trim())
+          .where((String text) => text.isNotEmpty)
+          .toList(growable: false);
+
+      expect(entry.value, isNotEmpty, reason: '${entry.key} is empty');
+      expect(englishTopics, hasLength(entry.value.length));
+      expect(chineseTopics, hasLength(entry.value.length));
+      expect(chineseTopics.length, englishTopics.length);
+    }
+  });
+
+  test('Work and Career contains the requested concise topic pairs', () async {
+    final BilingualTableTopicsRepository repository =
+        BilingualTableTopicsRepository();
+
+    final bundle = await repository.load();
+    final Map<String, String> workTopics = <String, String>{
+      for (final BilingualTableTopicContent item in bundle.items.where(
+          (BilingualTableTopicContent item) =>
+              item.category == 'Work & Career'))
+        item.text.zh: item.text.en,
+    };
+
+    expect(workTopics, containsPair('工作常被误解', 'Work Misunderstood'));
+    expect(workTopics, containsPair('犯错后调整', 'Recovering from Mistakes'));
+    expect(workTopics, containsPair('稳定还是成长', 'Stability or Growth'));
+    expect(workTopics, containsPair('一次解决问题', 'Solving a Problem'));
+    expect(workTopics, containsPair('苦学的技能', 'A Hard-Learned Skill'));
+    expect(workTopics, containsPair('一个好主管', 'A Good Manager'));
+    expect(workTopics, containsPair('我的职业目标', 'My Career Goal'));
+    expect(workTopics, containsPair('最好的建议', 'Best Work Advice'));
+    expect(workTopics, containsPair('面对截止日', 'Facing Deadlines'));
+    expect(workTopics, containsPair('职场必练技能', 'Essential Work Skill'));
   });
 
   test('maps repository-backed built-in topics into the existing library shape',
@@ -55,7 +137,7 @@ void main() {
       contains(TableTopicsRepository.chineseSourceExpressionsCategory),
     );
     expect(library.totalTopicCount, 400);
-    expect(library.categories['Daily Life']?.first, '请描述你理想中的平日作息。');
+    expect(library.categories['Daily Life']?.first, '理想平日作息');
     expect(
       library.categories[TableTopicsRepository.englishSourceExpressionsCategory]
           ?.first,
