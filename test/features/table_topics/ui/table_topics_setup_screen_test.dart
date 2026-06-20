@@ -149,6 +149,33 @@ void main() {
       final int count = RegExp(r'[\u4E00-\u9FFF]').allMatches(topic).length;
       expect(count, inInclusiveRange(4, 10), reason: topic);
     }
+
+    await tester.tap(find.text('编辑 10 个题目'));
+    await tester.pumpAndSettle();
+    expect(find.text('编辑题目'), findsOneWidget);
+    expect(find.byType(TextField), findsWidgets);
+    await tester.enterText(find.byType(TextField).first, '回归测试题目');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    expect(find.text('1. 回归测试题目'), findsOneWidget);
+
+    await tester.tap(find.text('展示模式'));
+    await tester.pumpAndSettle();
+    expect(find.text('展示模式'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('10'), findsOneWidget);
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('重置'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is Text && RegExp(r'^\d+\. \S').hasMatch(widget.data ?? ''),
+      ),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 }

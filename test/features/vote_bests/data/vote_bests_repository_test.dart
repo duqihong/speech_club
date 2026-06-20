@@ -80,4 +80,24 @@ void main() {
       isTrue,
     );
   });
+
+  test('candidates and votes persist across repository instances', () async {
+    VoteBestsState state = await repository.addCandidate(
+      categoryId: 'best_speaker',
+      name: 'Alice',
+    );
+    final String candidateId =
+        state.categoryById('best_speaker').candidates.single.id;
+    await repository.incrementVote(
+      categoryId: 'best_speaker',
+      candidateId: candidateId,
+    );
+
+    final VoteBestsState restored = await VoteBestsRepository().loadState();
+    final VoteCandidate candidate =
+        restored.categoryById('best_speaker').candidates.single;
+
+    expect(candidate.name, 'Alice');
+    expect(candidate.votes, 1);
+  });
 }

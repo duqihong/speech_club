@@ -94,6 +94,32 @@ void main() {
     expect(controller.topicSet?.items.first.isCustom, isTrue);
   });
 
+  test('stale pre-catalog built-ins do not reopen as blank topics', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      TableTopicsStorage.sessionKey: jsonEncode(<String, dynamic>{
+        'version': 2,
+        'randomAll': false,
+        'selectedCategories': <String>['Friendship'],
+        'items': List<Map<String, dynamic>>.generate(
+          10,
+          (int index) => <String, dynamic>{
+            'sourceType': 'builtIn',
+            'topicId': 'tt_${(index + 1).toString().padLeft(3, '0')}',
+          },
+        ),
+        'used': List<bool>.filled(10, false),
+        'isCustomMode': false,
+      }),
+    });
+
+    final TableTopicsController controller = TableTopicsController();
+    await controller.init(locale: const Locale('en'));
+
+    expect(controller.topicSet, isNull);
+    expect(controller.selection.randomAll, isFalse);
+    expect(controller.selection.selectedCategories, <String>{'Communication'});
+  });
+
   test('generate10 still produces a presenter-ready set', () async {
     final TableTopicsController controller = TableTopicsController();
 

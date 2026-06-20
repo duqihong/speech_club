@@ -41,8 +41,18 @@ class TableTopicsController extends ChangeNotifier {
       customTopics = loadedCustomTopics;
 
       if (session != null) {
+        final Set<String> validSelectedCategories = session.randomAll
+            ? <String>{}
+            : session.selectedCategories
+                .where(loadedLibrary.categories.containsKey)
+                .toSet();
+        if (!session.randomAll &&
+            validSelectedCategories.isEmpty &&
+            session.selectedCategories.isNotEmpty) {
+          validSelectedCategories.add('Communication');
+        }
         selection = CategorySelection(
-          selectedCategories: session.selectedCategories.toSet(),
+          selectedCategories: validSelectedCategories,
           randomAll: session.randomAll,
         );
         isCustomMode = session.isCustomMode;
@@ -53,11 +63,19 @@ class TableTopicsController extends ChangeNotifier {
             items: session.items,
             locale: _currentLocale,
           );
-          topicSet = TopicSet.fromItems(
-            items: List<TableTopicSessionItem>.from(session.items),
-            topics: resolvedTopics,
-            used: List<bool>.from(session.used),
-          );
+          final bool hasUnresolvedBuiltInTopic = session.items
+              .asMap()
+              .entries
+              .any((MapEntry<int, TableTopicSessionItem> entry) =>
+                  entry.value.isBuiltIn &&
+                  resolvedTopics[entry.key].trim().isEmpty);
+          topicSet = hasUnresolvedBuiltInTopic
+              ? null
+              : TopicSet.fromItems(
+                  items: List<TableTopicSessionItem>.from(session.items),
+                  topics: resolvedTopics,
+                  used: List<bool>.from(session.used),
+                );
         } else {
           topicSet = null;
         }
