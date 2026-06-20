@@ -182,10 +182,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tableTopicsErrorPrefix => '错误';
 
   @override
+  String get tableTopicsCategoryCommunication => '沟通';
+
+  @override
   String get tableTopicsCategoryDailyLife => '日常生活';
 
   @override
-  String get tableTopicsCategoryFamily => '家庭';
+  String get tableTopicsCategoryEducation => '教育';
 
   @override
   String get tableTopicsCategoryTravel => '旅行';
@@ -194,46 +197,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tableTopicsCategoryWorkCareer => '工作与职业';
 
   @override
-  String get tableTopicsCategoryFriendship => '友情';
-
-  @override
-  String get tableTopicsCategoryHealthFitness => '健康与运动';
+  String get tableTopicsCategoryEnglishOriginExpressions => '英语来源表达';
 
   @override
   String get tableTopicsCategoryFood => '美食';
 
   @override
-  String get tableTopicsCategoryTechnology => '科技';
+  String get tableTopicsCategoryHealthExercise => '健康与运动';
 
   @override
-  String get tableTopicsCategoryMoney => '金钱';
+  String get tableTopicsCategoryChineseIdioms => '成语';
 
   @override
-  String get tableTopicsCategoryEducation => '教育';
-
-  @override
-  String get tableTopicsCategoryHobbies => '兴趣爱好';
-
-  @override
-  String get tableTopicsCategoryLeadership => '领导力';
-
-  @override
-  String get tableTopicsCategoryCommunication => '沟通';
-
-  @override
-  String get tableTopicsCategoryValues => '价值观';
-
-  @override
-  String get tableTopicsCategoryCulture => '文化';
-
-  @override
-  String get tableTopicsCategoryFunHumor => '趣味幽默';
-
-  @override
-  String get tableTopicsCategoryEnglishSourceExpressions => '英语来源表达';
-
-  @override
-  String get tableTopicsCategoryChineseSourceExpressions => '中文来源表达';
+  String get tableTopicsCategoryClassicalPoetryLines => '诗句';
 
   @override
   String get flashcardsMySpeech => '我的演讲';

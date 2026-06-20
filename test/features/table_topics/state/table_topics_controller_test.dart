@@ -11,6 +11,19 @@ import 'package:speech_club/features/table_topics/state/table_topics_controller.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  const List<String> communicationTopics = <String>[
+    'Effective Communication',
+    'Resolving Misunderstanding',
+    'Importance of Listening',
+    'Speaking with Balance',
+    'Silence Communicates',
+    'A Warm Word',
+    'Expressing True Thoughts',
+    'Patience in Communication',
+    'Hard Words to Say',
+    'Communication Changes Relationships',
+  ];
+
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
@@ -20,28 +33,17 @@ void main() {
 
     await controller.init(locale: const Locale('en'));
     await controller.setGeneratedTopics(
-      <String>[
-        'Ideal Weekday Routine',
-        'A Better Daily Habit',
-        'Relaxing After Work',
-        'Least Favorite Chore',
-        'Favorite Time of Day',
-        'Staying Organized',
-        'Joy of Time Alone',
-        'Childhood Daily Routine',
-        'Everyday Carry',
-        'Changing Morning Routine',
-      ],
+      communicationTopics,
       locale: const Locale('en'),
     );
 
-    expect(controller.topicSet?.topics.first, 'Ideal Weekday Routine');
+    expect(controller.topicSet?.topics.first, 'Effective Communication');
     expect(controller.topicSet?.items.first.isBuiltIn, isTrue);
 
     await controller.init(locale: const Locale('zh'));
 
-    expect(controller.topicSet?.topics.first, '理想平日作息');
-    expect(controller.topicSet?.items.first.topicId, 'tt_001');
+    expect(controller.topicSet?.topics.first, '一次有效沟通');
+    expect(controller.topicSet?.items.first.topicId, 'tt_comm_001');
   });
 
   test('custom topics stay unchanged across locale switches', () async {
@@ -98,8 +100,8 @@ void main() {
     await controller.init(locale: const Locale('en'));
     await controller.generate10();
 
-    expect(controller.topicSet?.topics.length, 10);
-    expect(controller.topicSet?.used.length, 10);
+    expect(controller.topicSet?.topics, hasLength(10));
+    expect(controller.topicSet?.used, hasLength(10));
     expect(
       controller.topicSet?.items.every((item) => item.isBuiltIn),
       isTrue,
@@ -112,42 +114,23 @@ void main() {
     );
   });
 
-  test('generate10 includes only selected English source expressions',
+  test('generate10 includes only selected English-origin expressions',
       () async {
     final TableTopicsController controller = TableTopicsController();
 
     await controller.init(locale: const Locale('en'));
     await controller.generateBuiltInTopics(
       selectedCategories: <String>{
-        TableTopicsRepository.englishSourceExpressionsCategory,
+        TableTopicsRepository.englishOriginExpressionsCategory,
       },
       locale: const Locale('en'),
     );
 
+    expect(controller.topicSet?.topics, hasLength(10));
     expect(
       controller.topicSet?.items
           .map((item) => item.topicId!)
-          .every((String id) => id.startsWith('expr_en_')),
-      isTrue,
-    );
-  });
-
-  test('generate10 includes only selected Chinese source expressions',
-      () async {
-    final TableTopicsController controller = TableTopicsController();
-
-    await controller.init(locale: const Locale('zh'));
-    await controller.generateBuiltInTopics(
-      selectedCategories: <String>{
-        TableTopicsRepository.chineseSourceExpressionsCategory,
-      },
-      locale: const Locale('zh'),
-    );
-
-    expect(
-      controller.topicSet?.items
-          .map((item) => item.topicId!)
-          .every((String id) => id.startsWith('expr_zh_')),
+          .every((String id) => id.startsWith('tt_english_origin_')),
       isTrue,
     );
   });
@@ -158,9 +141,6 @@ void main() {
 
     await controller.init(locale: const Locale('en'));
     await controller.generate10();
-
-    expect(controller.topicSet?.topics.length, 10);
-
     await controller.resetSession();
 
     expect(controller.topicSet, isNull);
@@ -194,43 +174,44 @@ void main() {
     await controller.resetSession();
     await controller.generate10();
 
-    expect(controller.topicSet?.topics.length, 10);
+    expect(controller.topicSet?.topics, hasLength(10));
     expect(controller.topicSet?.items.every((item) => item.isBuiltIn), isTrue);
   });
 
-  test(
-      'expression built-ins keep source-first paired display across locale switches',
-      () async {
+  test('English-origin topics re-render in the active locale', () async {
     final TableTopicsController controller = TableTopicsController();
 
     await controller.init(locale: const Locale('en'));
     await controller.generateBuiltInTopics(
       selectedCategories: <String>{
-        TableTopicsRepository.englishSourceExpressionsCategory,
+        TableTopicsRepository.englishOriginExpressionsCategory,
       },
       locale: const Locale('en'),
     );
 
-    final String firstTopic = controller.topicSet!.topics.first;
+    final String englishTopic = controller.topicSet!.topics.first;
     final String firstId = controller.topicSet!.items.first.topicId!;
 
-    expect(firstId.startsWith('expr_en_'), isTrue);
-    expect(firstTopic, contains('\n'));
+    expect(firstId.startsWith('tt_english_origin_'), isTrue);
+    expect(englishTopic, isNot(contains('\n')));
 
     await controller.init(locale: const Locale('zh'));
 
     expect(controller.topicSet?.items.first.topicId, firstId);
-    expect(controller.topicSet?.topics.first, firstTopic);
+    expect(controller.topicSet?.topics.first, isNot(englishTopic));
+    expect(
+      RegExp(r'[\u4E00-\u9FFF]').hasMatch(controller.topicSet!.topics.first),
+      isTrue,
+    );
   });
 
-  test('selected expression categories persist safely in session state',
-      () async {
+  test('selected final categories persist safely in session state', () async {
     final TableTopicsController controller = TableTopicsController();
 
     await controller.init(locale: const Locale('en'));
     controller.selection = CategorySelection(
       selectedCategories: <String>{
-        TableTopicsRepository.chineseSourceExpressionsCategory,
+        TableTopicsRepository.chineseIdiomsCategory,
       },
       randomAll: false,
     );
@@ -240,28 +221,19 @@ void main() {
 
     expect(
       controller.selection.selectedCategories,
-      contains(TableTopicsRepository.chineseSourceExpressionsCategory),
+      contains(TableTopicsRepository.chineseIdiomsCategory),
     );
     expect(controller.selection.randomAll, isFalse);
   });
 
   test('edited built-in text converts safely to custom text', () async {
     final TableTopicsController controller = TableTopicsController();
+    final List<String> editedTopics = List<String>.from(communicationTopics);
+    editedTopics[1] = 'Edited freeform topic';
 
     await controller.init(locale: const Locale('en'));
     await controller.setGeneratedTopics(
-      <String>[
-        'Ideal Weekday Routine',
-        'Edited freeform topic',
-        'Relaxing After Work',
-        'Least Favorite Chore',
-        'Favorite Time of Day',
-        'Staying Organized',
-        'Joy of Time Alone',
-        'Childhood Daily Routine',
-        'Everyday Carry',
-        'Changing Morning Routine',
-      ],
+      editedTopics,
       locale: const Locale('en'),
     );
 

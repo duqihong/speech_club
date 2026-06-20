@@ -440,17 +440,23 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get tableTopicsErrorPrefix;
 
+  /// No description provided for @tableTopicsCategoryCommunication.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication'**
+  String get tableTopicsCategoryCommunication;
+
   /// No description provided for @tableTopicsCategoryDailyLife.
   ///
   /// In en, this message translates to:
   /// **'Daily Life'**
   String get tableTopicsCategoryDailyLife;
 
-  /// No description provided for @tableTopicsCategoryFamily.
+  /// No description provided for @tableTopicsCategoryEducation.
   ///
   /// In en, this message translates to:
-  /// **'Family'**
-  String get tableTopicsCategoryFamily;
+  /// **'Education'**
+  String get tableTopicsCategoryEducation;
 
   /// No description provided for @tableTopicsCategoryTravel.
   ///
@@ -464,17 +470,11 @@ abstract class AppLocalizations {
   /// **'Work & Career'**
   String get tableTopicsCategoryWorkCareer;
 
-  /// No description provided for @tableTopicsCategoryFriendship.
+  /// No description provided for @tableTopicsCategoryEnglishOriginExpressions.
   ///
   /// In en, this message translates to:
-  /// **'Friendship'**
-  String get tableTopicsCategoryFriendship;
-
-  /// No description provided for @tableTopicsCategoryHealthFitness.
-  ///
-  /// In en, this message translates to:
-  /// **'Health & Fitness'**
-  String get tableTopicsCategoryHealthFitness;
+  /// **'English-Origin Expressions'**
+  String get tableTopicsCategoryEnglishOriginExpressions;
 
   /// No description provided for @tableTopicsCategoryFood.
   ///
@@ -482,71 +482,23 @@ abstract class AppLocalizations {
   /// **'Food'**
   String get tableTopicsCategoryFood;
 
-  /// No description provided for @tableTopicsCategoryTechnology.
+  /// No description provided for @tableTopicsCategoryHealthExercise.
   ///
   /// In en, this message translates to:
-  /// **'Technology'**
-  String get tableTopicsCategoryTechnology;
+  /// **'Health & Exercise'**
+  String get tableTopicsCategoryHealthExercise;
 
-  /// No description provided for @tableTopicsCategoryMoney.
+  /// No description provided for @tableTopicsCategoryChineseIdioms.
   ///
   /// In en, this message translates to:
-  /// **'Money'**
-  String get tableTopicsCategoryMoney;
+  /// **'Chinese Idioms'**
+  String get tableTopicsCategoryChineseIdioms;
 
-  /// No description provided for @tableTopicsCategoryEducation.
+  /// No description provided for @tableTopicsCategoryClassicalPoetryLines.
   ///
   /// In en, this message translates to:
-  /// **'Education'**
-  String get tableTopicsCategoryEducation;
-
-  /// No description provided for @tableTopicsCategoryHobbies.
-  ///
-  /// In en, this message translates to:
-  /// **'Hobbies'**
-  String get tableTopicsCategoryHobbies;
-
-  /// No description provided for @tableTopicsCategoryLeadership.
-  ///
-  /// In en, this message translates to:
-  /// **'Leadership'**
-  String get tableTopicsCategoryLeadership;
-
-  /// No description provided for @tableTopicsCategoryCommunication.
-  ///
-  /// In en, this message translates to:
-  /// **'Communication'**
-  String get tableTopicsCategoryCommunication;
-
-  /// No description provided for @tableTopicsCategoryValues.
-  ///
-  /// In en, this message translates to:
-  /// **'Values'**
-  String get tableTopicsCategoryValues;
-
-  /// No description provided for @tableTopicsCategoryCulture.
-  ///
-  /// In en, this message translates to:
-  /// **'Culture'**
-  String get tableTopicsCategoryCulture;
-
-  /// No description provided for @tableTopicsCategoryFunHumor.
-  ///
-  /// In en, this message translates to:
-  /// **'Fun & Humor'**
-  String get tableTopicsCategoryFunHumor;
-
-  /// No description provided for @tableTopicsCategoryEnglishSourceExpressions.
-  ///
-  /// In en, this message translates to:
-  /// **'English Source Expressions'**
-  String get tableTopicsCategoryEnglishSourceExpressions;
-
-  /// No description provided for @tableTopicsCategoryChineseSourceExpressions.
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese Source Expressions'**
-  String get tableTopicsCategoryChineseSourceExpressions;
+  /// **'Classical Poetry Lines'**
+  String get tableTopicsCategoryClassicalPoetryLines;
 
   /// No description provided for @flashcardsMySpeech.
   ///

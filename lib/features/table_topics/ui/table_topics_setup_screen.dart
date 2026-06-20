@@ -249,42 +249,26 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
 
   String _categoryLabel(AppLocalizations l10n, String category) {
     switch (category) {
+      case 'Communication':
+        return l10n.tableTopicsCategoryCommunication;
       case 'Daily Life':
         return l10n.tableTopicsCategoryDailyLife;
-      case 'Family':
-        return l10n.tableTopicsCategoryFamily;
+      case 'Education':
+        return l10n.tableTopicsCategoryEducation;
       case 'Travel':
         return l10n.tableTopicsCategoryTravel;
       case 'Work & Career':
         return l10n.tableTopicsCategoryWorkCareer;
-      case 'Friendship':
-        return l10n.tableTopicsCategoryFriendship;
-      case 'Health & Fitness':
-        return l10n.tableTopicsCategoryHealthFitness;
+      case 'English-Origin Expressions':
+        return l10n.tableTopicsCategoryEnglishOriginExpressions;
       case 'Food':
         return l10n.tableTopicsCategoryFood;
-      case 'Technology':
-        return l10n.tableTopicsCategoryTechnology;
-      case 'Money':
-        return l10n.tableTopicsCategoryMoney;
-      case 'Education':
-        return l10n.tableTopicsCategoryEducation;
-      case 'Hobbies':
-        return l10n.tableTopicsCategoryHobbies;
-      case 'Leadership':
-        return l10n.tableTopicsCategoryLeadership;
-      case 'Communication':
-        return l10n.tableTopicsCategoryCommunication;
-      case 'Values':
-        return l10n.tableTopicsCategoryValues;
-      case 'Culture':
-        return l10n.tableTopicsCategoryCulture;
-      case 'Fun & Humor':
-        return l10n.tableTopicsCategoryFunHumor;
-      case 'english_source_expressions':
-        return l10n.tableTopicsCategoryEnglishSourceExpressions;
-      case 'chinese_source_expressions':
-        return l10n.tableTopicsCategoryChineseSourceExpressions;
+      case 'Health & Exercise':
+        return l10n.tableTopicsCategoryHealthExercise;
+      case 'Chinese Idioms':
+        return l10n.tableTopicsCategoryChineseIdioms;
+      case 'Classical Poetry Lines':
+        return l10n.tableTopicsCategoryClassicalPoetryLines;
       default:
         return category;
     }
@@ -326,7 +310,7 @@ class _TableTopicsSetupScreenState extends State<TableTopicsSetupScreen> {
 
             final List<String> categories = List<String>.from(
               _controller.library?.categoryNames ?? const <String>[],
-            )..sort();
+            );
 
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),

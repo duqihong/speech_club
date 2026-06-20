@@ -11,65 +11,56 @@ import 'package:speech_club/features/table_topics/domain/topic_service.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  const List<String> finalCategories = <String>[
+    'Communication',
+    'Daily Life',
+    'Education',
+    'Travel',
+    'Work & Career',
+    'English-Origin Expressions',
+    'Food',
+    'Health & Exercise',
+    'Chinese Idioms',
+    'Classical Poetry Lines',
+  ];
+
   int countChineseCharacters(String text) {
     return RegExp(r'[\u4E00-\u9FFF]').allMatches(text).length;
   }
 
-  test('loads bilingual table topics content from assets', () async {
+  Future<List<BilingualTableTopicContent>> loadItems() async {
+    final BilingualTableTopicsRepository repository =
+        BilingualTableTopicsRepository();
+    return (await repository.load()).items;
+  }
+
+  test('loads the final bilingual Table Topics catalog', () async {
     final BilingualTableTopicsRepository repository =
         BilingualTableTopicsRepository();
 
     final bundle = await repository.load();
 
-    expect(bundle.version, 1);
-    expect(bundle.items.length, 200);
-    expect(bundle.items.first.id, 'tt_001');
-    expect(bundle.items.first.category, 'Daily Life');
-  });
-
-  test('resolves bilingual table topic text by locale', () async {
-    final BilingualTableTopicsRepository repository =
-        BilingualTableTopicsRepository();
-
-    final bundle = await repository.load();
-    final firstItem = bundle.items.first;
-
+    expect(bundle.version, 2);
+    expect(bundle.items, hasLength(100));
+    expect(bundle.items.first.id, 'tt_comm_001');
+    expect(bundle.items.first.category, 'Communication');
     expect(
-      firstItem.text.forLocale(const Locale('en')),
-      'Ideal Weekday Routine',
+      bundle.items.first.text.forLocale(const Locale('en')),
+      'Effective Communication',
     );
     expect(
-      firstItem.text.forLocale(const Locale('zh')),
-      '理想平日作息',
+      bundle.items.first.text.forLocale(const Locale('zh')),
+      '一次有效沟通',
     );
   });
 
-  test('all Chinese topics have 4 to 10 Chinese characters', () async {
-    final BilingualTableTopicsRepository repository =
-        BilingualTableTopicsRepository();
-
-    final bundle = await repository.load();
-
-    for (final BilingualTableTopicContent item in bundle.items) {
-      final int count = countChineseCharacters(item.text.zh);
-      expect(
-        count,
-        inInclusiveRange(4, 10),
-        reason: '${item.id} has $count Chinese characters: ${item.text.zh}',
-      );
-    }
-  });
-
-  test('every category has matching non-empty Chinese and English topics',
+  test('catalog has the exact final category order and 10 paired topics each',
       () async {
-    final BilingualTableTopicsRepository repository =
-        BilingualTableTopicsRepository();
-
-    final bundle = await repository.load();
+    final List<BilingualTableTopicContent> items = await loadItems();
     final Map<String, List<BilingualTableTopicContent>> itemsByCategory =
         <String, List<BilingualTableTopicContent>>{};
 
-    for (final BilingualTableTopicContent item in bundle.items) {
+    for (final BilingualTableTopicContent item in items) {
       final List<BilingualTableTopicContent> categoryItems =
           itemsByCategory.putIfAbsent(
         item.category,
@@ -78,34 +69,75 @@ void main() {
       categoryItems.add(item);
     }
 
-    expect(itemsByCategory, isNotEmpty);
-    for (final MapEntry<String, List<BilingualTableTopicContent>> entry
-        in itemsByCategory.entries) {
-      final List<String> englishTopics = entry.value
-          .map((BilingualTableTopicContent item) => item.text.en.trim())
-          .where((String text) => text.isNotEmpty)
-          .toList(growable: false);
-      final List<String> chineseTopics = entry.value
-          .map((BilingualTableTopicContent item) => item.text.zh.trim())
-          .where((String text) => text.isNotEmpty)
-          .toList(growable: false);
+    expect(itemsByCategory.keys.toList(growable: false), finalCategories);
+    for (final String category in finalCategories) {
+      final List<BilingualTableTopicContent> categoryItems =
+          itemsByCategory[category]!;
+      expect(categoryItems, hasLength(10), reason: category);
+      expect(
+        categoryItems.every(
+          (BilingualTableTopicContent item) => item.text.en.trim().isNotEmpty,
+        ),
+        isTrue,
+        reason: '$category has a missing English topic',
+      );
+      expect(
+        categoryItems.every(
+          (BilingualTableTopicContent item) => item.text.zh.trim().isNotEmpty,
+        ),
+        isTrue,
+        reason: '$category has a missing Chinese topic',
+      );
+    }
+  });
 
-      expect(entry.value, isNotEmpty, reason: '${entry.key} is empty');
-      expect(englishTopics, hasLength(entry.value.length));
-      expect(chineseTopics, hasLength(entry.value.length));
-      expect(chineseTopics.length, englishTopics.length);
+  test('removed and non-final categories are absent', () async {
+    final List<BilingualTableTopicContent> items = await loadItems();
+    final Set<String> categories =
+        items.map((BilingualTableTopicContent item) => item.category).toSet();
+
+    for (final String category in <String>[
+      'Culture',
+      'Friendship',
+      'Fun & Humor',
+      'Values',
+      'Chinese-Origin Expressions',
+      'Family',
+      'Technology',
+      'Money',
+      'Hobbies',
+      'Leadership',
+    ]) {
+      expect(categories, isNot(contains(category)));
+    }
+  });
+
+  test('all Chinese topics obey general and specialized length rules',
+      () async {
+    final List<BilingualTableTopicContent> items = await loadItems();
+
+    for (final BilingualTableTopicContent item in items) {
+      final int count = countChineseCharacters(item.text.zh);
+      expect(
+        count,
+        inInclusiveRange(4, 10),
+        reason: '${item.id} has $count Chinese characters: ${item.text.zh}',
+      );
+      if (item.category == TableTopicsRepository.chineseIdiomsCategory) {
+        expect(count, 4, reason: item.text.zh);
+      }
+      if (item.category == TableTopicsRepository.classicalPoetryLinesCategory) {
+        expect(count, 7, reason: item.text.zh);
+      }
     }
   });
 
   test('Work and Career contains the requested concise topic pairs', () async {
-    final BilingualTableTopicsRepository repository =
-        BilingualTableTopicsRepository();
-
-    final bundle = await repository.load();
+    final List<BilingualTableTopicContent> items = await loadItems();
     final Map<String, String> workTopics = <String, String>{
-      for (final BilingualTableTopicContent item in bundle.items.where(
-          (BilingualTableTopicContent item) =>
-              item.category == 'Work & Career'))
+      for (final BilingualTableTopicContent item in items.where(
+        (BilingualTableTopicContent item) => item.category == 'Work & Career',
+      ))
         item.text.zh: item.text.en,
     };
 
@@ -121,37 +153,29 @@ void main() {
     expect(workTopics, containsPair('职场必练技能', 'Essential Work Skill'));
   });
 
-  test('maps repository-backed built-in topics into the existing library shape',
-      () async {
+  test('repository library preserves final category order and count', () async {
     final TableTopicsRepository repository = TableTopicsRepository();
 
-    final library = await repository.getLibrary(locale: const Locale('zh'));
+    final englishLibrary =
+        await repository.getLibrary(locale: const Locale('en'));
+    final chineseLibrary =
+        await repository.getLibrary(locale: const Locale('zh'));
 
-    expect(library.categoryNames, contains('Daily Life'));
+    expect(englishLibrary.categoryNames, finalCategories);
+    expect(chineseLibrary.categoryNames, finalCategories);
+    expect(englishLibrary.totalTopicCount, 100);
+    expect(chineseLibrary.totalTopicCount, 100);
     expect(
-      library.categoryNames,
-      contains(TableTopicsRepository.englishSourceExpressionsCategory),
+      chineseLibrary.categories['Chinese Idioms'],
+      contains('塞翁失马'),
     );
     expect(
-      library.categoryNames,
-      contains(TableTopicsRepository.chineseSourceExpressionsCategory),
-    );
-    expect(library.totalTopicCount, 400);
-    expect(library.categories['Daily Life']?.first, '理想平日作息');
-    expect(
-      library.categories[TableTopicsRepository.englishSourceExpressionsCategory]
-          ?.first,
-      'Break the ice\n打破僵局',
-    );
-    expect(
-      library.categories[TableTopicsRepository.chineseSourceExpressionsCategory]
-          ?.first,
-      '勇敢迈出第一步\nTake the first step bravely',
+      chineseLibrary.categories['Classical Poetry Lines'],
+      contains('春风又绿江南岸'),
     );
   });
 
-  test('existing generation flow still returns 10 topics from built-in content',
-      () async {
+  test('existing generation flow still returns 10 topics', () async {
     final TableTopicsRepository repository = TableTopicsRepository();
     final library = await repository.getLibrary(locale: const Locale('en'));
 
@@ -160,12 +184,11 @@ void main() {
       selection: CategorySelection.defaults(),
     );
 
-    expect(topicSet.topics.length, 10);
-    expect(topicSet.used.length, 10);
+    expect(topicSet.topics, hasLength(10));
+    expect(topicSet.used, hasLength(10));
   });
 
-  test('built-in generation creates stable built-in session items directly',
-      () async {
+  test('built-in generation creates stable built-in session items', () async {
     final TableTopicsRepository repository = TableTopicsRepository();
 
     final topicSet = await repository.generateBuiltInTopicSet(
@@ -173,133 +196,41 @@ void main() {
       locale: const Locale('en'),
     );
 
-    expect(topicSet.topics.length, 10);
-    expect(topicSet.items.length, 10);
+    expect(topicSet.topics, hasLength(10));
+    expect(topicSet.items, hasLength(10));
     expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
-    expect(topicSet.items.every((item) => item.topicId != null), isTrue);
-  });
-
-  test(
-      'default built-in generation excludes expression categories when none are selected',
-      () async {
-    final TableTopicsRepository repository = TableTopicsRepository();
-    final topicSet = await repository.generateBuiltInTopicSet(
-      selection: CategorySelection.defaults(),
-      locale: const Locale('en'),
-    );
-
     expect(
       topicSet.items
           .map((TableTopicSessionItem item) => item.topicId!)
           .every((String id) => id.startsWith('tt_')),
       isTrue,
     );
+  });
+
+  test('selected English-origin expressions generate only that category',
+      () async {
+    final TableTopicsRepository repository = TableTopicsRepository();
+
+    final topicSet = await repository.generateBuiltInTopicSet(
+      selection: CategorySelection(
+        selectedCategories: <String>{
+          TableTopicsRepository.englishOriginExpressionsCategory,
+        },
+        randomAll: false,
+      ),
+      locale: const Locale('zh'),
+    );
+
+    expect(topicSet.items, hasLength(10));
+    expect(
+      topicSet.items.every(
+        (item) => item.topicId!.startsWith('tt_english_origin_'),
+      ),
+      isTrue,
+    );
+    expect(topicSet.topics, contains('破冰的时刻'));
     expect(
       topicSet.topics.every((String topic) => !topic.contains('\n')),
-      isTrue,
-    );
-  });
-
-  test(
-      'english source expressions category generates built-in expression items',
-      () async {
-    final TableTopicsRepository repository = TableTopicsRepository();
-
-    final topicSet = await repository.generateBuiltInTopicSet(
-      selection: CategorySelection(
-        selectedCategories: <String>{
-          TableTopicsRepository.englishSourceExpressionsCategory,
-        },
-        randomAll: false,
-      ),
-      locale: const Locale('zh'),
-    );
-
-    expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
-    expect(
-      topicSet.items.every((item) => item.topicId!.startsWith('expr_en_')),
-      isTrue,
-    );
-    expect(
-      topicSet.topics.every(
-        (topic) => topic.contains('\n') && topic.indexOf('\n') > 0,
-      ),
-      isTrue,
-    );
-  });
-
-  test(
-      'selected English source expressions do not pull in unselected Chinese source expressions',
-      () async {
-    final TableTopicsRepository repository = TableTopicsRepository();
-
-    final topicSet = await repository.generateBuiltInTopicSet(
-      selection: CategorySelection(
-        selectedCategories: <String>{
-          'Daily Life',
-          TableTopicsRepository.englishSourceExpressionsCategory,
-        },
-        randomAll: false,
-      ),
-      locale: const Locale('en'),
-    );
-
-    expect(
-      topicSet.items
-          .map((TableTopicSessionItem item) => item.topicId!)
-          .every((String id) => !id.startsWith('expr_zh_')),
-      isTrue,
-    );
-  });
-
-  test(
-      'chinese source expressions category generates built-in expression items',
-      () async {
-    final TableTopicsRepository repository = TableTopicsRepository();
-
-    final topicSet = await repository.generateBuiltInTopicSet(
-      selection: CategorySelection(
-        selectedCategories: <String>{
-          TableTopicsRepository.chineseSourceExpressionsCategory,
-        },
-        randomAll: false,
-      ),
-      locale: const Locale('en'),
-    );
-
-    expect(topicSet.items.every((item) => item.isBuiltIn), isTrue);
-    expect(
-      topicSet.items.every((item) => item.topicId!.startsWith('expr_zh_')),
-      isTrue,
-    );
-    expect(
-      topicSet.topics.every(
-        (topic) => topic.contains('\n') && topic.indexOf('\n') > 0,
-      ),
-      isTrue,
-    );
-  });
-
-  test(
-      'selected Chinese source expressions do not pull in unselected English source expressions',
-      () async {
-    final TableTopicsRepository repository = TableTopicsRepository();
-
-    final topicSet = await repository.generateBuiltInTopicSet(
-      selection: CategorySelection(
-        selectedCategories: <String>{
-          'Daily Life',
-          TableTopicsRepository.chineseSourceExpressionsCategory,
-        },
-        randomAll: false,
-      ),
-      locale: const Locale('zh'),
-    );
-
-    expect(
-      topicSet.items
-          .map((TableTopicSessionItem item) => item.topicId!)
-          .every((String id) => !id.startsWith('expr_en_')),
       isTrue,
     );
   });

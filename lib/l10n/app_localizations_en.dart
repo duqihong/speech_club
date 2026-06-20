@@ -185,10 +185,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tableTopicsErrorPrefix => 'Error';
 
   @override
+  String get tableTopicsCategoryCommunication => 'Communication';
+
+  @override
   String get tableTopicsCategoryDailyLife => 'Daily Life';
 
   @override
-  String get tableTopicsCategoryFamily => 'Family';
+  String get tableTopicsCategoryEducation => 'Education';
 
   @override
   String get tableTopicsCategoryTravel => 'Travel';
@@ -197,48 +200,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tableTopicsCategoryWorkCareer => 'Work & Career';
 
   @override
-  String get tableTopicsCategoryFriendship => 'Friendship';
-
-  @override
-  String get tableTopicsCategoryHealthFitness => 'Health & Fitness';
+  String get tableTopicsCategoryEnglishOriginExpressions =>
+      'English-Origin Expressions';
 
   @override
   String get tableTopicsCategoryFood => 'Food';
 
   @override
-  String get tableTopicsCategoryTechnology => 'Technology';
+  String get tableTopicsCategoryHealthExercise => 'Health & Exercise';
 
   @override
-  String get tableTopicsCategoryMoney => 'Money';
+  String get tableTopicsCategoryChineseIdioms => 'Chinese Idioms';
 
   @override
-  String get tableTopicsCategoryEducation => 'Education';
-
-  @override
-  String get tableTopicsCategoryHobbies => 'Hobbies';
-
-  @override
-  String get tableTopicsCategoryLeadership => 'Leadership';
-
-  @override
-  String get tableTopicsCategoryCommunication => 'Communication';
-
-  @override
-  String get tableTopicsCategoryValues => 'Values';
-
-  @override
-  String get tableTopicsCategoryCulture => 'Culture';
-
-  @override
-  String get tableTopicsCategoryFunHumor => 'Fun & Humor';
-
-  @override
-  String get tableTopicsCategoryEnglishSourceExpressions =>
-      'English Source Expressions';
-
-  @override
-  String get tableTopicsCategoryChineseSourceExpressions =>
-      'Chinese Source Expressions';
+  String get tableTopicsCategoryClassicalPoetryLines =>
+      'Classical Poetry Lines';
 
   @override
   String get flashcardsMySpeech => 'My Speech';
