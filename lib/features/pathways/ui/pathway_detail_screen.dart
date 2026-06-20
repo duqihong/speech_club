@@ -85,19 +85,6 @@ class PathwayDetailScreen extends StatelessWidget {
                 title: l10n.pathwaysMentorTips,
                 child: _buildBulletList(guide.mentorTipsForLocale(locale)),
               ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Text(
-                    l10n.pathwaysBaseCampNote,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                      height: 1.3,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

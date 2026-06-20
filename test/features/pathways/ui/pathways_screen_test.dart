@@ -66,6 +66,10 @@ void main() {
     expect(find.text('Persuasive Influence'), findsOneWidget);
     expect(find.text('Presentation Mastery'), findsOneWidget);
     expect(find.text('Visionary Communication'), findsOneWidget);
+    expect(
+      find.textContaining('Use this as a simple club guide'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Chinese Pathways screen shows localized path cards',
@@ -87,6 +91,7 @@ void main() {
     expect(find.text('说服影响力'), findsOneWidget);
     expect(find.text('演讲精进'), findsOneWidget);
     expect(find.text('愿景沟通'), findsOneWidget);
+    expect(find.textContaining('这是俱乐部内使用的简明参考'), findsOneWidget);
   });
 
   testWidgets('English Presentation Mastery detail shows guide sections',
@@ -114,6 +119,10 @@ void main() {
     expect(find.text('Typical Speech Focus'), findsOneWidget);
     expect(find.text('How to Start'), findsOneWidget);
     expect(find.text('Mentor Tips'), findsOneWidget);
+    expect(
+      find.textContaining('Use this as a simple club guide'),
+      findsNothing,
+    );
   });
 
   testWidgets('Chinese Presentation Mastery detail shows guide sections',
@@ -142,5 +151,6 @@ void main() {
     expect(find.text('常见演讲重点'), findsOneWidget);
     expect(find.text('如何开始'), findsOneWidget);
     expect(find.text('导师提示'), findsOneWidget);
+    expect(find.textContaining('这是俱乐部内使用的简明参考'), findsNothing);
   });
 }
