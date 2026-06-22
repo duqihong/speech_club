@@ -4,11 +4,11 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'president',
     titleEn: 'President',
-    titleZh: '主席',
+    titleZh: '会长',
     icon: '🧭',
     rolePurposeEn:
         'You guide the club, support the committee, and keep the club moving in a healthy direction.',
-    rolePurposeZh: '你带领俱乐部，支持委员团队，让俱乐部保持健康、温暖、有方向地发展。',
+    rolePurposeZh: '你带领俱乐部，支持执委团队，让俱乐部保持健康、温暖、有方向地发展。',
     responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Before Meeting',
@@ -55,9 +55,9 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
       CommitteeResponsibilitySection(
         title: '每月',
         items: <String>[
-          '主持或参与委员会议。',
+          '主持或参与执委会议。',
           '跟进俱乐部目标和会员需要。',
-          '支持需要帮助的委员。',
+          '支持需要帮助的执委。',
         ],
       ),
     ],
@@ -75,7 +75,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'vpe',
     titleEn: 'Vice President Education',
-    titleZh: '教育副主席',
+    titleZh: '教育副会长',
     icon: '🎓',
     rolePurposeEn:
         'You help members grow by planning speeches, roles, mentoring, and education progress.',
@@ -146,7 +146,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'vpm',
     titleEn: 'Vice President Membership',
-    titleZh: '会员副主席',
+    titleZh: '会员副会长',
     icon: '🤝',
     rolePurposeEn:
         'You welcome guests and help them become comfortable members of the club.',
@@ -217,7 +217,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'vppr',
     titleEn: 'Vice President Public Relations',
-    titleZh: '公关副主席',
+    titleZh: '公关副会长',
     icon: '📣',
     rolePurposeEn:
         'You help people outside the club understand the club’s value and activities.',
@@ -336,7 +336,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         items: <String>[
           '整理并分享会议记录。',
           '更新俱乐部资料。',
-          '帮助委员查找过去决定。',
+          '帮助执委查找过去决定。',
         ],
       ),
     ],
@@ -383,7 +383,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         items: <String>[
           '记录收入和支出。',
           '更新付款记录。',
-          '向委员团队报告财务状况。',
+          '向执委团队报告财务状况。',
         ],
       ),
       CommitteeResponsibilitySection(
@@ -480,11 +480,11 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
   CommitteeGuide(
     id: 'immediate_past_president',
     titleEn: 'Immediate Past President',
-    titleZh: '前任主席',
+    titleZh: '前任会长',
     icon: '🌟',
     rolePurposeEn:
         'You provide experience, continuity, and quiet support to the current committee.',
-    rolePurposeZh: '你提供经验、延续性和安静的支持，帮助现任委员团队成长。',
+    rolePurposeZh: '你提供经验、延续性和安静的支持，帮助现任执委团队成长。',
     responsibilitySectionsEn: <CommitteeResponsibilitySection>[
       CommitteeResponsibilitySection(
         title: 'Monthly',
@@ -507,8 +507,8 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
       CommitteeResponsibilitySection(
         title: '每月',
         items: <String>[
-          '在需要时给主席建议。',
-          '支持委员团队的延续。',
+          '在需要时给会长建议。',
+          '支持执委团队的延续。',
           '分享过去经验，但不代替现任团队。',
         ],
       ),
@@ -516,7 +516,7 @@ const List<CommitteeGuide> committeeGuides = <CommitteeGuide>[
         title: '需要时',
         items: <String>[
           '协助处理敏感问题。',
-          '鼓励新委员。',
+          '鼓励新执委。',
           '支持俱乐部稳定发展。',
         ],
       ),

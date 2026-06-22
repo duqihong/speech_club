@@ -44,7 +44,7 @@ const List<PathwayGuide> pathwayGuides = <PathwayGuide>[
     howToStartZh: <String>[
       '选择一个自己的领导故事。',
       '想一个你曾经帮助解决的问题。',
-      '请教教育副主席或导师，确认适合当前级别的项目。',
+      '请教教育副会长或导师，确认适合当前级别的项目。',
       '准备一个有清楚体会的简单演讲。',
     ],
     mentorTipsEn: <String>[

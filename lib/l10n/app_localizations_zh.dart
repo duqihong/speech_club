@@ -27,7 +27,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navRoleAssistant => '角色助手';
 
   @override
-  String get navCommittees => '委员职责';
+  String get navCommittees => '执委职责';
 
   @override
   String get navPathways => '学习路径';
@@ -331,7 +331,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get roleAssistantTitleGeneralEvaluator => '总评论';
 
   @override
-  String get committeesTitle => '委员职责';
+  String get committeesTitle => '执委职责';
 
   @override
   String get committeesRolePurpose => '角色定位';

@@ -66,7 +66,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('委员职责'), findsOneWidget);
+    expect(find.text('执委职责'), findsOneWidget);
+    expect(find.text('委员职责'), findsNothing);
   });
 
   testWidgets('Chinese Committees screen renders localized guide roles',
@@ -82,16 +83,33 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('委员职责'), findsOneWidget);
-    expect(find.text('主席'), findsOneWidget);
-    expect(find.text('教育副主席'), findsOneWidget);
-    expect(find.text('会员副主席'), findsOneWidget);
-    expect(find.text('公关副主席'), findsOneWidget);
-    expect(find.text('礼宾司'), findsOneWidget);
-    expect(find.text('事务官'), findsNothing);
-    expect(find.text('VPE'), findsNothing);
-    expect(find.text('VPM'), findsNothing);
-    expect(find.text('VPPR'), findsNothing);
+    for (final String title in <String>[
+      '执委职责',
+      '会长',
+      '教育副会长',
+      '会员副会长',
+      '公关副会长',
+      '秘书',
+      '财务',
+      '礼宾司',
+      '前任会长',
+    ]) {
+      expect(find.text(title), findsOneWidget);
+    }
+    for (final String obsoleteTitle in <String>[
+      '委员职责',
+      '主席',
+      '教育副主席',
+      '会员副主席',
+      '公关副主席',
+      '前任主席',
+      '事务官',
+      'VPE',
+      'VPM',
+      'VPPR',
+    ]) {
+      expect(find.text(obsoleteTitle), findsNothing);
+    }
   });
 
   testWidgets('tapping Chinese President opens localized detail screen',
@@ -106,10 +124,10 @@ void main() {
     );
 
     await tester.pumpAndSettle();
-    await tester.tap(find.text('主席'));
+    await tester.tap(find.text('会长'));
     await tester.pumpAndSettle();
 
-    expect(find.text('🧭 主席'), findsOneWidget);
+    expect(find.text('🧭 会长'), findsOneWidget);
     expect(find.text('角色定位'), findsOneWidget);
     expect(find.text('主要责任'), findsOneWidget);
     expect(find.text('小提示'), findsOneWidget);

@@ -79,12 +79,13 @@ void main() {
       '选题助手',
       '即席演讲',
       '角色助手',
-      '委员职责',
+      '执委职责',
       '学习路径',
       '最佳投票',
     ]) {
       expect(find.text(title), findsOneWidget);
     }
+    expect(find.text('委员职责'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
