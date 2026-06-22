@@ -854,6 +854,54 @@ abstract class AppLocalizations {
   /// **'Vote Bests'**
   String get voteBestsTitle;
 
+  /// No description provided for @voteBestsModeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to count meeting award votes.'**
+  String get voteBestsModeIntro;
+
+  /// No description provided for @voteBestsManualCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Count'**
+  String get voteBestsManualCount;
+
+  /// No description provided for @voteBestsManualCountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count votes locally on this device.'**
+  String get voteBestsManualCountSubtitle;
+
+  /// No description provided for @voteBestsOnlineCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Count'**
+  String get voteBestsOnlineCount;
+
+  /// No description provided for @voteBestsOnlineCountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-supported voting is pending design.'**
+  String get voteBestsOnlineCountSubtitle;
+
+  /// No description provided for @voteBestsOnlineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.'**
+  String get voteBestsOnlineDescription;
+
+  /// No description provided for @voteBestsOnlineNote.
+  ///
+  /// In en, this message translates to:
+  /// **'For now, please use Manual Count.'**
+  String get voteBestsOnlineNote;
+
+  /// No description provided for @voteBestsGoToManualCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Manual Count'**
+  String get voteBestsGoToManualCount;
+
   /// No description provided for @voteBestsIntro.
   ///
   /// In en, this message translates to:

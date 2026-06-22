@@ -6,7 +6,7 @@ import 'features/committees/ui/committees_screen.dart';
 import 'features/pathways/ui/pathways_screen.dart';
 import 'features/table_topics/ui/table_topics_setup_screen.dart';
 import 'features/topic_selection/ui/topic_selection_screen.dart';
-import 'features/vote_bests/ui/vote_bests_screen.dart';
+import 'features/vote_bests/ui/vote_bests_mode_screen.dart';
 import 'l10n/app_localizations.dart';
 import 'localization/app_locale_controller.dart';
 import 'role_assistant/ui/role_assistant_screen.dart';
@@ -61,7 +61,7 @@ class SpeechClubApp extends StatelessWidget {
             AppRoutes.roleAssistant: (_) => const RoleAssistantScreen(),
             AppRoutes.committees: (_) => const CommitteesScreen(),
             AppRoutes.pathways: (_) => const PathwaysScreen(),
-            AppRoutes.voteBests: (_) => VoteBestsScreen(),
+            AppRoutes.voteBests: (_) => const VoteBestsModeScreen(),
           },
         );
       },

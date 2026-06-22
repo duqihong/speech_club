@@ -82,7 +82,7 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.voteBestsTitle),
+        title: Text(l10n.voteBestsManualCount),
         centerTitle: true,
       ),
       body: SafeArea(

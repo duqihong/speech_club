@@ -401,6 +401,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voteBestsTitle => 'Vote Bests';
 
   @override
+  String get voteBestsModeIntro =>
+      'Choose how you want to count meeting award votes.';
+
+  @override
+  String get voteBestsManualCount => 'Manual Count';
+
+  @override
+  String get voteBestsManualCountSubtitle =>
+      'Count votes locally on this device.';
+
+  @override
+  String get voteBestsOnlineCount => 'Online Count';
+
+  @override
+  String get voteBestsOnlineCountSubtitle =>
+      'Cloud-supported voting is pending design.';
+
+  @override
+  String get voteBestsOnlineDescription =>
+      'Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.';
+
+  @override
+  String get voteBestsOnlineNote => 'For now, please use Manual Count.';
+
+  @override
+  String get voteBestsGoToManualCount => 'Go to Manual Count';
+
+  @override
   String get voteBestsIntro =>
       'Use this as a simple local tally tool for meeting awards. It does not collect online votes.';
 

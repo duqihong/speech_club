@@ -42,7 +42,8 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
 
-  testWidgets('English home shows Vote Bests', (WidgetTester tester) async {
+  testWidgets('English home opens Vote Bests mode selection',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       SpeechClubApp(localeController: AppLocaleController()),
     );
@@ -55,9 +56,19 @@ void main() {
     );
 
     expect(find.text('Vote Bests'), findsOneWidget);
+    await tester.tap(find.text('Vote Bests'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Choose how you want to count meeting award votes.'),
+      findsOneWidget,
+    );
+    expect(find.text('Manual Count'), findsOneWidget);
+    expect(find.text('Online Count'), findsOneWidget);
   });
 
-  testWidgets('Chinese home shows Vote Bests', (WidgetTester tester) async {
+  testWidgets('Chinese home opens Vote Bests mode selection',
+      (WidgetTester tester) async {
     final AppLocaleController localeController = AppLocaleController();
     await localeController.setLocale(AppLocaleController.simplifiedChinese);
 
@@ -73,9 +84,15 @@ void main() {
     );
 
     expect(find.text('最佳投票'), findsOneWidget);
+    await tester.tap(find.text('最佳投票'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('选择本次例会奖项的计票方式。'), findsOneWidget);
+    expect(find.text('手动计票'), findsOneWidget);
+    expect(find.text('在线计票'), findsOneWidget);
   });
 
-  testWidgets('Vote Bests screen shows English award categories',
+  testWidgets('Manual Count screen shows English award categories',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -87,12 +104,13 @@ void main() {
 
     await tester.pumpAndSettle();
 
+    expect(find.text('Manual Count'), findsOneWidget);
     expect(find.text('Best Speaker'), findsOneWidget);
     expect(find.text('Best Table Topics Speaker'), findsOneWidget);
     expect(find.text('Best Evaluator'), findsOneWidget);
   });
 
-  testWidgets('Vote Bests screen shows Chinese award categories',
+  testWidgets('Manual Count screen shows Chinese award categories',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -105,6 +123,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
+    expect(find.text('手动计票'), findsOneWidget);
     expect(find.text('最佳演讲者'), findsOneWidget);
     expect(find.text('最佳即席演讲者'), findsOneWidget);
     expect(find.text('最佳点评者'), findsOneWidget);

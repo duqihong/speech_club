@@ -392,6 +392,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voteBestsTitle => '最佳投票';
 
   @override
+  String get voteBestsModeIntro => '选择本次例会奖项的计票方式。';
+
+  @override
+  String get voteBestsManualCount => '手动计票';
+
+  @override
+  String get voteBestsManualCountSubtitle => '在本机手动添加候选人和票数。';
+
+  @override
+  String get voteBestsOnlineCount => '在线计票';
+
+  @override
+  String get voteBestsOnlineCountSubtitle => '云端投票功能待设计。';
+
+  @override
+  String get voteBestsOnlineDescription => '在线投票功能将在后续设计。未来可考虑云端计票、会议链接或二维码投票。';
+
+  @override
+  String get voteBestsOnlineNote => '目前请先使用手动计票。';
+
+  @override
+  String get voteBestsGoToManualCount => '前往手动计票';
+
+  @override
   String get voteBestsIntro => '这是一个本地计票工具，用来记录例会奖项投票。它不会收集线上投票。';
 
   @override
