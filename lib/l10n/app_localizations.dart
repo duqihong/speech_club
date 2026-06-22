@@ -902,6 +902,72 @@ abstract class AppLocalizations {
   /// **'Go to Manual Count'**
   String get voteBestsGoToManualCount;
 
+  /// No description provided for @voteBestsSendResultsToPresident.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Results to President'**
+  String get voteBestsSendResultsToPresident;
+
+  /// No description provided for @voteBestsCopyResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Results'**
+  String get voteBestsCopyResults;
+
+  /// No description provided for @voteBestsPresidentContact.
+  ///
+  /// In en, this message translates to:
+  /// **'President Contact'**
+  String get voteBestsPresidentContact;
+
+  /// No description provided for @voteBestsContactNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get voteBestsContactNotSet;
+
+  /// No description provided for @voteBestsPresidentName.
+  ///
+  /// In en, this message translates to:
+  /// **'President name'**
+  String get voteBestsPresidentName;
+
+  /// No description provided for @voteBestsPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get voteBestsPhoneNumber;
+
+  /// No description provided for @voteBestsPresidentNameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter president name.'**
+  String get voteBestsPresidentNameError;
+
+  /// No description provided for @voteBestsPhoneNumberError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter phone number.'**
+  String get voteBestsPhoneNumberError;
+
+  /// No description provided for @voteBestsMissingContactMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'President contact is not set. Please add president name and phone number first.'**
+  String get voteBestsMissingContactMessage;
+
+  /// No description provided for @voteBestsSetNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Now'**
+  String get voteBestsSetNow;
+
+  /// No description provided for @voteBestsResultsCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Results copied. You can paste them into SMS or WhatsApp.'**
+  String get voteBestsResultsCopied;
+
   /// No description provided for @voteBestsIntro.
   ///
   /// In en, this message translates to:

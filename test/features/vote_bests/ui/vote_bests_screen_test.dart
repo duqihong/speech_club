@@ -254,6 +254,11 @@ void main() {
     );
     await pumpVoteBests(tester, repository: repository);
 
+    await tester.scrollUntilVisible(
+      find.text('Reset Meeting Votes'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Reset Meeting Votes'));
     await tester.pumpAndSettle();
     expect(
@@ -267,6 +272,11 @@ void main() {
       hasLength(1),
     );
 
+    await tester.scrollUntilVisible(
+      find.text('Reset Meeting Votes'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Reset Meeting Votes'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Confirm'));

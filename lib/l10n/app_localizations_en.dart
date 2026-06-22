@@ -429,6 +429,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voteBestsGoToManualCount => 'Go to Manual Count';
 
   @override
+  String get voteBestsSendResultsToPresident => 'Send Results to President';
+
+  @override
+  String get voteBestsCopyResults => 'Copy Results';
+
+  @override
+  String get voteBestsPresidentContact => 'President Contact';
+
+  @override
+  String get voteBestsContactNotSet => 'Not set';
+
+  @override
+  String get voteBestsPresidentName => 'President name';
+
+  @override
+  String get voteBestsPhoneNumber => 'Phone number';
+
+  @override
+  String get voteBestsPresidentNameError => 'Please enter president name.';
+
+  @override
+  String get voteBestsPhoneNumberError => 'Please enter phone number.';
+
+  @override
+  String get voteBestsMissingContactMessage =>
+      'President contact is not set. Please add president name and phone number first.';
+
+  @override
+  String get voteBestsSetNow => 'Set Now';
+
+  @override
+  String get voteBestsResultsCopied =>
+      'Results copied. You can paste them into SMS or WhatsApp.';
+
+  @override
   String get voteBestsIntro =>
       'Use this as a simple local tally tool for meeting awards. It does not collect online votes.';
 

@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../data/vote_bests_repository.dart';
 import '../data/vote_models.dart';
+import '../data/vote_results_recipient.dart';
+import '../data/vote_results_recipient_repository.dart';
+import '../data/vote_results_summary_builder.dart';
 import 'vote_award_detail_screen.dart';
 
 class VoteBestsScreen extends StatefulWidget {
   VoteBestsScreen({
     super.key,
     VoteBestsRepository? repository,
-  }) : repository = repository ?? VoteBestsRepository();
+    VoteResultsRecipientRepository? recipientRepository,
+    this.summaryBuilder = const VoteResultsSummaryBuilder(),
+  })  : repository = repository ?? VoteBestsRepository(),
+        recipientRepository =
+            recipientRepository ?? VoteResultsRecipientRepository();
 
   final VoteBestsRepository repository;
+  final VoteResultsRecipientRepository recipientRepository;
+  final VoteResultsSummaryBuilder summaryBuilder;
 
   @override
   State<VoteBestsScreen> createState() => _VoteBestsScreenState();
@@ -19,11 +29,13 @@ class VoteBestsScreen extends StatefulWidget {
 
 class _VoteBestsScreenState extends State<VoteBestsScreen> {
   late Future<VoteBestsState> _stateFuture;
+  late Future<VoteResultsRecipient?> _recipientFuture;
 
   @override
   void initState() {
     super.initState();
     _stateFuture = widget.repository.loadState();
+    _recipientFuture = widget.recipientRepository.load();
   }
 
   void _reload() {
@@ -73,6 +85,87 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
     await widget.repository.resetAll();
     if (mounted) {
       _reload();
+    }
+  }
+
+  Future<void> _showContactDialog() async {
+    final VoteResultsRecipient? currentRecipient =
+        await widget.recipientRepository.load();
+    if (!mounted) {
+      return;
+    }
+
+    final _PresidentContactInput? input =
+        await showDialog<_PresidentContactInput>(
+      context: context,
+      builder: (_) => _PresidentContactDialog(
+        initialName: currentRecipient?.name ?? '',
+        initialPhoneNumber: currentRecipient?.phoneNumber ?? '',
+      ),
+    );
+
+    if (input == null) {
+      return;
+    }
+    final VoteResultsRecipient recipient =
+        await widget.recipientRepository.save(
+      name: input.name,
+      phoneNumber: input.phoneNumber,
+    );
+    if (mounted) {
+      setState(() {
+        _recipientFuture = Future<VoteResultsRecipient?>.value(recipient);
+      });
+    }
+  }
+
+  Future<void> _sendResults() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final VoteResultsRecipient? recipient =
+        await widget.recipientRepository.load();
+    if (!mounted) {
+      return;
+    }
+    if (recipient == null) {
+      final bool? shouldSetContact = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text(l10n.voteBestsMissingContactMessage),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.buttonCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(l10n.voteBestsSetNow),
+              ),
+            ],
+          );
+        },
+      );
+      if (shouldSetContact == true && mounted) {
+        await _showContactDialog();
+      }
+      return;
+    }
+    await _copyResults();
+  }
+
+  Future<void> _copyResults() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Locale locale = Localizations.localeOf(context);
+    final VoteBestsState state = await _stateFuture;
+    final String summary = widget.summaryBuilder.build(
+      state: state,
+      locale: locale,
+    );
+    Clipboard.setData(ClipboardData(text: summary));
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.voteBestsResultsCopied)));
     }
   }
 
@@ -127,6 +220,55 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
                 SizedBox(
                   width: double.infinity,
                   height: 56,
+                  child: FilledButton.icon(
+                    onPressed: _sendResults,
+                    icon: const Icon(Icons.send_outlined),
+                    label: Text(l10n.voteBestsSendResultsToPresident),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: _copyResults,
+                    icon: const Icon(Icons.copy_outlined),
+                    label: Text(l10n.voteBestsCopyResults),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FutureBuilder<VoteResultsRecipient?>(
+                  future: _recipientFuture,
+                  builder: (
+                    BuildContext context,
+                    AsyncSnapshot<VoteResultsRecipient?> snapshot,
+                  ) {
+                    return Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
+                        minVerticalPadding: 14,
+                        leading: const Icon(Icons.contact_phone_outlined),
+                        title: Text(
+                          l10n.voteBestsPresidentContact,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          snapshot.connectionState == ConnectionState.waiting
+                              ? '…'
+                              : snapshot.data == null
+                                  ? l10n.voteBestsContactNotSet
+                                  : '${snapshot.data!.name} · ${snapshot.data!.phoneNumber}',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: _showContactDialog,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
                   child: OutlinedButton.icon(
                     onPressed: _confirmReset,
                     icon: const Icon(Icons.restart_alt),
@@ -138,6 +280,111 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _PresidentContactInput {
+  const _PresidentContactInput({
+    required this.name,
+    required this.phoneNumber,
+  });
+
+  final String name;
+  final String phoneNumber;
+}
+
+class _PresidentContactDialog extends StatefulWidget {
+  const _PresidentContactDialog({
+    required this.initialName,
+    required this.initialPhoneNumber,
+  });
+
+  final String initialName;
+  final String initialPhoneNumber;
+
+  @override
+  State<_PresidentContactDialog> createState() =>
+      _PresidentContactDialogState();
+}
+
+class _PresidentContactDialogState extends State<_PresidentContactDialog> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _phoneController;
+  String? _nameError;
+  String? _phoneError;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName);
+    _phoneController = TextEditingController(text: widget.initialPhoneNumber);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final String name = _nameController.text.trim();
+    final String phoneNumber = _phoneController.text.trim();
+    if (name.isEmpty || phoneNumber.isEmpty) {
+      setState(() {
+        _nameError = name.isEmpty ? l10n.voteBestsPresidentNameError : null;
+        _phoneError =
+            phoneNumber.isEmpty ? l10n.voteBestsPhoneNumberError : null;
+      });
+      return;
+    }
+    Navigator.of(context).pop(
+      _PresidentContactInput(name: name, phoneNumber: phoneNumber),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(l10n.voteBestsPresidentContact),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            key: const Key('presidentNameField'),
+            controller: _nameController,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              labelText: l10n.voteBestsPresidentName,
+              errorText: _nameError,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('presidentPhoneField'),
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              labelText: l10n.voteBestsPhoneNumber,
+              errorText: _phoneError,
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.buttonCancel),
+        ),
+        FilledButton(
+          onPressed: _save,
+          child: Text(l10n.buttonSave),
+        ),
+      ],
     );
   }
 }

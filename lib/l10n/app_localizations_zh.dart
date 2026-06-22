@@ -416,6 +416,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voteBestsGoToManualCount => '前往手动计票';
 
   @override
+  String get voteBestsSendResultsToPresident => '发送结果给会长';
+
+  @override
+  String get voteBestsCopyResults => '复制结果';
+
+  @override
+  String get voteBestsPresidentContact => '会长联系方式';
+
+  @override
+  String get voteBestsContactNotSet => '未设置';
+
+  @override
+  String get voteBestsPresidentName => '会长姓名';
+
+  @override
+  String get voteBestsPhoneNumber => '电话号码';
+
+  @override
+  String get voteBestsPresidentNameError => '请输入会长姓名。';
+
+  @override
+  String get voteBestsPhoneNumberError => '请输入电话号码。';
+
+  @override
+  String get voteBestsMissingContactMessage => '还没有设置会长联系方式。请先填写会长姓名和电话号码。';
+
+  @override
+  String get voteBestsSetNow => '现在设置';
+
+  @override
+  String get voteBestsResultsCopied => '结果已复制。你可以粘贴到短信或 WhatsApp。';
+
+  @override
   String get voteBestsIntro => '这是一个本地计票工具，用来记录例会奖项投票。它不会收集线上投票。';
 
   @override
