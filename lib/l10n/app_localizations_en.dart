@@ -416,11 +416,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voteBestsOnlineCountSubtitle =>
-      'Cloud-supported voting is pending design.';
+      'Create cloud voting rounds and collect online votes.';
 
   @override
   String get voteBestsOnlineDescription =>
-      'Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.';
+      'Create a cloud meeting, open one award round at a time, and share the voting link.';
 
   @override
   String get voteBestsOnlineNote => 'For now, please use Manual Count.';
@@ -534,6 +534,153 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voteBestsCurrentTie => 'Current tie';
+
+  @override
+  String get onlineCountCloudSetup => 'Cloud Setup';
+
+  @override
+  String get onlineCountBackendUrl => 'Backend URL';
+
+  @override
+  String get onlineCountClubName => 'Club Name';
+
+  @override
+  String get onlineCountClubSlug => 'Club Slug';
+
+  @override
+  String get onlineCountAdminPin => 'Admin PIN';
+
+  @override
+  String get onlineCountCreateClub => 'Create Club';
+
+  @override
+  String get onlineCountSlugHelp =>
+      'Use lowercase letters, numbers, and hyphens. Example: demo-speech-club';
+
+  @override
+  String get onlineCountCurrentMeeting => 'Current Meeting';
+
+  @override
+  String get onlineCountMeetingTitle => 'Meeting Title';
+
+  @override
+  String get onlineCountMeetingDate => 'Meeting Date';
+
+  @override
+  String get onlineCountCreateMeeting => 'Create Meeting';
+
+  @override
+  String get onlineCountOpenMeeting => 'Open Meeting';
+
+  @override
+  String get onlineCountCloseMeeting => 'Close Meeting';
+
+  @override
+  String get onlineCountCandidateSetup => 'Candidate Setup';
+
+  @override
+  String get onlineCountSaveBestSpeakerCandidates =>
+      'Save Best Speaker Candidates';
+
+  @override
+  String get onlineCountSaveTableTopicsCandidates =>
+      'Save Table Topics Candidates';
+
+  @override
+  String get onlineCountSaveEvaluatorCandidates => 'Save Evaluator Candidates';
+
+  @override
+  String get onlineCountVotingRound => 'Voting Round';
+
+  @override
+  String get onlineCountOpenVoting => 'Open Voting';
+
+  @override
+  String get onlineCountCloseVoting => 'Close Voting';
+
+  @override
+  String get onlineCountVotingLink => 'Voting Link';
+
+  @override
+  String get onlineCountCopyChineseLink => 'Copy Chinese Link';
+
+  @override
+  String get onlineCountCopyEnglishLink => 'Copy English Link';
+
+  @override
+  String get onlineCountResults => 'Results';
+
+  @override
+  String get onlineCountRefreshResults => 'Refresh Results';
+
+  @override
+  String get onlineCountCopyResults => 'Copy Results';
+
+  @override
+  String get onlineCountDraft => 'Draft';
+
+  @override
+  String get onlineCountOpen => 'Open';
+
+  @override
+  String get onlineCountClosed => 'Closed';
+
+  @override
+  String get onlineCountFinalResults => 'Final results';
+
+  @override
+  String get onlineCountResultsNotFinal => 'Results are not final yet';
+
+  @override
+  String get onlineCountSaved => 'Saved';
+
+  @override
+  String get onlineCountCopied => 'Copied';
+
+  @override
+  String get onlineCountPleaseCompleteSetup => 'Please complete setup first';
+
+  @override
+  String get onlineCountCouldNotConnect =>
+      'Could not connect to online voting service';
+
+  @override
+  String get onlineCountAnotherAwardOpen =>
+      'Another award voting round is already open';
+
+  @override
+  String get onlineCountNoSessionYet =>
+      'Create a meeting before setting candidates or opening voting.';
+
+  @override
+  String get onlineCountSessionId => 'Meeting ID';
+
+  @override
+  String get onlineCountSessionStatus => 'Meeting status';
+
+  @override
+  String get onlineCountCandidateHint => 'One candidate per line';
+
+  @override
+  String get onlineCountNoResultsYet => 'No results loaded yet.';
+
+  @override
+  String onlineCountWinner(String name) {
+    return 'Winner: $name';
+  }
+
+  @override
+  String onlineCountTie(String names) {
+    return 'Tie: $names';
+  }
+
+  @override
+  String onlineCountVotes(int votes) {
+    return '$votes votes';
+  }
+
+  @override
+  String get onlineCountActionComplete => 'Done';
 
   @override
   String get languageMenuLabel => 'Language';

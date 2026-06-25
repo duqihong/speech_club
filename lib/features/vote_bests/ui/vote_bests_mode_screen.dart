@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
-import 'online_vote_bests_screen.dart';
+import 'online_count_screen.dart';
 import 'vote_bests_screen.dart';
 
 class VoteBestsModeScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class VoteBestsModeScreen extends StatelessWidget {
 
   void _openOnlineCount(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const OnlineVoteBestsScreen()),
+      MaterialPageRoute<void>(builder: (_) => const OnlineCountScreen()),
     );
   }
 

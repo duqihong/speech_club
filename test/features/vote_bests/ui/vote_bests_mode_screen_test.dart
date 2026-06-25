@@ -42,7 +42,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.text('Cloud-supported voting is pending design.'),
+      find.text('Create cloud voting rounds and collect online votes.'),
       findsOneWidget,
     );
   });
@@ -56,7 +56,7 @@ void main() {
     expect(find.text('手动计票'), findsOneWidget);
     expect(find.text('在线计票'), findsOneWidget);
     expect(find.text('在本机手动添加候选人和票数。'), findsOneWidget);
-    expect(find.text('云端投票功能待设计。'), findsOneWidget);
+    expect(find.text('创建云端投票轮次并收集线上投票。'), findsOneWidget);
   });
 
   testWidgets('Manual Count opens the existing English tally flow',
@@ -83,7 +83,7 @@ void main() {
     expect(find.text('最佳点评者'), findsOneWidget);
   });
 
-  testWidgets('English Online Count placeholder links to Manual Count',
+  testWidgets('English Online Count opens admin MVP',
       (WidgetTester tester) async {
     await pumpModeScreen(tester);
 
@@ -91,23 +91,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Online Count'), findsOneWidget);
-    expect(
-      find.text(
-        'Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text('For now, please use Manual Count.'), findsOneWidget);
-    expect(find.text('Go to Manual Count'), findsOneWidget);
-
-    await tester.tap(find.text('Go to Manual Count'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Manual Count'), findsOneWidget);
-    expect(find.text('Best Speaker'), findsOneWidget);
+    expect(find.text('Cloud Setup'), findsOneWidget);
+    expect(find.text('Current Meeting'), findsOneWidget);
+    expect(find.text('Backend URL'), findsOneWidget);
+    expect(find.text('Create Club'), findsOneWidget);
   });
 
-  testWidgets('Chinese Online Count placeholder is localized',
+  testWidgets('Chinese Online Count admin MVP is localized',
       (WidgetTester tester) async {
     await pumpModeScreen(tester, locale: const Locale('zh'));
 
@@ -115,11 +105,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('在线计票'), findsOneWidget);
-    expect(
-      find.text('在线投票功能将在后续设计。未来可考虑云端计票、会议链接或二维码投票。'),
-      findsOneWidget,
-    );
-    expect(find.text('目前请先使用手动计票。'), findsOneWidget);
-    expect(find.text('前往手动计票'), findsOneWidget);
+    expect(find.text('云端设置'), findsOneWidget);
+    expect(find.text('当前会议'), findsOneWidget);
+    expect(find.text('后台网址'), findsOneWidget);
+    expect(find.text('创建俱乐部'), findsOneWidget);
   });
 }

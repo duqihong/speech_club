@@ -144,8 +144,8 @@
   "voteBestsManualCount": "Manual Count",
   "voteBestsManualCountSubtitle": "Count votes locally on this device.",
   "voteBestsOnlineCount": "Online Count",
-  "voteBestsOnlineCountSubtitle": "Cloud-supported voting is pending design.",
-  "voteBestsOnlineDescription": "Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.",
+  "voteBestsOnlineCountSubtitle": "Create cloud voting rounds and collect online votes.",
+  "voteBestsOnlineDescription": "Create a cloud meeting, open one award round at a time, and share the voting link.",
   "voteBestsOnlineNote": "For now, please use Manual Count.",
   "voteBestsGoToManualCount": "Go to Manual Count",
   "voteBestsSendResultsToPresident": "Send Results to President",
@@ -203,6 +203,72 @@
     }
   },
   "voteBestsCurrentTie": "Current tie",
+  "onlineCountCloudSetup": "Cloud Setup",
+  "onlineCountBackendUrl": "Backend URL",
+  "onlineCountClubName": "Club Name",
+  "onlineCountClubSlug": "Club Slug",
+  "onlineCountAdminPin": "Admin PIN",
+  "onlineCountCreateClub": "Create Club",
+  "onlineCountSlugHelp": "Use lowercase letters, numbers, and hyphens. Example: demo-speech-club",
+  "onlineCountCurrentMeeting": "Current Meeting",
+  "onlineCountMeetingTitle": "Meeting Title",
+  "onlineCountMeetingDate": "Meeting Date",
+  "onlineCountCreateMeeting": "Create Meeting",
+  "onlineCountOpenMeeting": "Open Meeting",
+  "onlineCountCloseMeeting": "Close Meeting",
+  "onlineCountCandidateSetup": "Candidate Setup",
+  "onlineCountSaveBestSpeakerCandidates": "Save Best Speaker Candidates",
+  "onlineCountSaveTableTopicsCandidates": "Save Table Topics Candidates",
+  "onlineCountSaveEvaluatorCandidates": "Save Evaluator Candidates",
+  "onlineCountVotingRound": "Voting Round",
+  "onlineCountOpenVoting": "Open Voting",
+  "onlineCountCloseVoting": "Close Voting",
+  "onlineCountVotingLink": "Voting Link",
+  "onlineCountCopyChineseLink": "Copy Chinese Link",
+  "onlineCountCopyEnglishLink": "Copy English Link",
+  "onlineCountResults": "Results",
+  "onlineCountRefreshResults": "Refresh Results",
+  "onlineCountCopyResults": "Copy Results",
+  "onlineCountDraft": "Draft",
+  "onlineCountOpen": "Open",
+  "onlineCountClosed": "Closed",
+  "onlineCountFinalResults": "Final results",
+  "onlineCountResultsNotFinal": "Results are not final yet",
+  "onlineCountSaved": "Saved",
+  "onlineCountCopied": "Copied",
+  "onlineCountPleaseCompleteSetup": "Please complete setup first",
+  "onlineCountCouldNotConnect": "Could not connect to online voting service",
+  "onlineCountAnotherAwardOpen": "Another award voting round is already open",
+  "onlineCountNoSessionYet": "Create a meeting before setting candidates or opening voting.",
+  "onlineCountSessionId": "Meeting ID",
+  "onlineCountSessionStatus": "Meeting status",
+  "onlineCountCandidateHint": "One candidate per line",
+  "onlineCountNoResultsYet": "No results loaded yet.",
+  "onlineCountWinner": "Winner: {name}",
+  "@onlineCountWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountTie": "Tie: {names}",
+  "@onlineCountTie": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountVotes": "{votes} votes",
+  "@onlineCountVotes": {
+    "placeholders": {
+      "votes": {
+        "type": "int"
+      }
+    }
+  },
+  "onlineCountActionComplete": "Done",
   "languageMenuLabel": "Language",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "Simplified Chinese"

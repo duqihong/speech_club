@@ -404,10 +404,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voteBestsOnlineCount => '在线计票';
 
   @override
-  String get voteBestsOnlineCountSubtitle => '云端投票功能待设计。';
+  String get voteBestsOnlineCountSubtitle => '创建云端投票轮次并收集线上投票。';
 
   @override
-  String get voteBestsOnlineDescription => '在线投票功能将在后续设计。未来可考虑云端计票、会议链接或二维码投票。';
+  String get voteBestsOnlineDescription => '创建云端会议，每次开放一个奖项投票，并分享投票链接。';
 
   @override
   String get voteBestsOnlineNote => '目前请先使用手动计票。';
@@ -513,6 +513,147 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voteBestsCurrentTie => '当前并列';
+
+  @override
+  String get onlineCountCloudSetup => '云端设置';
+
+  @override
+  String get onlineCountBackendUrl => '后台网址';
+
+  @override
+  String get onlineCountClubName => '俱乐部名称';
+
+  @override
+  String get onlineCountClubSlug => '俱乐部代号';
+
+  @override
+  String get onlineCountAdminPin => '管理员密码';
+
+  @override
+  String get onlineCountCreateClub => '创建俱乐部';
+
+  @override
+  String get onlineCountSlugHelp => '请使用小写字母、数字和连字符。例如：demo-speech-club';
+
+  @override
+  String get onlineCountCurrentMeeting => '当前会议';
+
+  @override
+  String get onlineCountMeetingTitle => '会议名称';
+
+  @override
+  String get onlineCountMeetingDate => '会议日期';
+
+  @override
+  String get onlineCountCreateMeeting => '创建会议';
+
+  @override
+  String get onlineCountOpenMeeting => '开放会议';
+
+  @override
+  String get onlineCountCloseMeeting => '结束会议';
+
+  @override
+  String get onlineCountCandidateSetup => '候选人设置';
+
+  @override
+  String get onlineCountSaveBestSpeakerCandidates => '保存最佳演讲候选人';
+
+  @override
+  String get onlineCountSaveTableTopicsCandidates => '保存即席演讲候选人';
+
+  @override
+  String get onlineCountSaveEvaluatorCandidates => '保存点评候选人';
+
+  @override
+  String get onlineCountVotingRound => '投票轮次';
+
+  @override
+  String get onlineCountOpenVoting => '开放投票';
+
+  @override
+  String get onlineCountCloseVoting => '结束投票';
+
+  @override
+  String get onlineCountVotingLink => '投票链接';
+
+  @override
+  String get onlineCountCopyChineseLink => '复制中文链接';
+
+  @override
+  String get onlineCountCopyEnglishLink => '复制英文链接';
+
+  @override
+  String get onlineCountResults => '结果';
+
+  @override
+  String get onlineCountRefreshResults => '刷新结果';
+
+  @override
+  String get onlineCountCopyResults => '复制结果';
+
+  @override
+  String get onlineCountDraft => '草稿';
+
+  @override
+  String get onlineCountOpen => '开放';
+
+  @override
+  String get onlineCountClosed => '已结束';
+
+  @override
+  String get onlineCountFinalResults => '最终结果';
+
+  @override
+  String get onlineCountResultsNotFinal => '结果尚未最终确认';
+
+  @override
+  String get onlineCountSaved => '已保存';
+
+  @override
+  String get onlineCountCopied => '已复制';
+
+  @override
+  String get onlineCountPleaseCompleteSetup => '请先完成设置';
+
+  @override
+  String get onlineCountCouldNotConnect => '无法连接在线投票服务';
+
+  @override
+  String get onlineCountAnotherAwardOpen => '已有一个奖项投票正在开放';
+
+  @override
+  String get onlineCountNoSessionYet => '请先创建会议，再设置候选人或开放投票。';
+
+  @override
+  String get onlineCountSessionId => '会议编号';
+
+  @override
+  String get onlineCountSessionStatus => '会议状态';
+
+  @override
+  String get onlineCountCandidateHint => '每行一位候选人';
+
+  @override
+  String get onlineCountNoResultsYet => '还没有加载结果。';
+
+  @override
+  String onlineCountWinner(String name) {
+    return '获奖者：$name';
+  }
+
+  @override
+  String onlineCountTie(String names) {
+    return '并列：$names';
+  }
+
+  @override
+  String onlineCountVotes(int votes) {
+    return '$votes 票';
+  }
+
+  @override
+  String get onlineCountActionComplete => '完成';
 
   @override
   String get languageMenuLabel => '语言';

@@ -144,8 +144,8 @@
   "voteBestsManualCount": "手动计票",
   "voteBestsManualCountSubtitle": "在本机手动添加候选人和票数。",
   "voteBestsOnlineCount": "在线计票",
-  "voteBestsOnlineCountSubtitle": "云端投票功能待设计。",
-  "voteBestsOnlineDescription": "在线投票功能将在后续设计。未来可考虑云端计票、会议链接或二维码投票。",
+  "voteBestsOnlineCountSubtitle": "创建云端投票轮次并收集线上投票。",
+  "voteBestsOnlineDescription": "创建云端会议，每次开放一个奖项投票，并分享投票链接。",
   "voteBestsOnlineNote": "目前请先使用手动计票。",
   "voteBestsGoToManualCount": "前往手动计票",
   "voteBestsSendResultsToPresident": "发送结果给会长",
@@ -203,6 +203,72 @@
     }
   },
   "voteBestsCurrentTie": "当前并列",
+  "onlineCountCloudSetup": "云端设置",
+  "onlineCountBackendUrl": "后台网址",
+  "onlineCountClubName": "俱乐部名称",
+  "onlineCountClubSlug": "俱乐部代号",
+  "onlineCountAdminPin": "管理员密码",
+  "onlineCountCreateClub": "创建俱乐部",
+  "onlineCountSlugHelp": "请使用小写字母、数字和连字符。例如：demo-speech-club",
+  "onlineCountCurrentMeeting": "当前会议",
+  "onlineCountMeetingTitle": "会议名称",
+  "onlineCountMeetingDate": "会议日期",
+  "onlineCountCreateMeeting": "创建会议",
+  "onlineCountOpenMeeting": "开放会议",
+  "onlineCountCloseMeeting": "结束会议",
+  "onlineCountCandidateSetup": "候选人设置",
+  "onlineCountSaveBestSpeakerCandidates": "保存最佳演讲候选人",
+  "onlineCountSaveTableTopicsCandidates": "保存即席演讲候选人",
+  "onlineCountSaveEvaluatorCandidates": "保存点评候选人",
+  "onlineCountVotingRound": "投票轮次",
+  "onlineCountOpenVoting": "开放投票",
+  "onlineCountCloseVoting": "结束投票",
+  "onlineCountVotingLink": "投票链接",
+  "onlineCountCopyChineseLink": "复制中文链接",
+  "onlineCountCopyEnglishLink": "复制英文链接",
+  "onlineCountResults": "结果",
+  "onlineCountRefreshResults": "刷新结果",
+  "onlineCountCopyResults": "复制结果",
+  "onlineCountDraft": "草稿",
+  "onlineCountOpen": "开放",
+  "onlineCountClosed": "已结束",
+  "onlineCountFinalResults": "最终结果",
+  "onlineCountResultsNotFinal": "结果尚未最终确认",
+  "onlineCountSaved": "已保存",
+  "onlineCountCopied": "已复制",
+  "onlineCountPleaseCompleteSetup": "请先完成设置",
+  "onlineCountCouldNotConnect": "无法连接在线投票服务",
+  "onlineCountAnotherAwardOpen": "已有一个奖项投票正在开放",
+  "onlineCountNoSessionYet": "请先创建会议，再设置候选人或开放投票。",
+  "onlineCountSessionId": "会议编号",
+  "onlineCountSessionStatus": "会议状态",
+  "onlineCountCandidateHint": "每行一位候选人",
+  "onlineCountNoResultsYet": "还没有加载结果。",
+  "onlineCountWinner": "获奖者：{name}",
+  "@onlineCountWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountTie": "并列：{names}",
+  "@onlineCountTie": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountVotes": "{votes} 票",
+  "@onlineCountVotes": {
+    "placeholders": {
+      "votes": {
+        "type": "int"
+      }
+    }
+  },
+  "onlineCountActionComplete": "完成",
   "languageMenuLabel": "语言",
   "languageEnglish": "English",
   "languageSimplifiedChinese": "简体中文"

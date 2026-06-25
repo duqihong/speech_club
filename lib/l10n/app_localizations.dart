@@ -881,13 +881,13 @@ abstract class AppLocalizations {
   /// No description provided for @voteBestsOnlineCountSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Cloud-supported voting is pending design.'**
+  /// **'Create cloud voting rounds and collect online votes.'**
   String get voteBestsOnlineCountSubtitle;
 
   /// No description provided for @voteBestsOnlineDescription.
   ///
   /// In en, this message translates to:
-  /// **'Online voting will be designed later. It may support cloud counting, meeting links, or QR-based voting.'**
+  /// **'Create a cloud meeting, open one award round at a time, and share the voting link.'**
   String get voteBestsOnlineDescription;
 
   /// No description provided for @voteBestsOnlineNote.
@@ -1087,6 +1087,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current tie'**
   String get voteBestsCurrentTie;
+
+  /// No description provided for @onlineCountCloudSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Setup'**
+  String get onlineCountCloudSetup;
+
+  /// No description provided for @onlineCountBackendUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend URL'**
+  String get onlineCountBackendUrl;
+
+  /// No description provided for @onlineCountClubName.
+  ///
+  /// In en, this message translates to:
+  /// **'Club Name'**
+  String get onlineCountClubName;
+
+  /// No description provided for @onlineCountClubSlug.
+  ///
+  /// In en, this message translates to:
+  /// **'Club Slug'**
+  String get onlineCountClubSlug;
+
+  /// No description provided for @onlineCountAdminPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin PIN'**
+  String get onlineCountAdminPin;
+
+  /// No description provided for @onlineCountCreateClub.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Club'**
+  String get onlineCountCreateClub;
+
+  /// No description provided for @onlineCountSlugHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use lowercase letters, numbers, and hyphens. Example: demo-speech-club'**
+  String get onlineCountSlugHelp;
+
+  /// No description provided for @onlineCountCurrentMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Meeting'**
+  String get onlineCountCurrentMeeting;
+
+  /// No description provided for @onlineCountMeetingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting Title'**
+  String get onlineCountMeetingTitle;
+
+  /// No description provided for @onlineCountMeetingDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting Date'**
+  String get onlineCountMeetingDate;
+
+  /// No description provided for @onlineCountCreateMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Meeting'**
+  String get onlineCountCreateMeeting;
+
+  /// No description provided for @onlineCountOpenMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Meeting'**
+  String get onlineCountOpenMeeting;
+
+  /// No description provided for @onlineCountCloseMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Close Meeting'**
+  String get onlineCountCloseMeeting;
+
+  /// No description provided for @onlineCountCandidateSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidate Setup'**
+  String get onlineCountCandidateSetup;
+
+  /// No description provided for @onlineCountSaveBestSpeakerCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Best Speaker Candidates'**
+  String get onlineCountSaveBestSpeakerCandidates;
+
+  /// No description provided for @onlineCountSaveTableTopicsCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Table Topics Candidates'**
+  String get onlineCountSaveTableTopicsCandidates;
+
+  /// No description provided for @onlineCountSaveEvaluatorCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Evaluator Candidates'**
+  String get onlineCountSaveEvaluatorCandidates;
+
+  /// No description provided for @onlineCountVotingRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting Round'**
+  String get onlineCountVotingRound;
+
+  /// No description provided for @onlineCountOpenVoting.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Voting'**
+  String get onlineCountOpenVoting;
+
+  /// No description provided for @onlineCountCloseVoting.
+  ///
+  /// In en, this message translates to:
+  /// **'Close Voting'**
+  String get onlineCountCloseVoting;
+
+  /// No description provided for @onlineCountVotingLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting Link'**
+  String get onlineCountVotingLink;
+
+  /// No description provided for @onlineCountCopyChineseLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Chinese Link'**
+  String get onlineCountCopyChineseLink;
+
+  /// No description provided for @onlineCountCopyEnglishLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy English Link'**
+  String get onlineCountCopyEnglishLink;
+
+  /// No description provided for @onlineCountResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Results'**
+  String get onlineCountResults;
+
+  /// No description provided for @onlineCountRefreshResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Results'**
+  String get onlineCountRefreshResults;
+
+  /// No description provided for @onlineCountCopyResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Results'**
+  String get onlineCountCopyResults;
+
+  /// No description provided for @onlineCountDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get onlineCountDraft;
+
+  /// No description provided for @onlineCountOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get onlineCountOpen;
+
+  /// No description provided for @onlineCountClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get onlineCountClosed;
+
+  /// No description provided for @onlineCountFinalResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Final results'**
+  String get onlineCountFinalResults;
+
+  /// No description provided for @onlineCountResultsNotFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are not final yet'**
+  String get onlineCountResultsNotFinal;
+
+  /// No description provided for @onlineCountSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get onlineCountSaved;
+
+  /// No description provided for @onlineCountCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get onlineCountCopied;
+
+  /// No description provided for @onlineCountPleaseCompleteSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete setup first'**
+  String get onlineCountPleaseCompleteSetup;
+
+  /// No description provided for @onlineCountCouldNotConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to online voting service'**
+  String get onlineCountCouldNotConnect;
+
+  /// No description provided for @onlineCountAnotherAwardOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Another award voting round is already open'**
+  String get onlineCountAnotherAwardOpen;
+
+  /// No description provided for @onlineCountNoSessionYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a meeting before setting candidates or opening voting.'**
+  String get onlineCountNoSessionYet;
+
+  /// No description provided for @onlineCountSessionId.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting ID'**
+  String get onlineCountSessionId;
+
+  /// No description provided for @onlineCountSessionStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting status'**
+  String get onlineCountSessionStatus;
+
+  /// No description provided for @onlineCountCandidateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One candidate per line'**
+  String get onlineCountCandidateHint;
+
+  /// No description provided for @onlineCountNoResultsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No results loaded yet.'**
+  String get onlineCountNoResultsYet;
+
+  /// No description provided for @onlineCountWinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Winner: {name}'**
+  String onlineCountWinner(String name);
+
+  /// No description provided for @onlineCountTie.
+  ///
+  /// In en, this message translates to:
+  /// **'Tie: {names}'**
+  String onlineCountTie(String names);
+
+  /// No description provided for @onlineCountVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'{votes} votes'**
+  String onlineCountVotes(int votes);
+
+  /// No description provided for @onlineCountActionComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get onlineCountActionComplete;
 
   /// No description provided for @languageMenuLabel.
   ///
