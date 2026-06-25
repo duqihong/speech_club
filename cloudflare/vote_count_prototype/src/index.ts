@@ -3,7 +3,7 @@ interface Env {
 }
 
 type AwardType = 'best_speaker' | 'best_table_topics' | 'best_evaluator';
-type SessionStatus = 'draft' | 'open' | 'closed';
+type RoundStatus = 'draft' | 'open' | 'closed';
 
 interface ClubRow {
   club_id: string;
@@ -19,7 +19,7 @@ interface SessionRow {
   club_id: string;
   meeting_title: string;
   meeting_date: string;
-  status: SessionStatus;
+  status: RoundStatus;
   opened_at: string | null;
   closed_at: string | null;
   created_at: string;
@@ -31,6 +31,9 @@ interface AwardRow {
   session_id: string;
   award_type: AwardType;
   display_order: number;
+  status: RoundStatus;
+  opened_at: string | null;
+  closed_at: string | null;
 }
 
 interface CandidateRow {
@@ -39,11 +42,6 @@ interface CandidateRow {
   candidate_name: string;
   display_order: number;
   created_at: string;
-}
-
-interface VoteInput {
-  awardId: string;
-  candidateId: string;
 }
 
 const serviceName = 'speech-club-vote-prototype';
@@ -97,16 +95,36 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     return htmlResponse(renderVotingPage(decodeURIComponent(clubPageMatch[1])));
   }
 
+  const activeVoteMatch = path.match(
+    /^\/api\/public\/club\/([^/]+)\/active-vote$/,
+  );
+  if (request.method === 'GET' && activeVoteMatch) {
+    return getActiveVote(env, decodeURIComponent(activeVoteMatch[1]));
+  }
+
   const activeSessionMatch = path.match(
     /^\/api\/public\/club\/([^/]+)\/active-session$/,
   );
   if (request.method === 'GET' && activeSessionMatch) {
+    // Legacy route retained for Phase 5B curl flows while active-vote becomes official.
     return getActiveSession(env, decodeURIComponent(activeSessionMatch[1]));
   }
 
-  const voteMatch = path.match(/^\/api\/public\/session\/([^/]+)\/vote$/);
-  if (request.method === 'POST' && voteMatch) {
-    return submitVote(request, env, decodeURIComponent(voteMatch[1]));
+  const activeAwardVoteMatch = path.match(
+    /^\/api\/public\/session\/([^/]+)\/award\/([^/]+)\/vote$/,
+  );
+  if (request.method === 'POST' && activeAwardVoteMatch) {
+    return submitAwardVote(
+      request,
+      env,
+      decodeURIComponent(activeAwardVoteMatch[1]),
+      decodeURIComponent(activeAwardVoteMatch[2]),
+    );
+  }
+
+  const legacyVoteMatch = path.match(/^\/api\/public\/session\/([^/]+)\/vote$/);
+  if (request.method === 'POST' && legacyVoteMatch) {
+    return submitVote(request, env, decodeURIComponent(legacyVoteMatch[1]));
   }
 
   if (request.method === 'POST' && path === '/api/admin/club') {
@@ -129,6 +147,30 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   );
   if (request.method === 'POST' && candidatesMatch) {
     return setCandidates(request, env, decodeURIComponent(candidatesMatch[1]));
+  }
+
+  const openAwardMatch = path.match(
+    /^\/api\/admin\/session\/([^/]+)\/award\/([^/]+)\/open$/,
+  );
+  if (request.method === 'POST' && openAwardMatch) {
+    return openAward(
+      request,
+      env,
+      decodeURIComponent(openAwardMatch[1]),
+      decodeURIComponent(openAwardMatch[2]),
+    );
+  }
+
+  const closeAwardMatch = path.match(
+    /^\/api\/admin\/session\/([^/]+)\/award\/([^/]+)\/close$/,
+  );
+  if (request.method === 'POST' && closeAwardMatch) {
+    return closeAward(
+      request,
+      env,
+      decodeURIComponent(closeAwardMatch[1]),
+      decodeURIComponent(closeAwardMatch[2]),
+    );
   }
 
   const openMatch = path.match(/^\/api\/admin\/session\/([^/]+)\/open$/);
@@ -231,8 +273,8 @@ async function createSession(
     ...defaultAwards.map((award) =>
       env.DB.prepare(
         `INSERT INTO awards
-         (award_id, session_id, award_type, display_order)
-         VALUES (?, ?, ?, ?)`,
+         (award_id, session_id, award_type, display_order, status)
+         VALUES (?, ?, ?, ?, 'draft')`,
       ).bind(
         crypto.randomUUID(),
         sessionId,
@@ -286,6 +328,14 @@ async function setCandidates(
     return errorResponse('INVALID_AWARD', 'Award not found.', 404);
   }
 
+  if (award.status !== 'draft') {
+    return errorResponse(
+      'AWARD_LOCKED',
+      'Candidates can only be edited while the award is in draft.',
+      409,
+    );
+  }
+
   const voteCount = await env.DB.prepare(
     `SELECT COUNT(*) AS count FROM votes WHERE award_id = ?`,
   )
@@ -326,39 +376,29 @@ async function openSession(
     return context;
   }
 
-  const missingAwards = await env.DB.prepare(
-    `SELECT a.award_type
-     FROM awards a
-     LEFT JOIN candidates c ON c.award_id = a.award_id
-     WHERE a.session_id = ?
-     GROUP BY a.award_id
-     HAVING COUNT(c.candidate_id) = 0`,
+  const otherOpenSession = await env.DB.prepare(
+    `SELECT session_id FROM sessions
+     WHERE club_id = ? AND status = 'open' AND session_id <> ?
+     LIMIT 1`,
   )
-    .bind(context.session.session_id)
-    .all<{ award_type: AwardType }>();
-
-  if (missingAwards.results.length > 0) {
+    .bind(context.club.club_id, context.session.session_id)
+    .first<{ session_id: string }>();
+  if (otherOpenSession) {
     return errorResponse(
-      'NO_CANDIDATES',
-      'Every award must have at least one candidate before voting opens.',
+      'OPEN_SESSION_EXISTS',
+      'Another meeting session is already open.',
       409,
     );
   }
 
-  await env.DB.batch([
-    env.DB.prepare(
-      `UPDATE sessions
-       SET status = 'closed', closed_at = COALESCE(closed_at, CURRENT_TIMESTAMP),
-           updated_at = CURRENT_TIMESTAMP
-       WHERE club_id = ? AND status = 'open' AND session_id <> ?`,
-    ).bind(context.club.club_id, context.session.session_id),
-    env.DB.prepare(
-      `UPDATE sessions
-       SET status = 'open', opened_at = COALESCE(opened_at, CURRENT_TIMESTAMP),
-           closed_at = NULL, updated_at = CURRENT_TIMESTAMP
-       WHERE session_id = ?`,
-    ).bind(context.session.session_id),
-  ]);
+  await env.DB.prepare(
+    `UPDATE sessions
+     SET status = 'open', opened_at = COALESCE(opened_at, CURRENT_TIMESTAMP),
+         closed_at = NULL, updated_at = CURRENT_TIMESTAMP
+     WHERE session_id = ?`,
+  )
+    .bind(context.session.session_id)
+    .run();
 
   const session = await getSessionById(env, context.session.session_id);
   return jsonResponse({ ok: true, session });
@@ -374,17 +414,119 @@ async function closeSession(
     return context;
   }
 
-  await env.DB.prepare(
-    `UPDATE sessions
-     SET status = 'closed', closed_at = CURRENT_TIMESTAMP,
-         updated_at = CURRENT_TIMESTAMP
-     WHERE session_id = ?`,
-  )
-    .bind(context.session.session_id)
-    .run();
+  await env.DB.batch([
+    env.DB.prepare(
+      `UPDATE awards
+       SET status = 'closed', closed_at = CURRENT_TIMESTAMP
+       WHERE session_id = ? AND status = 'open'`,
+    ).bind(context.session.session_id),
+    env.DB.prepare(
+      `UPDATE sessions
+       SET status = 'closed', closed_at = CURRENT_TIMESTAMP,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE session_id = ?`,
+    ).bind(context.session.session_id),
+  ]);
 
   const session = await getSessionById(env, context.session.session_id);
   return jsonResponse({ ok: true, session });
+}
+
+async function openAward(
+  request: Request,
+  env: Env,
+  sessionId: string,
+  awardId: string,
+): Promise<Response> {
+  const context = await getAdminSessionContext(request, env, sessionId);
+  if (context instanceof Response) {
+    return context;
+  }
+  if (context.session.status !== 'open') {
+    return errorResponse(
+      'SESSION_NOT_OPEN',
+      'Open the meeting session before opening an award round.',
+      409,
+    );
+  }
+
+  const award = await getAwardById(env, awardId);
+  if (!award || award.session_id !== context.session.session_id) {
+    return errorResponse('INVALID_AWARD', 'Award not found for this session.', 404);
+  }
+
+  const openAward = await env.DB.prepare(
+    `SELECT award_id FROM awards
+     WHERE session_id = ? AND status = 'open' AND award_id <> ?
+     LIMIT 1`,
+  )
+    .bind(context.session.session_id, award.award_id)
+    .first<{ award_id: string }>();
+  if (openAward) {
+    return errorResponse(
+      'OPEN_AWARD_EXISTS',
+      'Another award voting round is already open.',
+      409,
+    );
+  }
+
+  const candidateCount = await env.DB.prepare(
+    `SELECT COUNT(*) AS count FROM candidates WHERE award_id = ?`,
+  )
+    .bind(award.award_id)
+    .first<{ count: number }>();
+  if ((candidateCount?.count ?? 0) === 0) {
+    return errorResponse(
+      'NO_CANDIDATES',
+      'Award must have at least one candidate before voting opens.',
+      409,
+    );
+  }
+
+  await env.DB.prepare(
+    `UPDATE awards
+     SET status = 'open', opened_at = COALESCE(opened_at, CURRENT_TIMESTAMP),
+         closed_at = NULL
+     WHERE award_id = ?`,
+  )
+    .bind(award.award_id)
+    .run();
+
+  return jsonResponse({ ok: true, award: await getAwardById(env, award.award_id) });
+}
+
+async function closeAward(
+  request: Request,
+  env: Env,
+  sessionId: string,
+  awardId: string,
+): Promise<Response> {
+  const context = await getAdminSessionContext(request, env, sessionId);
+  if (context instanceof Response) {
+    return context;
+  }
+
+  const award = await getAwardById(env, awardId);
+  if (!award || award.session_id !== context.session.session_id) {
+    return errorResponse('INVALID_AWARD', 'Award not found for this session.', 404);
+  }
+  if (award.status !== 'open') {
+    return errorResponse(
+      'AWARD_NOT_OPEN',
+      'Award voting round is not open.',
+      409,
+    );
+  }
+
+  await env.DB.prepare(
+    `UPDATE awards
+     SET status = 'closed', closed_at = CURRENT_TIMESTAMP
+     WHERE award_id = ?`,
+  )
+    .bind(award.award_id)
+    .run();
+
+  return jsonResponse({ ok: true, award: await getAwardById(env, award.award_id) });
 }
 
 async function getResults(
@@ -422,12 +564,14 @@ async function getResults(
         ...candidates.results.map((candidate) => candidate.vote_count),
       );
       const winners = candidates.results.filter(
-        (candidate) => candidate.vote_count > 0 && candidate.vote_count === maxVotes,
+        (candidate) =>
+          candidate.vote_count > 0 && candidate.vote_count === maxVotes,
       );
 
       return {
         awardId: award.award_id,
         awardType: award.award_type,
+        awardStatus: award.status,
         label: awardLabels[award.award_type],
         candidates: candidates.results,
         winners,
@@ -444,6 +588,31 @@ async function getResults(
   });
 }
 
+async function getActiveVote(
+  env: Env,
+  rawClubSlug: string,
+): Promise<Response> {
+  const activeVote = await loadActiveVote(env, rawClubSlug);
+  if (!activeVote) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: 'NO_ACTIVE_VOTE',
+        message: 'Voting is not open now.',
+      },
+      404,
+    );
+  }
+
+  return jsonResponse({
+    ok: true,
+    club: publicClubCamel(activeVote.club),
+    session: publicSessionCamel(activeVote.session),
+    award: publicAwardCamel(activeVote.award),
+    candidates: activeVote.candidates.map(publicCandidateCamel),
+  });
+}
+
 async function getActiveSession(
   env: Env,
   rawClubSlug: string,
@@ -454,15 +623,7 @@ async function getActiveSession(
     return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
   }
 
-  const session = await env.DB.prepare(
-    `SELECT * FROM sessions
-     WHERE club_id = ? AND status = 'open'
-     ORDER BY opened_at DESC
-     LIMIT 1`,
-  )
-    .bind(club.club_id)
-    .first<SessionRow>();
-
+  const session = await getOpenSessionForClub(env, club.club_id);
   if (!session) {
     return jsonResponse(
       {
@@ -481,6 +642,91 @@ async function getActiveSession(
     session,
     awards,
   });
+}
+
+async function submitAwardVote(
+  request: Request,
+  env: Env,
+  sessionId: string,
+  awardId: string,
+): Promise<Response> {
+  const session = await getSessionById(env, sessionId);
+  if (!session) {
+    return errorResponse('SESSION_NOT_FOUND', 'Session not found.', 404);
+  }
+  if (session.status !== 'open') {
+    return errorResponse(
+      'SESSION_NOT_OPEN',
+      'Voting is not open now.',
+      409,
+    );
+  }
+
+  const award = await getAwardById(env, awardId);
+  if (!award || award.session_id !== session.session_id) {
+    return errorResponse('INVALID_AWARD', 'Award not found for this session.', 404);
+  }
+  if (award.status !== 'open') {
+    return errorResponse(
+      'AWARD_NOT_OPEN',
+      'Voting is not open now.',
+      409,
+    );
+  }
+
+  const body = await readJson(request);
+  const voterToken = getString(body, 'voterToken');
+  const candidateId = getString(body, 'candidateId');
+  if (!voterToken || !candidateId) {
+    return errorResponse(
+      'MISSING_FIELD',
+      'voterToken and candidateId are required.',
+    );
+  }
+
+  const candidate = await env.DB.prepare(
+    `SELECT * FROM candidates WHERE candidate_id = ? AND award_id = ?`,
+  )
+    .bind(candidateId, award.award_id)
+    .first<CandidateRow>();
+  if (!candidate) {
+    return errorResponse(
+      'INVALID_CANDIDATE',
+      'Candidate does not belong to this award.',
+      400,
+    );
+  }
+
+  const voterTokenHash = await hashText(
+    `${session.session_id}:${award.award_id}:${voterToken}`,
+  );
+
+  try {
+    await env.DB.prepare(
+      `INSERT INTO votes
+       (vote_id, session_id, award_id, candidate_id, voter_token_hash)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        crypto.randomUUID(),
+        session.session_id,
+        award.award_id,
+        candidate.candidate_id,
+        voterTokenHash,
+      )
+      .run();
+    return jsonResponse({ ok: true, recorded: true, duplicate: false });
+  } catch (error) {
+    if (isConstraintError(error)) {
+      return jsonResponse({
+        ok: true,
+        recorded: false,
+        duplicate: true,
+        code: 'ALREADY_VOTED',
+      });
+    }
+    throw error;
+  }
 }
 
 async function submitVote(
@@ -507,7 +753,6 @@ async function submitVote(
     return errorResponse('MISSING_FIELD', 'voterToken and votes are required.');
   }
 
-  const voterTokenHash = await hashText(`${session.session_id}:${voterToken}`);
   let recorded = 0;
   let duplicates = 0;
 
@@ -545,6 +790,9 @@ async function submitVote(
       );
     }
 
+    const voterTokenHash = await hashText(
+      `${session.session_id}:${award.award_id}:${voterToken}`,
+    );
     try {
       await env.DB.prepare(
         `INSERT INTO votes
@@ -612,6 +860,63 @@ async function verifyAdminPin(
   return null;
 }
 
+async function loadActiveVote(
+  env: Env,
+  rawClubSlug: string,
+): Promise<
+  | {
+      club: ClubRow;
+      session: SessionRow;
+      award: AwardRow;
+      candidates: CandidateRow[];
+    }
+  | null
+> {
+  const clubSlug = normalizeSlug(rawClubSlug);
+  const club = await getClubBySlug(env, clubSlug);
+  if (!club) {
+    return null;
+  }
+
+  const session = await getOpenSessionForClub(env, club.club_id);
+  if (!session) {
+    return null;
+  }
+
+  const award = await env.DB.prepare(
+    `SELECT * FROM awards
+     WHERE session_id = ? AND status = 'open'
+     ORDER BY opened_at DESC
+     LIMIT 1`,
+  )
+    .bind(session.session_id)
+    .first<AwardRow>();
+  if (!award) {
+    return null;
+  }
+
+  return {
+    club,
+    session,
+    award,
+    candidates: await getCandidatesForAward(env, award.award_id),
+  };
+}
+
+async function getOpenSessionForClub(
+  env: Env,
+  clubId: string,
+): Promise<SessionRow | null> {
+  return env.DB.prepare(
+    `SELECT * FROM sessions
+     WHERE club_id = ? AND status = 'open'
+     ORDER BY opened_at DESC
+     LIMIT 1`,
+  )
+    .bind(clubId)
+    .first<SessionRow>();
+}
+
 async function getClubBySlug(
   env: Env,
   clubSlug: string,
@@ -634,6 +939,12 @@ async function getSessionById(
   return env.DB.prepare(`SELECT * FROM sessions WHERE session_id = ?`)
     .bind(sessionId)
     .first<SessionRow>();
+}
+
+async function getAwardById(env: Env, awardId: string): Promise<AwardRow | null> {
+  return env.DB.prepare(`SELECT * FROM awards WHERE award_id = ?`)
+    .bind(awardId)
+    .first<AwardRow>();
 }
 
 async function getAwardsForSession(
@@ -665,7 +976,9 @@ async function getCandidatesForAward(
 async function getAwardsWithCandidates(
   env: Env,
   sessionId: string,
-): Promise<Array<AwardRow & { label: { en: string; zh: string }; candidates: CandidateRow[] }>> {
+): Promise<
+  Array<AwardRow & { label: { en: string; zh: string }; candidates: CandidateRow[] }>
+> {
   const awards = await getAwardsForSession(env, sessionId);
   return Promise.all(
     awards.map(async (award) => ({
@@ -681,6 +994,39 @@ function publicClub(club: ClubRow) {
     club_id: club.club_id,
     club_name: club.club_name,
     club_slug: club.club_slug,
+  };
+}
+
+function publicClubCamel(club: ClubRow) {
+  return {
+    clubId: club.club_id,
+    clubName: club.club_name,
+    clubSlug: club.club_slug,
+  };
+}
+
+function publicSessionCamel(session: SessionRow) {
+  return {
+    sessionId: session.session_id,
+    meetingTitle: session.meeting_title,
+    meetingDate: session.meeting_date,
+    status: session.status,
+  };
+}
+
+function publicAwardCamel(award: AwardRow) {
+  return {
+    awardId: award.award_id,
+    awardType: award.award_type,
+    status: award.status,
+  };
+}
+
+function publicCandidateCamel(candidate: CandidateRow) {
+  return {
+    candidateId: candidate.candidate_id,
+    candidateName: candidate.candidate_name,
+    displayOrder: candidate.display_order,
   };
 }
 
@@ -738,7 +1084,9 @@ function trimTrailingSlash(path: string): string {
 }
 
 function getRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  return value && typeof value === 'object'
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function getString(value: unknown, key: string): string | undefined {
@@ -766,7 +1114,7 @@ function renderVotingPage(clubSlug: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Speech Club Voting / 演讲俱乐部投票</title>
+  <title>Speech Club Voting</title>
   <style>
     :root {
       color-scheme: light;
@@ -779,13 +1127,35 @@ function renderVotingPage(clubSlug: string): string {
       color: #17202a;
     }
     main {
-      max-width: 760px;
+      max-width: 680px;
       margin: 0 auto;
       padding: 24px 16px 40px;
     }
+    .language-switch {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+    .language-switch button {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 6px 8px;
+      border: 0;
+      background: transparent;
+      color: #1769aa;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .language-switch button[aria-current="true"] {
+      color: #17202a;
+      text-decoration: underline;
+    }
     h1 {
       margin: 0 0 8px;
-      font-size: 30px;
+      font-size: 32px;
     }
     .subtitle {
       margin: 0 0 20px;
@@ -796,32 +1166,44 @@ function renderVotingPage(clubSlug: string): string {
       background: #fff;
       border: 1px solid #d7dde5;
       border-radius: 8px;
-      padding: 18px;
+      padding: 20px;
       margin: 14px 0;
       box-shadow: 0 2px 6px rgb(15 23 42 / 6%);
     }
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #52606d;
+      font-size: 18px;
+      font-weight: 700;
+    }
     .award-title {
+      margin: 0 0 18px;
+      font-size: 26px;
+    }
+    .prompt {
       margin: 0 0 12px;
-      font-size: 22px;
+      font-size: 20px;
+      font-weight: 650;
     }
     label {
-      display: block;
-      padding: 14px;
-      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      margin: 12px 0;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 20px;
+      font-size: 22px;
       background: #fbfcfe;
     }
     input[type="radio"] {
-      width: 22px;
-      height: 22px;
-      margin-right: 10px;
-      vertical-align: middle;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
     }
-    button {
+    .submit {
       width: 100%;
-      min-height: 58px;
+      min-height: 60px;
       margin-top: 18px;
       border: 0;
       border-radius: 8px;
@@ -830,11 +1212,11 @@ function renderVotingPage(clubSlug: string): string {
       font-size: 22px;
       font-weight: 700;
     }
-    button:disabled {
+    .submit:disabled {
       background: #8aa7bf;
     }
     .message {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 650;
     }
     .error {
@@ -847,22 +1229,106 @@ function renderVotingPage(clubSlug: string): string {
 </head>
 <body>
   <main>
-    <h1>Speech Club Voting / 演讲俱乐部投票</h1>
-    <p class="subtitle" id="meeting">Loading / 加载中...</p>
-    <section id="content" class="card">
-      <p class="message">Loading voting page... / 正在加载投票页面...</p>
-    </section>
+    <nav class="language-switch" aria-label="Language">
+      <button id="langEn" type="button">English</button>
+      <span aria-hidden="true">|</span>
+      <button id="langZh" type="button">中文</button>
+    </nav>
+    <h1 id="title"></h1>
+    <p class="subtitle" id="meeting"></p>
+    <section id="content" class="card"></section>
   </main>
   <script>
     const clubSlug = '${safeClubSlug}';
     const content = document.getElementById('content');
     const meeting = document.getElementById('meeting');
+    const title = document.getElementById('title');
+    const langEn = document.getElementById('langEn');
+    const langZh = document.getElementById('langZh');
+    let currentData = null;
+    let currentLang = chooseInitialLanguage();
+
+    const text = {
+      en: {
+        title: 'Speech Club Voting',
+        loading: 'Loading voting page...',
+        noActiveVote: 'Voting is not open now.',
+        currentVote: 'Current Vote',
+        chooseOne: 'Please choose one candidate',
+        submit: 'Submit Vote',
+        thankYou: 'Thank you. Your vote has been recorded.',
+        alreadyVoted: 'You have already voted for this award.',
+        chooseCandidate: 'Please choose one candidate.',
+        genericError: 'Unable to submit vote. Please try again.'
+      },
+      zh: {
+        title: '演讲俱乐部投票',
+        loading: '正在加载投票页面...',
+        noActiveVote: '当前没有开放的投票。',
+        currentVote: '当前投票',
+        chooseOne: '请选择一位候选人',
+        submit: '提交投票',
+        thankYou: '谢谢，您的投票已记录。',
+        alreadyVoted: '您已经为这个奖项投过票。',
+        chooseCandidate: '请选择一位候选人。',
+        genericError: '无法提交投票，请再试一次。'
+      }
+    };
+
+    const awardLabels = {
+      best_speaker: { en: 'Best Speaker', zh: '最佳演讲者' },
+      best_table_topics: { en: 'Best Table Topics Speaker', zh: '最佳即席演讲者' },
+      best_evaluator: { en: 'Best Evaluator', zh: '最佳点评者' }
+    };
+
+    function chooseInitialLanguage() {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = normalizeLanguage(params.get('lang'));
+      if (urlLang) {
+        localStorage.setItem('speechClubVoteLang', urlLang);
+        return urlLang;
+      }
+
+      const savedLang = normalizeLanguage(localStorage.getItem('speechClubVoteLang'));
+      if (savedLang) {
+        return savedLang;
+      }
+
+      const browserLanguages = navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language];
+      return browserLanguages.some((lang) => String(lang).toLowerCase().startsWith('zh'))
+        ? 'zh'
+        : 'en';
+    }
+
+    function normalizeLanguage(value) {
+      if (!value) return null;
+      const lang = String(value).toLowerCase();
+      if (lang === 'en' || lang.startsWith('en-')) return 'en';
+      if (lang === 'zh' || lang.startsWith('zh-')) return 'zh';
+      return null;
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('speechClubVoteLang', lang);
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      history.replaceState(null, '', url.toString());
+      renderPage(currentData);
+    }
+
+    langEn.addEventListener('click', () => setLanguage('en'));
+    langZh.addEventListener('click', () => setLanguage('zh'));
 
     function getVoterToken() {
-      const key = 'speechClubVoteToken';
+      const key = 'speechClubVoterToken';
       let token = localStorage.getItem(key);
       if (!token) {
-        token = crypto.randomUUID();
+        token = crypto.randomUUID
+          ? crypto.randomUUID()
+          : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
         localStorage.setItem(key, token);
       }
       return token;
@@ -878,62 +1344,90 @@ function renderVotingPage(clubSlug: string): string {
       }[char]));
     }
 
-    async function loadSession() {
-      const response = await fetch('/api/public/club/' + encodeURIComponent(clubSlug) + '/active-session');
-      const data = await response.json();
+    function awardLabel(awardType) {
+      return (awardLabels[awardType] && awardLabels[awardType][currentLang]) || awardType;
+    }
+
+    function renderShell() {
+      document.documentElement.lang = currentLang;
+      document.title = text[currentLang].title;
+      title.textContent = text[currentLang].title;
+      langEn.setAttribute('aria-current', currentLang === 'en' ? 'true' : 'false');
+      langZh.setAttribute('aria-current', currentLang === 'zh' ? 'true' : 'false');
+    }
+
+    function renderPage(data) {
+      renderShell();
+      if (!data) {
+        meeting.textContent = '';
+        content.innerHTML = '<p class="message">' + escapeHtml(text[currentLang].loading) + '</p>';
+        return;
+      }
       if (!data.ok) {
-        meeting.textContent = 'Online Count / 在线计票';
-        content.innerHTML = '<p class="message error">Voting is not open now.<br>当前没有开放的投票。</p>';
+        meeting.textContent = '';
+        content.innerHTML = '<p class="message error">' + escapeHtml(text[currentLang].noActiveVote) + '</p>';
         return;
       }
 
-      meeting.textContent = data.session.meeting_title + ' · ' + data.session.meeting_date;
-      content.innerHTML = renderForm(data);
-      document.getElementById('voteForm').addEventListener('submit', (event) => submitVote(event, data.session.session_id));
-    }
-
-    function renderForm(data) {
-      const sections = data.awards.map((award) => {
-        const options = award.candidates.map((candidate) => {
-          return '<label><input type="radio" name="' + award.award_id + '" value="' + candidate.candidate_id + '"> ' + escapeHtml(candidate.candidate_name) + '</label>';
-        }).join('');
-        return '<section class="card"><h2 class="award-title">' + escapeHtml(award.label.en) + ' / ' + escapeHtml(award.label.zh) + '</h2>' + options + '</section>';
+      meeting.textContent = data.session.meetingTitle + ' · ' + data.session.meetingDate;
+      const options = data.candidates.map((candidate) => {
+        return '<label><input type="radio" name="candidate" value="' + candidate.candidateId + '"> <span>' + escapeHtml(candidate.candidateName) + '</span></label>';
       }).join('');
-
-      return '<form id="voteForm">' + sections + '<button type="submit">Submit Vote / 提交投票</button></form>';
+      content.innerHTML =
+        '<form id="voteForm">' +
+        '<p class="eyebrow">' + escapeHtml(text[currentLang].currentVote) + '</p>' +
+        '<h2 class="award-title">' + escapeHtml(awardLabel(data.award.awardType)) + '</h2>' +
+        '<p class="prompt">' + escapeHtml(text[currentLang].chooseOne) + '</p>' +
+        options +
+        '<button class="submit" type="submit">' + escapeHtml(text[currentLang].submit) + '</button>' +
+        '</form>';
+      document.getElementById('voteForm').addEventListener('submit', (event) => submitVote(event, data));
     }
 
-    async function submitVote(event, sessionId) {
+    async function loadActiveVote() {
+      renderPage(null);
+      const response = await fetch('/api/public/club/' + encodeURIComponent(clubSlug) + '/active-vote');
+      const data = await response.json();
+      currentData = data;
+      renderPage(data);
+    }
+
+    async function submitVote(event, data) {
       event.preventDefault();
       const form = event.target;
-      const button = form.querySelector('button');
-      button.disabled = true;
-      const votes = Array.from(form.querySelectorAll('input[type="radio"]:checked')).map((input) => ({
-        awardId: input.name,
-        candidateId: input.value
-      }));
-
-      const response = await fetch('/api/public/session/' + encodeURIComponent(sessionId) + '/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voterToken: getVoterToken(), votes })
-      });
-      const data = await response.json();
-
-      if (!data.ok) {
-        content.innerHTML = '<p class="message error">' + escapeHtml(data.message) + '</p>';
+      const selected = form.querySelector('input[name="candidate"]:checked');
+      if (!selected) {
+        content.innerHTML = '<p class="message error">' + escapeHtml(text[currentLang].chooseCandidate) + '</p>';
         return;
       }
 
-      const duplicateNote = data.duplicates > 0
-        ? '<p class="message">Some votes were already recorded earlier.<br>部分奖项您已经投过票。</p>'
-        : '';
-      content.innerHTML = '<p class="message success">Thank you. Your vote has been recorded.<br>谢谢，您的投票已记录。</p>' + duplicateNote;
+      const button = form.querySelector('button');
+      button.disabled = true;
+      const response = await fetch('/api/public/session/' + encodeURIComponent(data.session.sessionId) + '/award/' + encodeURIComponent(data.award.awardId) + '/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voterToken: getVoterToken(),
+          candidateId: selected.value
+        })
+      });
+      const result = await response.json();
+
+      if (!result.ok) {
+        content.innerHTML = '<p class="message error">' + escapeHtml(result.message || text[currentLang].genericError) + '</p>';
+        return;
+      }
+
+      const message = result.duplicate
+        ? text[currentLang].alreadyVoted
+        : text[currentLang].thankYou;
+      content.innerHTML = '<p class="message success">' + escapeHtml(message) + '</p>';
     }
 
-    loadSession().catch(() => {
-      meeting.textContent = 'Online Count / 在线计票';
-      content.innerHTML = '<p class="message error">Voting is not open now.<br>当前没有开放的投票。</p>';
+    renderShell();
+    loadActiveVote().catch(() => {
+      currentData = { ok: false };
+      renderPage(currentData);
     });
   </script>
 </body>
