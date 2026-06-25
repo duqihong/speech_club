@@ -5,5 +5,5 @@ compatibility_date = "2026-06-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "speech_club_votes"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "d98a29cc-2288-41cf-93d6-b5121aa932df"
 migrations_dir = "migrations"

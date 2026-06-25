@@ -143,6 +143,29 @@ curl http://localhost:8787/api/admin/session/SESSION_ID/results \
   -H "X-Admin-Pin: 123456"
 ```
 
+## Remote Deployment Test
+
+Current test Worker URL:
+
+```text
+https://speech-club-vote-prototype.duduqihong.workers.dev
+```
+
+This URL is for prototype testing only. Do not use real club data yet.
+
+Remote setup commands:
+
+```sh
+npx wrangler whoami
+npx wrangler d1 create speech_club_votes
+npx wrangler d1 migrations apply speech_club_votes --remote
+npx wrangler deploy
+```
+
+After `wrangler d1 create`, replace the placeholder `database_id` in `wrangler.toml` with the real Cloudflare database ID before applying remote migrations or deploying.
+
+The demo admin PIN `123456` is only for prototype testing. Do not use it for real club meetings.
+
 ## Remote Deployment Later
 
 Do not deploy this prototype to production yet. When ready for a remote test deployment:
