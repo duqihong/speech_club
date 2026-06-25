@@ -251,6 +251,26 @@ String generateClubCode(String clubName) {
   return code.isEmpty ? 'speech-club' : code;
 }
 
+String buildVotingPrintText(String url, Locale locale) {
+  final bool isChinese = locale.languageCode == 'zh';
+  if (isChinese) {
+    return <String>[
+      '演讲俱乐部投票',
+      '请在会议中扫描此二维码进行投票。',
+      '每个奖项投票都使用同一个二维码。',
+      '投票链接：',
+      url,
+    ].join('\n');
+  }
+  return <String>[
+    'Speech Club Voting',
+    'Scan this QR code to vote during the meeting.',
+    'The same QR code is used for each award vote.',
+    'Voting link:',
+    url,
+  ].join('\n');
+}
+
 String onlineAwardLabel(OnlineAwardType type, Locale locale) {
   final bool isChinese = locale.languageCode == 'zh';
   return switch (type) {

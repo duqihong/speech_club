@@ -640,10 +640,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountVotingLink => '投票链接';
 
   @override
+  String get onlineCountPermanentVotingQr => '永久投票二维码';
+
+  @override
+  String get onlineCountPermanentVotingQrHelp =>
+      '每次会议都可以使用同一个二维码。投票页面只会显示当前开放的奖项投票。';
+
+  @override
+  String get onlineCountChineseVotingPage => '中文投票页面';
+
+  @override
+  String get onlineCountEnglishVotingPage => '英文投票页面';
+
+  @override
+  String get onlineCountAutoLanguage => '自动语言';
+
+  @override
+  String get onlineCountQrChinese => '中文';
+
+  @override
+  String get onlineCountQrEnglish => 'English';
+
+  @override
+  String get onlineCountQrAuto => 'Auto';
+
+  @override
+  String get onlineCountCopyQrLink => '复制二维码链接';
+
+  @override
+  String get onlineCountCopyPrintText => '复制打印文字';
+
+  @override
+  String get onlineCountEnterClubCodeFirst => '请先填写并保存俱乐部代号。';
+
+  @override
+  String get onlineCountCompleteSetupFirst => '请先完成在线俱乐部设置。';
+
+  @override
   String get onlineCountCopyChineseLink => '复制中文链接';
 
   @override
   String get onlineCountCopyEnglishLink => '复制英文链接';
+
+  @override
+  String get onlineCountCopyAutoLink => '复制自动语言链接';
 
   @override
   String get onlineCountResults => '结果';
@@ -685,7 +725,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSaved => '已保存';
 
   @override
-  String get onlineCountCopied => '已复制';
+  String get onlineCountCopied => '已复制。';
 
   @override
   String get onlineCountPleaseCompleteSetup => '请先完成设置';
@@ -727,7 +767,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountNoResultsYet => '还没有加载结果。';
 
   @override
-  String get onlineCountVotingLinkHelp => '每个奖项都使用同一个链接。页面只会显示当前开放的奖项投票。';
+  String get onlineCountVotingLinkHelp => '每个奖项都使用同一个链接。请一次只开放一个奖项投票。';
 
   @override
   String onlineCountWinner(String name) {

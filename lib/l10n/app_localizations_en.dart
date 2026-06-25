@@ -671,10 +671,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountVotingLink => 'Voting Link';
 
   @override
+  String get onlineCountPermanentVotingQr => 'Permanent Voting QR';
+
+  @override
+  String get onlineCountPermanentVotingQrHelp =>
+      'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.';
+
+  @override
+  String get onlineCountChineseVotingPage => 'Chinese voting page';
+
+  @override
+  String get onlineCountEnglishVotingPage => 'English voting page';
+
+  @override
+  String get onlineCountAutoLanguage => 'Auto language';
+
+  @override
+  String get onlineCountQrChinese => '中文';
+
+  @override
+  String get onlineCountQrEnglish => 'English';
+
+  @override
+  String get onlineCountQrAuto => 'Auto';
+
+  @override
+  String get onlineCountCopyQrLink => 'Copy QR Link';
+
+  @override
+  String get onlineCountCopyPrintText => 'Copy Print Text';
+
+  @override
+  String get onlineCountEnterClubCodeFirst =>
+      'Enter and save a club code first.';
+
+  @override
+  String get onlineCountCompleteSetupFirst =>
+      'Please complete online club setup first.';
+
+  @override
   String get onlineCountCopyChineseLink => 'Copy Chinese Link';
 
   @override
   String get onlineCountCopyEnglishLink => 'Copy English Link';
+
+  @override
+  String get onlineCountCopyAutoLink => 'Copy Auto Link';
 
   @override
   String get onlineCountResults => 'Results';
@@ -718,7 +760,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountSaved => 'Saved';
 
   @override
-  String get onlineCountCopied => 'Copied';
+  String get onlineCountCopied => 'Copied.';
 
   @override
   String get onlineCountPleaseCompleteSetup => 'Please complete setup first';
@@ -766,7 +808,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountVotingLinkHelp =>
-      'Use the same link for every award. The page will show only the award currently open for voting.';
+      'The same link is used for every award. Open one award voting round at a time.';
 
   @override
   String onlineCountWinner(String name) {

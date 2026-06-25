@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../data/online_count/online_count_api.dart';
@@ -41,6 +42,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   bool _clubCodeManuallyEdited = false;
   bool _clubCreated = false;
   bool _loaded = false;
+  _QrLinkType? _selectedQrType;
 
   @override
   void initState() {
@@ -489,6 +491,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             _buildMeetingCard(l10n),
             _buildCandidateSetupCard(l10n),
             _buildVotingRoundCard(l10n),
+            _buildPermanentQrCard(l10n),
             _buildVotingLinkCard(l10n),
             _buildResultsCard(l10n),
           ],
@@ -770,6 +773,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   Widget _buildVotingLinkCard(AppLocalizations l10n) {
     final String clubSlug = _clubSlugController.text.trim();
     final OnlineCountApi api = _api();
+    final String autoLink =
+        clubSlug.isEmpty ? '' : api.votingLinkForClub(clubSlug);
     final String zhLink =
         clubSlug.isEmpty ? '' : api.votingLinkForClub(clubSlug, lang: 'zh');
     final String enLink =
@@ -784,6 +789,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _LinkBlock(link: zhLink),
         const SizedBox(height: 8),
         _LinkBlock(link: enLink),
+        const SizedBox(height: 8),
+        _LinkBlock(link: autoLink),
         _buttonWrap(
           <Widget>[
             FilledButton.icon(
@@ -796,8 +803,103 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               icon: const Icon(Icons.copy_outlined),
               label: Text(l10n.onlineCountCopyEnglishLink),
             ),
+            OutlinedButton.icon(
+              onPressed: autoLink.isEmpty ? null : () => _copyText(autoLink),
+              icon: const Icon(Icons.copy_outlined),
+              label: Text(l10n.onlineCountCopyAutoLink),
+            ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _buildPermanentQrCard(AppLocalizations l10n) {
+    final Locale locale = Localizations.localeOf(context);
+    final _QrLinkType selectedType = _currentQrType(locale);
+    final String clubCode = _clubSlugController.text.trim();
+    final String baseUrl = _baseUrlController.text.trim();
+    final String url = _qrUrl(selectedType);
+
+    return _SectionCard(
+      title: l10n.onlineCountPermanentVotingQr,
+      icon: Icons.qr_code_2_outlined,
+      children: <Widget>[
+        _BodyText(l10n.onlineCountPermanentVotingQrHelp),
+        const SizedBox(height: 12),
+        if (baseUrl.isEmpty)
+          Text(
+            l10n.onlineCountCompleteSetupFirst,
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
+          )
+        else if (clubCode.isEmpty)
+          Text(
+            l10n.onlineCountEnterClubCodeFirst,
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
+          )
+        else ...<Widget>[
+          SegmentedButton<_QrLinkType>(
+            segments: <ButtonSegment<_QrLinkType>>[
+              ButtonSegment<_QrLinkType>(
+                value: _QrLinkType.zh,
+                label: Text(l10n.onlineCountQrChinese),
+              ),
+              ButtonSegment<_QrLinkType>(
+                value: _QrLinkType.en,
+                label: Text(l10n.onlineCountQrEnglish),
+              ),
+              ButtonSegment<_QrLinkType>(
+                value: _QrLinkType.auto,
+                label: Text(l10n.onlineCountQrAuto),
+              ),
+            ],
+            selected: <_QrLinkType>{selectedType},
+            onSelectionChanged: (Set<_QrLinkType> value) {
+              setState(() => _selectedQrType = value.single);
+            },
+          ),
+          const SizedBox(height: 14),
+          Text(
+            _qrLabel(selectedType, l10n),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.black12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: QrImageView(
+                  data: url,
+                  version: QrVersions.auto,
+                  size: 240,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          _LinkBlock(link: url),
+          _buttonWrap(
+            <Widget>[
+              FilledButton.icon(
+                onPressed: () => _copyText(url),
+                icon: const Icon(Icons.copy_outlined),
+                label: Text(l10n.onlineCountCopyQrLink),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _copyText(buildVotingPrintText(url, locale)),
+                icon: const Icon(Icons.print_outlined),
+                label: Text(l10n.onlineCountCopyPrintText),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -941,6 +1043,31 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     };
   }
 
+  _QrLinkType _currentQrType(Locale locale) {
+    return _selectedQrType ??
+        (locale.languageCode == 'zh' ? _QrLinkType.zh : _QrLinkType.en);
+  }
+
+  String _qrUrl(_QrLinkType type) {
+    final String clubCode = _clubSlugController.text.trim();
+    if (clubCode.isEmpty) {
+      return '';
+    }
+    return switch (type) {
+      _QrLinkType.zh => _api().votingLinkForClub(clubCode, lang: 'zh'),
+      _QrLinkType.en => _api().votingLinkForClub(clubCode, lang: 'en'),
+      _QrLinkType.auto => _api().votingLinkForClub(clubCode),
+    };
+  }
+
+  String _qrLabel(_QrLinkType type, AppLocalizations l10n) {
+    return switch (type) {
+      _QrLinkType.zh => l10n.onlineCountChineseVotingPage,
+      _QrLinkType.en => l10n.onlineCountEnglishVotingPage,
+      _QrLinkType.auto => l10n.onlineCountAutoLanguage,
+    };
+  }
+
   String _buildResultsText(OnlineResults results, Locale locale) {
     final bool isChinese = locale.languageCode == 'zh';
     final List<String> sections = <String>[
@@ -988,6 +1115,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return '${now.year}-$month-$day';
   }
 }
+
+enum _QrLinkType { zh, en, auto }
 
 class _SectionCard extends StatelessWidget {
   const _SectionCard({

@@ -1334,6 +1334,78 @@ abstract class AppLocalizations {
   /// **'Voting Link'**
   String get onlineCountVotingLink;
 
+  /// No description provided for @onlineCountPermanentVotingQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent Voting QR'**
+  String get onlineCountPermanentVotingQr;
+
+  /// No description provided for @onlineCountPermanentVotingQrHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.'**
+  String get onlineCountPermanentVotingQrHelp;
+
+  /// No description provided for @onlineCountChineseVotingPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese voting page'**
+  String get onlineCountChineseVotingPage;
+
+  /// No description provided for @onlineCountEnglishVotingPage.
+  ///
+  /// In en, this message translates to:
+  /// **'English voting page'**
+  String get onlineCountEnglishVotingPage;
+
+  /// No description provided for @onlineCountAutoLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto language'**
+  String get onlineCountAutoLanguage;
+
+  /// No description provided for @onlineCountQrChinese.
+  ///
+  /// In en, this message translates to:
+  /// **'中文'**
+  String get onlineCountQrChinese;
+
+  /// No description provided for @onlineCountQrEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get onlineCountQrEnglish;
+
+  /// No description provided for @onlineCountQrAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get onlineCountQrAuto;
+
+  /// No description provided for @onlineCountCopyQrLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy QR Link'**
+  String get onlineCountCopyQrLink;
+
+  /// No description provided for @onlineCountCopyPrintText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Print Text'**
+  String get onlineCountCopyPrintText;
+
+  /// No description provided for @onlineCountEnterClubCodeFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter and save a club code first.'**
+  String get onlineCountEnterClubCodeFirst;
+
+  /// No description provided for @onlineCountCompleteSetupFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete online club setup first.'**
+  String get onlineCountCompleteSetupFirst;
+
   /// No description provided for @onlineCountCopyChineseLink.
   ///
   /// In en, this message translates to:
@@ -1345,6 +1417,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy English Link'**
   String get onlineCountCopyEnglishLink;
+
+  /// No description provided for @onlineCountCopyAutoLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Auto Link'**
+  String get onlineCountCopyAutoLink;
 
   /// No description provided for @onlineCountResults.
   ///
@@ -1427,7 +1505,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCopied.
   ///
   /// In en, this message translates to:
-  /// **'Copied'**
+  /// **'Copied.'**
   String get onlineCountCopied;
 
   /// No description provided for @onlineCountPleaseCompleteSetup.
@@ -1511,7 +1589,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountVotingLinkHelp.
   ///
   /// In en, this message translates to:
-  /// **'Use the same link for every award. The page will show only the award currently open for voting.'**
+  /// **'The same link is used for every award. Open one award voting round at a time.'**
   String get onlineCountVotingLinkHelp;
 
   /// No description provided for @onlineCountWinner.

@@ -19,6 +19,18 @@ void main() {
       expect(generateClubCode('中文俱乐部'), 'speech-club');
     });
 
+    test('print text is localized and includes voting URL', () {
+      const String url = 'https://example.com/c/demo-club?lang=zh';
+
+      final String english = buildVotingPrintText(url, const Locale('en'));
+      expect(english, contains('Speech Club Voting'));
+      expect(english, contains(url));
+
+      final String chinese = buildVotingPrintText(url, const Locale('zh'));
+      expect(chinese, contains('演讲俱乐部投票'));
+      expect(chinese, contains(url));
+    });
+
     test('award labels map in English and Chinese', () {
       expect(
         onlineAwardLabel(

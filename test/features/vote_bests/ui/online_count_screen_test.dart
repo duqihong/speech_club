@@ -131,7 +131,58 @@ void main() {
 
     expect(
       find.text(
-        'Use the same link for every award. The page will show only the award currently open for voting.',
+        'The same link is used for every award. Open one award voting round at a time.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('permanent QR card guides when club code is empty',
+      (WidgetTester tester) async {
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Permanent Voting QR'),
+      600,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Permanent Voting QR'), findsOneWidget);
+    expect(
+      find.text(
+        'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Enter and save a club code first.'), findsOneWidget);
+  });
+
+  testWidgets('permanent QR card shows copy actions with club code',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'speech_club_online_base_url_v1':
+          'https://speech-club-vote-prototype.duduqihong.workers.dev',
+      'speech_club_online_club_name_v1': 'Demo Club',
+      'speech_club_online_club_slug_v1': 'demo-club',
+      'speech_club_online_admin_pin_v1': '123456',
+    });
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Permanent Voting QR'),
+      600,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('English voting page'), findsOneWidget);
+    expect(find.text('Copy QR Link'), findsOneWidget);
+    expect(find.text('Copy Print Text'), findsOneWidget);
+    expect(
+      find.text(
+        'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club?lang=en',
       ),
       findsOneWidget,
     );
