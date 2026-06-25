@@ -7,10 +7,30 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/online_count/online_count_api.dart';
 import '../data/online_count/online_count_models.dart';
+import '../data/online_count/online_count_results_summary_builder.dart';
 import '../data/online_count/online_count_storage.dart';
+import '../data/vote_results_recipient.dart';
+import '../data/vote_results_recipient_repository.dart';
+import '../data/vote_results_share_helper.dart';
+import '../data/whatsapp_phone_normalizer.dart';
+import 'president_contact_dialog.dart';
 
 class OnlineCountScreen extends StatefulWidget {
-  const OnlineCountScreen({super.key});
+  OnlineCountScreen({
+    super.key,
+    VoteResultsRecipientRepository? recipientRepository,
+    OnlineCountResultsSummaryBuilder? summaryBuilder,
+    LaunchPresidentWhatsApp? launchWhatsAppToPresident,
+  })  : recipientRepository =
+            recipientRepository ?? VoteResultsRecipientRepository(),
+        summaryBuilder =
+            summaryBuilder ?? const OnlineCountResultsSummaryBuilder(),
+        launchWhatsAppToPresident =
+            launchWhatsAppToPresident ?? launchWhatsAppToPresidentDefault;
+
+  final VoteResultsRecipientRepository recipientRepository;
+  final OnlineCountResultsSummaryBuilder summaryBuilder;
+  final LaunchPresidentWhatsApp launchWhatsAppToPresident;
 
   @override
   State<OnlineCountScreen> createState() => _OnlineCountScreenState();
@@ -43,11 +63,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   bool _clubCreated = false;
   bool _loaded = false;
   _QrLinkType? _selectedQrType;
+  late Future<VoteResultsRecipient?> _recipientFuture;
 
   @override
   void initState() {
     super.initState();
     _meetingDateController.text = _todayText();
+    _recipientFuture = widget.recipientRepository.load();
     _loadSetup();
   }
 
@@ -379,8 +401,92 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _showMessage(AppLocalizations.of(context)!.onlineCountNoResultsYet);
       return;
     }
-    await _copyText(
-        _buildResultsText(results, Localizations.localeOf(context)));
+    await _copyText(_buildOnlineResultsSummary(results));
+  }
+
+  Future<void> _sendResultsToPresident() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (_session == null) {
+      _showMessage(l10n.onlineCountCreateMeetingFirst);
+      return;
+    }
+    final OnlineResults? results = _results;
+    if (results == null) {
+      _showMessage(l10n.onlineCountRefreshResultsFirst);
+      return;
+    }
+
+    final VoteResultsRecipient? recipient =
+        await widget.recipientRepository.load();
+    if (!mounted) {
+      return;
+    }
+    if (recipient == null ||
+        normalizeWhatsAppPhone(recipient.phoneNumber) == null) {
+      _showMessage(l10n.voteBestsMissingPresidentPhoneNumber);
+      return;
+    }
+
+    final String summary = _buildOnlineResultsSummary(results);
+    final bool opened = await widget.launchWhatsAppToPresident(
+      rawPhone: recipient.phoneNumber,
+      message: summary,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (opened) {
+      _showMessage(l10n.voteBestsWhatsAppOpened);
+    } else {
+      _copySummaryToClipboard(summary);
+      if (mounted) {
+        _showMessage(l10n.voteBestsWhatsAppOpenFailedCopied);
+      }
+    }
+  }
+
+  Future<void> _showContactDialog() async {
+    final VoteResultsRecipient? currentRecipient =
+        await widget.recipientRepository.load();
+    if (!mounted) {
+      return;
+    }
+
+    final PresidentContactInput? input =
+        await showDialog<PresidentContactInput>(
+      context: context,
+      builder: (_) => PresidentContactDialog(
+        initialName: currentRecipient?.name ?? '',
+        initialPhoneNumber: currentRecipient?.phoneNumber ?? '',
+      ),
+    );
+
+    if (input == null) {
+      return;
+    }
+    final VoteResultsRecipient recipient =
+        await widget.recipientRepository.save(
+      name: input.name,
+      phoneNumber: input.phoneNumber,
+    );
+    if (mounted) {
+      setState(() {
+        _recipientFuture = Future<VoteResultsRecipient?>.value(recipient);
+      });
+    }
+  }
+
+  void _copySummaryToClipboard(String summary) {
+    unawaited(
+      Clipboard.setData(ClipboardData(text: summary)).catchError((_) {}),
+    );
+  }
+
+  String _buildOnlineResultsSummary(OnlineResults results) {
+    return widget.summaryBuilder.build(
+      results: results,
+      locale: Localizations.localeOf(context),
+    );
   }
 
   void _onClubNameChanged(String value) {
@@ -920,12 +1026,19 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               label: Text(l10n.onlineCountRefreshResults),
             ),
             OutlinedButton.icon(
+              onPressed: _sendResultsToPresident,
+              icon: const Icon(Icons.send_outlined),
+              label: Text(l10n.voteBestsSendResultsToPresident),
+            ),
+            OutlinedButton.icon(
               onPressed: _copyResults,
               icon: const Icon(Icons.copy_outlined),
               label: Text(l10n.onlineCountCopyResults),
             ),
           ],
         ),
+        const SizedBox(height: 10),
+        _buildPresidentContactCard(l10n),
         const SizedBox(height: 10),
         if (_results == null)
           Text(
@@ -951,6 +1064,38 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             ),
         ],
       ],
+    );
+  }
+
+  Widget _buildPresidentContactCard(AppLocalizations l10n) {
+    return FutureBuilder<VoteResultsRecipient?>(
+      future: _recipientFuture,
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<VoteResultsRecipient?> snapshot,
+      ) {
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            minVerticalPadding: 14,
+            leading: const Icon(Icons.contact_phone_outlined),
+            title: Text(
+              l10n.voteBestsPresidentContact,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            subtitle: Text(
+              snapshot.connectionState == ConnectionState.waiting
+                  ? '...'
+                  : snapshot.data == null
+                      ? l10n.voteBestsContactNotSet
+                      : '${snapshot.data!.name} · ${snapshot.data!.phoneNumber}',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _showContactDialog,
+          ),
+        );
+      },
     );
   }
 
@@ -1066,46 +1211,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _QrLinkType.en => l10n.onlineCountEnglishVotingPage,
       _QrLinkType.auto => l10n.onlineCountAutoLanguage,
     };
-  }
-
-  String _buildResultsText(OnlineResults results, Locale locale) {
-    final bool isChinese = locale.languageCode == 'zh';
-    final List<String> sections = <String>[
-      isChinese ? '演讲俱乐部在线投票结果' : 'Speech Club Online Voting Results',
-      results.isFinal
-          ? (isChinese ? '最终结果' : 'Final results')
-          : (isChinese ? '结果尚未最终确认' : 'Results are not final yet'),
-    ];
-
-    for (final OnlineAwardResult award in results.awards) {
-      final List<String> lines = <String>[
-        onlineAwardLabel(award.type, locale),
-      ];
-      if (award.winners.isEmpty) {
-        lines.add(isChinese ? '还没有计票。' : 'No votes counted yet.');
-      } else if (award.hasTie) {
-        final String names = award.winners
-            .map((OnlineCandidateResult candidate) => candidate.name)
-            .join(isChinese ? '、' : ', ');
-        lines.add(isChinese ? '并列：$names' : 'Tie: $names');
-      } else {
-        lines.add(
-          isChinese
-              ? '获奖者：${award.winners.single.name}'
-              : 'Winner: ${award.winners.single.name}',
-        );
-      }
-      lines.add(isChinese ? '全部票数：' : 'All votes:');
-      for (final OnlineCandidateResult candidate in award.candidates) {
-        lines.add(
-          isChinese
-              ? '- ${candidate.name}：${candidate.voteCount} 票'
-              : '- ${candidate.name}: ${candidate.voteCount} votes',
-        );
-      }
-      sections.add(lines.join('\n'));
-    }
-    return sections.join('\n\n');
   }
 
   static String _todayText() {

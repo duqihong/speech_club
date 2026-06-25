@@ -261,6 +261,7 @@
   "onlineCountCopyAutoLink": "复制自动语言链接",
   "onlineCountResults": "结果",
   "onlineCountRefreshResults": "刷新结果",
+  "onlineCountRefreshResultsFirst": "请先刷新结果。",
   "onlineCountCopyResults": "复制结果",
   "onlineCountDraft": "草稿",
   "onlineCountOpen": "开放",

@@ -261,6 +261,7 @@
   "onlineCountCopyAutoLink": "Copy Auto Link",
   "onlineCountResults": "Results",
   "onlineCountRefreshResults": "Refresh Results",
+  "onlineCountRefreshResultsFirst": "Please refresh results first.",
   "onlineCountCopyResults": "Copy Results",
   "onlineCountDraft": "Draft",
   "onlineCountOpen": "Open",

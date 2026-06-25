@@ -692,6 +692,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountRefreshResults => '刷新结果';
 
   @override
+  String get onlineCountRefreshResultsFirst => '请先刷新结果。';
+
+  @override
   String get onlineCountCopyResults => '复制结果';
 
   @override

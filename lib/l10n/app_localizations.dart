@@ -1436,6 +1436,12 @@ abstract class AppLocalizations {
   /// **'Refresh Results'**
   String get onlineCountRefreshResults;
 
+  /// No description provided for @onlineCountRefreshResultsFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please refresh results first.'**
+  String get onlineCountRefreshResultsFirst;
+
   /// No description provided for @onlineCountCopyResults.
   ///
   /// In en, this message translates to:

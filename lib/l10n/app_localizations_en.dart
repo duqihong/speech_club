@@ -725,6 +725,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountRefreshResults => 'Refresh Results';
 
   @override
+  String get onlineCountRefreshResultsFirst => 'Please refresh results first.';
+
+  @override
   String get onlineCountCopyResults => 'Copy Results';
 
   @override

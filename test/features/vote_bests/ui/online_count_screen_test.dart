@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_club/features/vote_bests/data/vote_results_recipient_repository.dart';
 import 'package:speech_club/features/vote_bests/ui/online_count_screen.dart';
 import 'package:speech_club/l10n/app_localizations.dart';
 
@@ -9,7 +10,7 @@ void main() {
 
   Future<void> pumpOnlineCountScreen(WidgetTester tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: OnlineCountScreen(),
@@ -186,5 +187,51 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('results card shows send button and shared president contact',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await VoteResultsRecipientRepository().save(
+      name: 'Ada President',
+      phoneNumber: '+65 9664 5650',
+    );
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Results'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Refresh Results'), findsOneWidget);
+    expect(find.text('Send Results to President'), findsOneWidget);
+    expect(find.text('Copy Results'), findsOneWidget);
+    expect(find.text('President Contact'), findsOneWidget);
+    expect(find.text('Ada President · +65 9664 5650'), findsOneWidget);
+  });
+
+  testWidgets('send results asks to refresh before sending stale results',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'speech_club_online_current_session_id_v1': 'session-1',
+      'speech_club_online_current_session_title_v1': 'Regular Meeting',
+      'speech_club_online_current_session_date_v1': '2026-06-25',
+    });
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Send Results to President'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send Results to President'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Please refresh results first.'), findsOneWidget);
   });
 }

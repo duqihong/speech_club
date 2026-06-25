@@ -2,21 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../data/vote_bests_repository.dart';
 import '../data/vote_models.dart';
 import '../data/vote_results_recipient.dart';
 import '../data/vote_results_recipient_repository.dart';
+import '../data/vote_results_share_helper.dart';
 import '../data/vote_results_summary_builder.dart';
 import '../data/whatsapp_phone_normalizer.dart';
+import 'president_contact_dialog.dart';
 import 'vote_award_detail_screen.dart';
-
-typedef LaunchPresidentWhatsApp = Future<bool> Function({
-  required String rawPhone,
-  required String message,
-});
 
 class VoteBestsScreen extends StatefulWidget {
   VoteBestsScreen({
@@ -108,10 +104,10 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
       return;
     }
 
-    final _PresidentContactInput? input =
-        await showDialog<_PresidentContactInput>(
+    final PresidentContactInput? input =
+        await showDialog<PresidentContactInput>(
       context: context,
-      builder: (_) => _PresidentContactDialog(
+      builder: (_) => PresidentContactDialog(
         initialName: currentRecipient?.name ?? '',
         initialPhoneNumber: currentRecipient?.phoneNumber ?? '',
       ),
@@ -305,150 +301,6 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
           },
         ),
       ),
-    );
-  }
-}
-
-Future<bool> launchWhatsAppToPresidentDefault({
-  required String rawPhone,
-  required String message,
-}) async {
-  final String? phone = normalizeWhatsAppPhone(rawPhone);
-  if (phone == null) {
-    return false;
-  }
-
-  final String encodedMessage = Uri.encodeComponent(message);
-  final Uri whatsappUri = Uri.parse(
-    'whatsapp://send?phone=$phone&text=$encodedMessage',
-  );
-  final Uri webFallbackUri = Uri.parse(
-    'https://wa.me/$phone?text=$encodedMessage',
-  );
-
-  try {
-    final bool openedWhatsapp = await launchUrl(
-      whatsappUri,
-      mode: LaunchMode.externalApplication,
-    );
-    if (openedWhatsapp) {
-      return true;
-    }
-  } catch (_) {
-    // Continue to web fallback.
-  }
-
-  try {
-    return await launchUrl(
-      webFallbackUri,
-      mode: LaunchMode.externalApplication,
-    );
-  } catch (_) {
-    return false;
-  }
-}
-
-class _PresidentContactInput {
-  const _PresidentContactInput({
-    required this.name,
-    required this.phoneNumber,
-  });
-
-  final String name;
-  final String phoneNumber;
-}
-
-class _PresidentContactDialog extends StatefulWidget {
-  const _PresidentContactDialog({
-    required this.initialName,
-    required this.initialPhoneNumber,
-  });
-
-  final String initialName;
-  final String initialPhoneNumber;
-
-  @override
-  State<_PresidentContactDialog> createState() =>
-      _PresidentContactDialogState();
-}
-
-class _PresidentContactDialogState extends State<_PresidentContactDialog> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _phoneController;
-  String? _nameError;
-  String? _phoneError;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.initialName);
-    _phoneController = TextEditingController(text: widget.initialPhoneNumber);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final String name = _nameController.text.trim();
-    final String phoneNumber = _phoneController.text.trim();
-    if (name.isEmpty || phoneNumber.isEmpty) {
-      setState(() {
-        _nameError = name.isEmpty ? l10n.voteBestsPresidentNameError : null;
-        _phoneError =
-            phoneNumber.isEmpty ? l10n.voteBestsPhoneNumberError : null;
-      });
-      return;
-    }
-    Navigator.of(context).pop(
-      _PresidentContactInput(name: name, phoneNumber: phoneNumber),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    return AlertDialog(
-      title: Text(l10n.voteBestsPresidentContact),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          TextField(
-            key: const Key('presidentNameField'),
-            controller: _nameController,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              labelText: l10n.voteBestsPresidentName,
-              errorText: _nameError,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            key: const Key('presidentPhoneField'),
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: l10n.voteBestsPhoneNumber,
-              errorText: _phoneError,
-            ),
-          ),
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.buttonCancel),
-        ),
-        FilledButton(
-          onPressed: _save,
-          child: Text(l10n.buttonSave),
-        ),
-      ],
     );
   }
 }

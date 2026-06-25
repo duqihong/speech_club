@@ -15,7 +15,7 @@ class VoteBestsModeScreen extends StatelessWidget {
 
   void _openOnlineCount(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const OnlineCountScreen()),
+      MaterialPageRoute<void>(builder: (_) => OnlineCountScreen()),
     );
   }
 
