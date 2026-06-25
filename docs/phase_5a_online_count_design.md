@@ -2,6 +2,147 @@
 
 This document defines the official Phase 5 direction for Speech Club / 演讲俱乐部 online voting for Vote Bests.
 
+## Phase 5A-2 Refinement Decisions
+
+Phase 5A-2 makes two official refinements to the Online Count design:
+
+1. The public voting page should show one language at a time.
+2. Voting should be conducted one award round at a time.
+
+### Public Voting Page Language
+
+The current prototype shows English and Chinese together, for example:
+
+```text
+Speech Club Voting / 演讲俱乐部投票
+```
+
+The future public voting page should show only one language at a time.
+
+Recommended language priority:
+
+1. URL query parameter: `?lang=zh` or `?lang=en`
+2. Browser-saved language choice: `localStorage speechClubVoteLang`
+3. Browser/device language: `navigator.language` or `navigator.languages`
+4. Default: English
+
+Chinese detection:
+
+Any browser language starting with `zh` should use Chinese.
+
+Examples:
+
+- `zh`
+- `zh-CN`
+- `zh-SG`
+- `zh-Hans`
+- `zh-Hant`
+- `zh-TW`
+- `zh-HK`
+
+The page should still show a small language switch:
+
+```text
+English | 中文
+```
+
+When the user taps the switch:
+
+- update `localStorage`
+- reload or re-render the page in the selected language
+- optionally update the URL query parameter
+
+QR code options:
+
+- Default permanent club QR: `https://worker-url/c/{clubSlug}`
+- Chinese-specific QR: `https://worker-url/c/{clubSlug}?lang=zh`
+- English-specific QR: `https://worker-url/c/{clubSlug}?lang=en`
+
+Recommendation for Chinese-speaking clubs:
+
+Use `?lang=zh` in the printed QR code.
+
+### One Award Round At A Time
+
+The current prototype shows all three awards together:
+
+- Best Speaker
+- Best Table Topics Speaker
+- Best Evaluator
+
+Toastmasters award voting is normally conducted independently. Therefore, the future public page should show only the currently open award round.
+
+The same permanent club QR remains unchanged.
+
+Example meeting flow:
+
+1. Officer opens Best Speaker voting.
+2. Voters scan the permanent QR and vote only for Best Speaker.
+3. Officer closes Best Speaker voting.
+4. Officer opens Best Table Topics Speaker voting.
+5. Voters scan the same QR and vote only for Best Table Topics Speaker.
+6. Officer closes Best Table Topics Speaker voting.
+7. Officer opens Best Evaluator voting.
+8. Voters scan the same QR and vote only for Best Evaluator.
+9. Officer closes Best Evaluator voting.
+10. Officer closes the meeting session and views final results.
+
+Chinese page example:
+
+```text
+演讲俱乐部投票
+
+当前投票：
+最佳演讲者
+
+请选择一位候选人：
+
+○ Alice
+○ Bob
+○ Charlie
+
+提交投票
+```
+
+After submission:
+
+```text
+谢谢，您的投票已记录。
+```
+
+English page example:
+
+```text
+Speech Club Voting
+
+Current Vote:
+Best Speaker
+
+Please choose one candidate:
+
+○ Alice
+○ Bob
+○ Charlie
+
+Submit Vote
+```
+
+After submission:
+
+```text
+Thank you. Your vote has been recorded.
+```
+
+No open award round:
+
+- English: Voting is not open now.
+- Chinese: 当前没有开放的投票。
+
+Already voted for this award:
+
+- English: You have already voted for this award.
+- Chinese: 您已经为这个奖项投过票。
+
 ## 1. Product Decision
 
 Speech Club Online Count uses:
@@ -25,15 +166,15 @@ Reasons:
 - Senior users should not need a new QR every meeting.
 - A permanent club QR reduces operational burden for officers.
 - The QR opens the club voting page.
-- The club voting page routes voters to the current active meeting session.
+- The club voting page routes voters to the current active award round in the current meeting session.
 
 Example flow:
 
 ```text
 Permanent Club QR
 -> Club Voting Page
--> Current Open Meeting Session
--> Vote for award categories
+-> Current Open Award Round
+-> Vote for one award
 ```
 
 ## 3. Why Temporary Meeting Session
@@ -45,14 +186,21 @@ Reasons:
 - Votes must belong to one meeting only.
 - Each meeting has its own candidates and result.
 - Sessions can be Draft / Open / Closed.
-- Closed sessions reject new votes.
+- Award rounds inside a session can also be Draft / Open / Closed.
+- Closed sessions reject new votes and prevent new award rounds from opening.
 - Results are only final after closing.
 
 Session status meanings:
 
 - Draft: officer is preparing candidates; voters cannot vote.
-- Open: voters can submit votes.
+- Open: the meeting voting system is active, but there may or may not be one open award round.
 - Closed: voting is finished; new votes are rejected and results can be finalized.
+
+Award status meanings:
+
+- Draft: candidates can still be edited.
+- Open: the public voting page shows this award and voters can submit one vote.
+- Closed: votes are locked for this award.
 
 ## 4. User Roles
 
@@ -74,7 +222,7 @@ Uses only a web page to:
 
 - scan QR code
 - see current meeting
-- vote for awards
+- vote for the currently open award
 - submit
 - see thank-you message
 
@@ -86,12 +234,9 @@ Can vote the same way as a member if the club allows it. No app installation is 
 
 1. Voter scans permanent club QR.
 2. Web page opens.
-3. Page detects language or offers 中文 / English.
-4. Page shows current open meeting.
-5. Voter chooses candidates for:
-   - Best Speaker / 最佳演讲者
-   - Best Table Topics Speaker / 最佳即席演讲者
-   - Best Evaluator / 最佳点评者
+3. Page chooses one display language from URL, saved choice, browser language, or English default.
+4. Page shows the current open award round.
+5. Voter chooses one candidate for that award.
 6. Voter taps Submit.
 7. Page shows:
    - English: Thank you. Your vote has been recorded.
@@ -99,7 +244,7 @@ Can vote the same way as a member if the club allows it. No app installation is 
 
 Edge cases:
 
-- No active meeting:
+- No active meeting or no open award round:
   - English: Voting is not open now.
   - Chinese: 当前没有开放的投票。
 - Voting already closed:
@@ -116,8 +261,13 @@ Online Count / 在线计票
 -> Club Setup / 俱乐部设置
 -> Current Meeting / 当前会议
 -> Add Candidates / 添加候选人
--> Open Voting / 开放投票
--> Close Voting / 结束投票
+-> Open Best Speaker Voting / 开放最佳演讲者投票
+-> Close Best Speaker Voting / 结束最佳演讲者投票
+-> Open Table Topics Voting / 开放最佳即席演讲者投票
+-> Close Table Topics Voting / 结束最佳即席演讲者投票
+-> Open Evaluator Voting / 开放最佳点评者投票
+-> Close Evaluator Voting / 结束最佳点评者投票
+-> Close Meeting / 结束会议
 -> View Results / 查看结果
 -> Copy Results / 复制结果
 -> Send Results to President / 发送结果给会长
@@ -154,12 +304,42 @@ The existing Manual Count result sharing behavior should be reused later where p
 - session_id
 - award_type
 - display_order
+- status: draft / open / closed
+- opened_at
+- closed_at
 
 award_type values:
 
 - best_speaker
 - best_table_topics
 - best_evaluator
+
+Award status meanings:
+
+- draft: award round is prepared but not yet open.
+- open: voters can vote for this award round.
+- closed: voting for this award round is finished.
+
+Important rule:
+
+Only one award can be open within one meeting session at a time.
+
+The meeting session still has its own status:
+
+- session status: draft / open / closed
+
+The award round also has its own status:
+
+- award status: draft / open / closed
+
+Recommended combined meaning:
+
+- Session draft: meeting is being prepared.
+- Session open: meeting voting system is active, but there may or may not be one open award round.
+- Session closed: meeting voting is finished. No award can be opened or voted on.
+- Award draft: candidates can still be edited.
+- Award open: public voting page shows this award.
+- Award closed: votes are locked for this award.
 
 ### candidates
 
@@ -181,6 +361,8 @@ award_type values:
 Important unique rule:
 
 One voter_token_hash can vote only once per award per session.
+
+Under the award-round model, a voter may vote once for Best Speaker, once for Best Table Topics Speaker, and once for Best Evaluator. Each award round is independent. Duplicate detection applies to the currently open award only.
 
 ## 8. Privacy Model
 
@@ -209,7 +391,9 @@ Recommended simple model:
 - Browser creates an anonymous voter token.
 - Server stores only the hashed token.
 - One token can vote once per award per session.
-- A voter can vote for multiple award categories, but only once per category.
+- A voter can vote once for Best Speaker, once for Best Table Topics Speaker, and once for Best Evaluator.
+- Each award round is independent.
+- Duplicate detection applies to the currently open award only.
 - Clearing browser data may allow another vote; this is acceptable for a lightweight club tool.
 
 Optional stronger control:
@@ -275,9 +459,80 @@ GET /api/admin/session/{sessionId}/results
 Public voter API:
 
 ```text
-GET /api/public/club/{clubSlug}/active-session
-POST /api/public/session/{sessionId}/vote
+GET /api/public/club/{clubSlug}/active-vote
+POST /api/public/session/{sessionId}/award/{awardId}/vote
 ```
+
+`GET /api/public/club/{clubSlug}/active-vote` returns:
+
+- club
+- session
+- active award
+- candidates for active award only
+- localized labels or `award_type` for frontend localization
+
+If no session or no award round is open:
+
+```json
+{
+  "ok": false,
+  "code": "NO_ACTIVE_VOTE",
+  "message": "Voting is not open now."
+}
+```
+
+Voting endpoint:
+
+```text
+POST /api/public/session/{sessionId}/award/{awardId}/vote
+```
+
+Body:
+
+```json
+{
+  "voterToken": "browser-generated-token",
+  "candidateId": "..."
+}
+```
+
+Behavior:
+
+- session must be open
+- award must be open
+- candidate must belong to award
+- voter token hash can vote only once for this award
+- return recorded or duplicate result
+
+Planned admin API changes:
+
+```text
+POST /api/admin/session/{sessionId}/award/{awardId}/open
+POST /api/admin/session/{sessionId}/award/{awardId}/close
+GET /api/admin/session/{sessionId}/results
+```
+
+`POST /api/admin/session/{sessionId}/award/{awardId}/open` behavior:
+
+- verify admin PIN
+- session must be open
+- award must have candidates
+- no other award in the same session may remain open
+- either close other open award automatically or reject with error
+- recommended MVP behavior: reject if another award is already open
+
+`POST /api/admin/session/{sessionId}/award/{awardId}/close` behavior:
+
+- verify admin PIN
+- award must be open
+- set award status to closed
+- set `closed_at`
+
+`GET /api/admin/session/{sessionId}/results` behavior:
+
+- return results for all awards
+- each award has its own status
+- meeting result is final only when session is closed
 
 ## 12. MVP Scope
 
@@ -309,8 +564,17 @@ Not included in Phase 5B:
 
 ## 13. Future Phase Plan
 
-- Phase 5A: Online Count product design document.
+- Phase 5A: Initial Online Count product design.
+- Phase 5A-2: Refine design for device-language public page and one-award-at-a-time voting rounds.
 - Phase 5B: Cloudflare Workers + D1 prototype outside Flutter.
+- Phase 5B-2: Remote Cloudflare deployment test.
+- Phase 5B-3: Update Cloudflare prototype to support:
+  - one language at a time
+  - device/browser language detection
+  - URL `?lang=zh` / `?lang=en`
+  - one active award round at a time
+  - award-level draft/open/closed status
+  - active-vote public page
 - Phase 5C: Flutter Online Count admin screens connect to Cloudflare backend.
 - Phase 5D: QR code display, copy voting link, print-friendly voting instructions.
 - Phase 5E: Testing with a real club meeting.
@@ -321,7 +585,7 @@ Not included in Phase 5B:
 - Voters should not create accounts.
 - Officers should see large buttons and simple status labels.
 - Use Draft / Open / Closed, not technical terms.
-- Use bilingual English/Chinese text.
+- Show one language at a time, with a small English / 中文 switch.
 - Keep Manual Count visible as offline backup.
 - Avoid forcing QR regeneration every meeting.
 
@@ -334,7 +598,8 @@ Open questions and recommended default answers:
 | Should clubs use a shared Speech Club backend or each officer create their own Cloudflare deployment? | Shared backend later, single test deployment first. |
 | How should admin PIN reset work? | No PIN reset in prototype. |
 | Should guests be allowed to vote? | Guests allowed. |
-| Should voters vote for all awards on one page or one award at a time? | All awards on one page. |
+| Should voters vote for all awards on one page or one award at a time? | One award at a time, because club meetings usually conduct these votes separately. |
+| Should the voting page show both languages? | No. It should follow device/browser language and show one language at a time, with a manual language switch. |
 | Should results be hidden until the meeting is closed? | Hide results until closed. |
 | Should candidate names be typed manually or imported from meeting roles later? | Manually typed candidate names. |
 | Should the app support multiple clubs on one device? | One club per device for MVP. |
