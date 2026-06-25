@@ -12,6 +12,13 @@ void main() {
       );
     });
 
+    test('club code generation normalizes names', () {
+      expect(generateClubCode('Demo App Test Club'), 'demo-app-test-club');
+      expect(generateClubCode('Jiangyin Speech Club'), 'jiangyin-speech-club');
+      expect(generateClubCode('  My   Club! 2026  '), 'my-club-2026');
+      expect(generateClubCode('中文俱乐部'), 'speech-club');
+    });
+
     test('award labels map in English and Chinese', () {
       expect(
         onlineAwardLabel(

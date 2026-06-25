@@ -240,6 +240,17 @@ List<String> parseOnlineCandidateLines(String value) {
       .toList(growable: false);
 }
 
+String generateClubCode(String clubName) {
+  final String code = clubName
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'\s+'), '-')
+      .replaceAll(RegExp(r'[^a-z0-9-]'), '')
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-+|-+$'), '');
+  return code.isEmpty ? 'speech-club' : code;
+}
+
 String onlineAwardLabel(OnlineAwardType type, Locale locale) {
   final bool isChinese = locale.languageCode == 'zh';
   return switch (type) {

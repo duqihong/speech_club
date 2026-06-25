@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCloudSetup.
   ///
   /// In en, this message translates to:
-  /// **'Cloud Setup'**
+  /// **'Online Club Setup'**
   String get onlineCountCloudSetup;
 
   /// No description provided for @onlineCountBackendUrl.
@@ -1109,7 +1109,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountClubSlug.
   ///
   /// In en, this message translates to:
-  /// **'Club Slug'**
+  /// **'Club Code'**
   String get onlineCountClubSlug;
 
   /// No description provided for @onlineCountAdminPin.
@@ -1121,20 +1121,140 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCreateClub.
   ///
   /// In en, this message translates to:
-  /// **'Create Club'**
+  /// **'Create Online Club'**
   String get onlineCountCreateClub;
 
   /// No description provided for @onlineCountSlugHelp.
   ///
   /// In en, this message translates to:
-  /// **'Use lowercase letters, numbers, and hyphens. Example: demo-speech-club'**
+  /// **'Used in the permanent voting link. Use lowercase letters, numbers, and hyphens.'**
   String get onlineCountSlugHelp;
+
+  /// No description provided for @onlineCountSaveSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Setup'**
+  String get onlineCountSaveSetup;
+
+  /// No description provided for @onlineCountSetupPurpose.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up the permanent online club identity and voting link.'**
+  String get onlineCountSetupPurpose;
+
+  /// No description provided for @onlineCountAdminPinHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin PIN is used by club officers to manage online voting. Do not share it with voters.'**
+  String get onlineCountAdminPinHelp;
+
+  /// No description provided for @onlineCountAdminPinVoterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Voters do not need this PIN.'**
+  String get onlineCountAdminPinVoterNote;
+
+  /// No description provided for @onlineCountSetupButtonHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Setup stores these details on this device.\nCreate Online Club creates the club in the online voting service.'**
+  String get onlineCountSetupButtonHelp;
+
+  /// No description provided for @onlineCountAdvancedSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Settings'**
+  String get onlineCountAdvancedSettings;
+
+  /// No description provided for @onlineCountBackendUrlHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal club officers should not need to edit the Backend URL. It is mainly for testing or future backend changes.'**
+  String get onlineCountBackendUrlHelp;
+
+  /// No description provided for @onlineCountOnlineClubLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Online club'**
+  String get onlineCountOnlineClubLabel;
+
+  /// No description provided for @onlineCountClubCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Club code'**
+  String get onlineCountClubCodeLabel;
+
+  /// No description provided for @onlineCountLinkReadyAfterCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent voting link is ready after the club is created.'**
+  String get onlineCountLinkReadyAfterCreate;
+
+  /// No description provided for @onlineCountClubReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Online club is ready.'**
+  String get onlineCountClubReady;
 
   /// No description provided for @onlineCountCurrentMeeting.
   ///
   /// In en, this message translates to:
   /// **'Current Meeting'**
   String get onlineCountCurrentMeeting;
+
+  /// No description provided for @onlineCountMeetingExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Each meeting has its own voting session. Create a meeting, open it, then open one award vote at a time.'**
+  String get onlineCountMeetingExplanation;
+
+  /// No description provided for @onlineCountMeetingStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1: Create Meeting'**
+  String get onlineCountMeetingStep1Title;
+
+  /// No description provided for @onlineCountMeetingStep1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare today’s voting session.'**
+  String get onlineCountMeetingStep1Body;
+
+  /// No description provided for @onlineCountMeetingStep2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2: Open Meeting'**
+  String get onlineCountMeetingStep2Title;
+
+  /// No description provided for @onlineCountMeetingStep2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow award voting rounds to start.'**
+  String get onlineCountMeetingStep2Body;
+
+  /// No description provided for @onlineCountMeetingStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3: Open one award voting round'**
+  String get onlineCountMeetingStep3Title;
+
+  /// No description provided for @onlineCountMeetingStep3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Members vote using the same link.'**
+  String get onlineCountMeetingStep3Body;
+
+  /// No description provided for @onlineCountMeetingStep4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 4: Close Meeting'**
+  String get onlineCountMeetingStep4Title;
+
+  /// No description provided for @onlineCountMeetingStep4Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish voting and make results final.'**
+  String get onlineCountMeetingStep4Body;
 
   /// No description provided for @onlineCountMeetingTitle.
   ///
@@ -1262,6 +1382,30 @@ abstract class AppLocalizations {
   /// **'Closed'**
   String get onlineCountClosed;
 
+  /// No description provided for @onlineCountSessionOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get onlineCountSessionOpen;
+
+  /// No description provided for @onlineCountDraftHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting is prepared, but voting is not open yet.'**
+  String get onlineCountDraftHelp;
+
+  /// No description provided for @onlineCountOpenHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting is open. Open one award voting round when ready.'**
+  String get onlineCountOpenHelp;
+
+  /// No description provided for @onlineCountClosedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting is closed. Results are final.'**
+  String get onlineCountClosedHelp;
+
   /// No description provided for @onlineCountFinalResults.
   ///
   /// In en, this message translates to:
@@ -1304,6 +1448,30 @@ abstract class AppLocalizations {
   /// **'Another award voting round is already open'**
   String get onlineCountAnotherAwardOpen;
 
+  /// No description provided for @onlineCountCreateMeetingFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a meeting first.'**
+  String get onlineCountCreateMeetingFirst;
+
+  /// No description provided for @onlineCountOpenMeetingFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please open the meeting first.'**
+  String get onlineCountOpenMeetingFirst;
+
+  /// No description provided for @onlineCountAddCandidatesFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add candidates before opening this vote.'**
+  String get onlineCountAddCandidatesFirst;
+
+  /// No description provided for @onlineCountClubMayExist.
+  ///
+  /// In en, this message translates to:
+  /// **'Online club may already exist. Try another club code or continue with the saved setup.'**
+  String get onlineCountClubMayExist;
+
   /// No description provided for @onlineCountNoSessionYet.
   ///
   /// In en, this message translates to:
@@ -1322,6 +1490,12 @@ abstract class AppLocalizations {
   /// **'Meeting status'**
   String get onlineCountSessionStatus;
 
+  /// No description provided for @onlineCountTechnicalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Details'**
+  String get onlineCountTechnicalDetails;
+
   /// No description provided for @onlineCountCandidateHint.
   ///
   /// In en, this message translates to:
@@ -1333,6 +1507,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results loaded yet.'**
   String get onlineCountNoResultsYet;
+
+  /// No description provided for @onlineCountVotingLinkHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the same link for every award. The page will show only the award currently open for voting.'**
+  String get onlineCountVotingLinkHelp;
 
   /// No description provided for @onlineCountWinner.
   ///

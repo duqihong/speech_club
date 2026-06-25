@@ -515,7 +515,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voteBestsCurrentTie => '当前并列';
 
   @override
-  String get onlineCountCloudSetup => '云端设置';
+  String get onlineCountCloudSetup => '在线俱乐部设置';
 
   @override
   String get onlineCountBackendUrl => '后台网址';
@@ -530,13 +530,75 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountAdminPin => '管理员密码';
 
   @override
-  String get onlineCountCreateClub => '创建俱乐部';
+  String get onlineCountCreateClub => '创建在线俱乐部';
 
   @override
-  String get onlineCountSlugHelp => '请使用小写字母、数字和连字符。例如：demo-speech-club';
+  String get onlineCountSlugHelp => '用于永久投票链接。请使用小写字母、数字和连字符。';
+
+  @override
+  String get onlineCountSaveSetup => '保存设置';
+
+  @override
+  String get onlineCountSetupPurpose => '设置永久在线俱乐部身份和投票链接。';
+
+  @override
+  String get onlineCountAdminPinHelp => '管理员密码用于执委管理在线投票，请不要分享给投票者。';
+
+  @override
+  String get onlineCountAdminPinVoterNote => '投票者不需要这个密码。';
+
+  @override
+  String get onlineCountSetupButtonHelp =>
+      '保存设置会把资料保存在本机。\n创建在线俱乐部会在云端投票服务中建立俱乐部。';
+
+  @override
+  String get onlineCountAdvancedSettings => '高级设置';
+
+  @override
+  String get onlineCountBackendUrlHelp => '普通俱乐部执委通常不需要修改后台网址。它主要用于测试或未来更换后台。';
+
+  @override
+  String get onlineCountOnlineClubLabel => '在线俱乐部';
+
+  @override
+  String get onlineCountClubCodeLabel => '俱乐部代号';
+
+  @override
+  String get onlineCountLinkReadyAfterCreate => '创建俱乐部后，永久投票链接即可使用。';
+
+  @override
+  String get onlineCountClubReady => '在线俱乐部已准备好。';
 
   @override
   String get onlineCountCurrentMeeting => '当前会议';
+
+  @override
+  String get onlineCountMeetingExplanation =>
+      '每次会议都有独立的投票场次。先创建会议并开放会议，然后一次只开放一个奖项投票。';
+
+  @override
+  String get onlineCountMeetingStep1Title => '步骤一：创建会议';
+
+  @override
+  String get onlineCountMeetingStep1Body => '准备今天的投票场次。';
+
+  @override
+  String get onlineCountMeetingStep2Title => '步骤二：开放会议';
+
+  @override
+  String get onlineCountMeetingStep2Body => '允许开始各奖项投票。';
+
+  @override
+  String get onlineCountMeetingStep3Title => '步骤三：开放一个奖项投票';
+
+  @override
+  String get onlineCountMeetingStep3Body => '会员使用同一个链接投票。';
+
+  @override
+  String get onlineCountMeetingStep4Title => '步骤四：结束会议';
+
+  @override
+  String get onlineCountMeetingStep4Body => '停止投票并确认最终结果。';
 
   @override
   String get onlineCountMeetingTitle => '会议名称';
@@ -602,6 +664,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountClosed => '已结束';
 
   @override
+  String get onlineCountSessionOpen => '开放中';
+
+  @override
+  String get onlineCountDraftHelp => '会议已创建，但投票尚未开放。';
+
+  @override
+  String get onlineCountOpenHelp => '会议已开放。准备好后，请开放一个奖项投票。';
+
+  @override
+  String get onlineCountClosedHelp => '会议已结束，结果已最终确认。';
+
+  @override
   String get onlineCountFinalResults => '最终结果';
 
   @override
@@ -623,6 +697,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountAnotherAwardOpen => '已有一个奖项投票正在开放';
 
   @override
+  String get onlineCountCreateMeetingFirst => '请先创建会议。';
+
+  @override
+  String get onlineCountOpenMeetingFirst => '请先开放会议。';
+
+  @override
+  String get onlineCountAddCandidatesFirst => '请先添加候选人，再开放此项投票。';
+
+  @override
+  String get onlineCountClubMayExist => '在线俱乐部可能已经存在。请换一个俱乐部代号，或继续使用已保存的设置。';
+
+  @override
   String get onlineCountNoSessionYet => '请先创建会议，再设置候选人或开放投票。';
 
   @override
@@ -632,10 +718,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSessionStatus => '会议状态';
 
   @override
+  String get onlineCountTechnicalDetails => '技术信息';
+
+  @override
   String get onlineCountCandidateHint => '每行一位候选人';
 
   @override
   String get onlineCountNoResultsYet => '还没有加载结果。';
+
+  @override
+  String get onlineCountVotingLinkHelp => '每个奖项都使用同一个链接。页面只会显示当前开放的奖项投票。';
 
   @override
   String onlineCountWinner(String name) {

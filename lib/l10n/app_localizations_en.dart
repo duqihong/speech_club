@@ -536,7 +536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voteBestsCurrentTie => 'Current tie';
 
   @override
-  String get onlineCountCloudSetup => 'Cloud Setup';
+  String get onlineCountCloudSetup => 'Online Club Setup';
 
   @override
   String get onlineCountBackendUrl => 'Backend URL';
@@ -545,20 +545,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountClubName => 'Club Name';
 
   @override
-  String get onlineCountClubSlug => 'Club Slug';
+  String get onlineCountClubSlug => 'Club Code';
 
   @override
   String get onlineCountAdminPin => 'Admin PIN';
 
   @override
-  String get onlineCountCreateClub => 'Create Club';
+  String get onlineCountCreateClub => 'Create Online Club';
 
   @override
   String get onlineCountSlugHelp =>
-      'Use lowercase letters, numbers, and hyphens. Example: demo-speech-club';
+      'Used in the permanent voting link. Use lowercase letters, numbers, and hyphens.';
+
+  @override
+  String get onlineCountSaveSetup => 'Save Setup';
+
+  @override
+  String get onlineCountSetupPurpose =>
+      'Set up the permanent online club identity and voting link.';
+
+  @override
+  String get onlineCountAdminPinHelp =>
+      'Admin PIN is used by club officers to manage online voting. Do not share it with voters.';
+
+  @override
+  String get onlineCountAdminPinVoterNote => 'Voters do not need this PIN.';
+
+  @override
+  String get onlineCountSetupButtonHelp =>
+      'Save Setup stores these details on this device.\nCreate Online Club creates the club in the online voting service.';
+
+  @override
+  String get onlineCountAdvancedSettings => 'Advanced Settings';
+
+  @override
+  String get onlineCountBackendUrlHelp =>
+      'Normal club officers should not need to edit the Backend URL. It is mainly for testing or future backend changes.';
+
+  @override
+  String get onlineCountOnlineClubLabel => 'Online club';
+
+  @override
+  String get onlineCountClubCodeLabel => 'Club code';
+
+  @override
+  String get onlineCountLinkReadyAfterCreate =>
+      'Permanent voting link is ready after the club is created.';
+
+  @override
+  String get onlineCountClubReady => 'Online club is ready.';
 
   @override
   String get onlineCountCurrentMeeting => 'Current Meeting';
+
+  @override
+  String get onlineCountMeetingExplanation =>
+      'Each meeting has its own voting session. Create a meeting, open it, then open one award vote at a time.';
+
+  @override
+  String get onlineCountMeetingStep1Title => 'Step 1: Create Meeting';
+
+  @override
+  String get onlineCountMeetingStep1Body => 'Prepare today’s voting session.';
+
+  @override
+  String get onlineCountMeetingStep2Title => 'Step 2: Open Meeting';
+
+  @override
+  String get onlineCountMeetingStep2Body =>
+      'Allow award voting rounds to start.';
+
+  @override
+  String get onlineCountMeetingStep3Title =>
+      'Step 3: Open one award voting round';
+
+  @override
+  String get onlineCountMeetingStep3Body => 'Members vote using the same link.';
+
+  @override
+  String get onlineCountMeetingStep4Title => 'Step 4: Close Meeting';
+
+  @override
+  String get onlineCountMeetingStep4Body =>
+      'Finish voting and make results final.';
 
   @override
   String get onlineCountMeetingTitle => 'Meeting Title';
@@ -626,6 +695,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountClosed => 'Closed';
 
   @override
+  String get onlineCountSessionOpen => 'Open';
+
+  @override
+  String get onlineCountDraftHelp =>
+      'Meeting is prepared, but voting is not open yet.';
+
+  @override
+  String get onlineCountOpenHelp =>
+      'Meeting is open. Open one award voting round when ready.';
+
+  @override
+  String get onlineCountClosedHelp => 'Meeting is closed. Results are final.';
+
+  @override
   String get onlineCountFinalResults => 'Final results';
 
   @override
@@ -649,6 +732,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Another award voting round is already open';
 
   @override
+  String get onlineCountCreateMeetingFirst => 'Please create a meeting first.';
+
+  @override
+  String get onlineCountOpenMeetingFirst => 'Please open the meeting first.';
+
+  @override
+  String get onlineCountAddCandidatesFirst =>
+      'Please add candidates before opening this vote.';
+
+  @override
+  String get onlineCountClubMayExist =>
+      'Online club may already exist. Try another club code or continue with the saved setup.';
+
+  @override
   String get onlineCountNoSessionYet =>
       'Create a meeting before setting candidates or opening voting.';
 
@@ -659,10 +756,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountSessionStatus => 'Meeting status';
 
   @override
+  String get onlineCountTechnicalDetails => 'Technical Details';
+
+  @override
   String get onlineCountCandidateHint => 'One candidate per line';
 
   @override
   String get onlineCountNoResultsYet => 'No results loaded yet.';
+
+  @override
+  String get onlineCountVotingLinkHelp =>
+      'Use the same link for every award. The page will show only the award currently open for voting.';
 
   @override
   String onlineCountWinner(String name) {

@@ -91,10 +91,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Online Count'), findsOneWidget);
-    expect(find.text('Cloud Setup'), findsOneWidget);
-    expect(find.text('Current Meeting'), findsOneWidget);
-    expect(find.text('Backend URL'), findsOneWidget);
-    expect(find.text('Create Club'), findsOneWidget);
+    expect(find.text('Online Club Setup'), findsOneWidget);
+    expect(find.text('Club Code'), findsOneWidget);
+    expect(find.text('Create Online Club'), findsOneWidget);
   });
 
   testWidgets('Chinese Online Count admin MVP is localized',
@@ -105,9 +104,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('在线计票'), findsOneWidget);
-    expect(find.text('云端设置'), findsOneWidget);
-    expect(find.text('当前会议'), findsOneWidget);
-    expect(find.text('后台网址'), findsOneWidget);
-    expect(find.text('创建俱乐部'), findsOneWidget);
+    expect(find.text('在线俱乐部设置'), findsOneWidget);
+    expect(find.text('俱乐部代号'), findsOneWidget);
+    expect(find.text('创建在线俱乐部'), findsOneWidget);
   });
 }
