@@ -457,11 +457,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'President contact is not set. Please add president name and phone number first.';
 
   @override
+  String get voteBestsMissingPresidentPhoneNumber =>
+      'Please set the president phone number first.';
+
+  @override
   String get voteBestsSetNow => 'Set Now';
 
   @override
   String get voteBestsResultsCopied =>
       'Results copied. You can paste them into SMS or WhatsApp.';
+
+  @override
+  String get voteBestsWhatsAppOpened =>
+      'WhatsApp opened. Please review and send the results.';
+
+  @override
+  String get voteBestsWhatsAppOpenFailedCopied =>
+      'Could not open WhatsApp. Results copied instead.';
 
   @override
   String get voteBestsIntro =>

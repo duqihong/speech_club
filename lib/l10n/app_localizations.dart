@@ -956,6 +956,12 @@ abstract class AppLocalizations {
   /// **'President contact is not set. Please add president name and phone number first.'**
   String get voteBestsMissingContactMessage;
 
+  /// No description provided for @voteBestsMissingPresidentPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please set the president phone number first.'**
+  String get voteBestsMissingPresidentPhoneNumber;
+
   /// No description provided for @voteBestsSetNow.
   ///
   /// In en, this message translates to:
@@ -967,6 +973,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Results copied. You can paste them into SMS or WhatsApp.'**
   String get voteBestsResultsCopied;
+
+  /// No description provided for @voteBestsWhatsAppOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp opened. Please review and send the results.'**
+  String get voteBestsWhatsAppOpened;
+
+  /// No description provided for @voteBestsWhatsAppOpenFailedCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open WhatsApp. Results copied instead.'**
+  String get voteBestsWhatsAppOpenFailedCopied;
 
   /// No description provided for @voteBestsIntro.
   ///

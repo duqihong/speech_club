@@ -443,10 +443,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voteBestsMissingContactMessage => '还没有设置会长联系方式。请先填写会长姓名和电话号码。';
 
   @override
+  String get voteBestsMissingPresidentPhoneNumber => '请先设置会长电话号码。';
+
+  @override
   String get voteBestsSetNow => '现在设置';
 
   @override
   String get voteBestsResultsCopied => '结果已复制。你可以粘贴到短信或 WhatsApp。';
+
+  @override
+  String get voteBestsWhatsAppOpened => '已打开 WhatsApp。请确认后发送结果。';
+
+  @override
+  String get voteBestsWhatsAppOpenFailedCopied => '无法打开 WhatsApp，结果已复制。';
 
   @override
   String get voteBestsIntro => '这是一个本地计票工具，用来记录例会奖项投票。它不会收集线上投票。';

@@ -6,6 +6,7 @@ import 'package:speech_club/features/vote_bests/data/vote_models.dart';
 import 'package:speech_club/features/vote_bests/data/vote_results_recipient.dart';
 import 'package:speech_club/features/vote_bests/data/vote_results_recipient_repository.dart';
 import 'package:speech_club/features/vote_bests/data/vote_results_summary_builder.dart';
+import 'package:speech_club/features/vote_bests/data/whatsapp_phone_normalizer.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +66,15 @@ void main() {
     expect(restored?.name, 'David');
     expect(restored?.phoneNumber, '+65 9123 4567');
     expect(restored?.updatedAt, baseTime);
+  });
+
+  test('normalizes WhatsApp phone numbers', () {
+    expect(normalizeWhatsAppPhone('96645650'), '6596645650');
+    expect(normalizeWhatsAppPhone('+65 9664 5650'), '6596645650');
+    expect(normalizeWhatsAppPhone('65-9664-5650'), '6596645650');
+    expect(normalizeWhatsAppPhone('006596645650'), '6596645650');
+    expect(normalizeWhatsAppPhone(''), isNull);
+    expect(normalizeWhatsAppPhone('abc'), isNull);
   });
 
   test('English summary reports a clear winner', () {

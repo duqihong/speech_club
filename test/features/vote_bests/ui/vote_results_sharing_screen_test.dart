@@ -14,6 +14,7 @@ void main() {
     Locale? locale,
     VoteBestsRepository? voteRepository,
     VoteResultsRecipientRepository? recipientRepository,
+    LaunchPresidentWhatsApp? launchWhatsAppToPresident,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -23,6 +24,7 @@ void main() {
         home: VoteBestsScreen(
           repository: voteRepository,
           recipientRepository: recipientRepository,
+          launchWhatsAppToPresident: launchWhatsAppToPresident,
         ),
       ),
     );
@@ -67,7 +69,7 @@ void main() {
     expect(find.text('未设置'), findsOneWidget);
   });
 
-  testWidgets('English Send Results prompts for missing contact',
+  testWidgets('English Send Results prompts for missing president phone',
       (WidgetTester tester) async {
     await pumpManualCount(tester);
     await scrollTo(tester, 'Send Results to President');
@@ -76,19 +78,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text(
-        'President contact is not set. Please add president name and phone number first.',
-      ),
+      find.text('Please set the president phone number first.'),
       findsOneWidget,
     );
-    expect(find.text('Set Now'), findsOneWidget);
-    await tester.tap(find.text('Set Now'));
-    await tester.pumpAndSettle();
-    expect(find.text('President name'), findsOneWidget);
-    expect(find.text('Phone number'), findsOneWidget);
   });
 
-  testWidgets('Chinese Send Results prompts for missing contact',
+  testWidgets('Chinese Send Results prompts for missing president phone',
       (WidgetTester tester) async {
     await pumpManualCount(tester, locale: const Locale('zh'));
     await scrollTo(tester, '发送结果给会长');
@@ -97,10 +92,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('还没有设置会长联系方式。请先填写会长姓名和电话号码。'),
+      find.text('请先设置会长电话号码。'),
       findsOneWidget,
     );
-    expect(find.text('现在设置'), findsOneWidget);
   });
 
   testWidgets('contact dialog validates and saves president contact',
@@ -149,10 +143,15 @@ void main() {
   testWidgets('Copy Results copies summary and shows confirmation',
       (WidgetTester tester) async {
     await pumpManualCount(tester);
-    await scrollTo(tester, 'Copy Results');
+    final Finder copyButton = find.widgetWithText(
+      OutlinedButton,
+      'Copy Results',
+    );
+    await tester.ensureVisible(copyButton);
+    await tester.pump();
 
-    await tester.tap(find.text('Copy Results'));
-    await tester.pumpAndSettle();
+    await tester.tap(copyButton);
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(
       find.text('Results copied. You can paste them into SMS or WhatsApp.'),
@@ -160,7 +159,7 @@ void main() {
     );
   });
 
-  testWidgets('Send Results copies summary when contact is set',
+  testWidgets('Send Results copies summary when WhatsApp cannot open',
       (WidgetTester tester) async {
     final VoteResultsRecipientRepository recipientRepository =
         VoteResultsRecipientRepository();
@@ -168,17 +167,34 @@ void main() {
       name: 'David',
       phoneNumber: '+65 9123 4567',
     );
+    String? launchedRawPhone;
+    String? launchedMessage;
     await pumpManualCount(
       tester,
       recipientRepository: recipientRepository,
+      launchWhatsAppToPresident: ({
+        required String rawPhone,
+        required String message,
+      }) async {
+        launchedRawPhone = rawPhone;
+        launchedMessage = message;
+        return false;
+      },
     );
-    await scrollTo(tester, 'Send Results to President');
+    final Finder sendButton = find.widgetWithText(
+      FilledButton,
+      'Send Results to President',
+    );
+    await tester.ensureVisible(sendButton);
+    await tester.pump();
 
-    await tester.tap(find.text('Send Results to President'));
-    await tester.pumpAndSettle();
+    await tester.tap(sendButton);
+    await tester.pump(const Duration(milliseconds: 100));
 
+    expect(launchedRawPhone, '+65 9123 4567');
+    expect(launchedMessage, contains('Speech Club Voting Results'));
     expect(
-      find.text('Results copied. You can paste them into SMS or WhatsApp.'),
+      find.text('Could not open WhatsApp. Results copied instead.'),
       findsOneWidget,
     );
   });

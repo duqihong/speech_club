@@ -157,8 +157,11 @@
   "voteBestsPresidentNameError": "Please enter president name.",
   "voteBestsPhoneNumberError": "Please enter phone number.",
   "voteBestsMissingContactMessage": "President contact is not set. Please add president name and phone number first.",
+  "voteBestsMissingPresidentPhoneNumber": "Please set the president phone number first.",
   "voteBestsSetNow": "Set Now",
   "voteBestsResultsCopied": "Results copied. You can paste them into SMS or WhatsApp.",
+  "voteBestsWhatsAppOpened": "WhatsApp opened. Please review and send the results.",
+  "voteBestsWhatsAppOpenFailedCopied": "Could not open WhatsApp. Results copied instead.",
   "voteBestsIntro": "Use this as a simple local tally tool for meeting awards. It does not collect online votes.",
   "voteBestsAwardSummary": "{candidateCount} candidates · {voteCount} votes",
   "@voteBestsAwardSummary": {

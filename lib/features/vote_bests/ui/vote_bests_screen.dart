@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../data/vote_bests_repository.dart';
@@ -7,7 +10,13 @@ import '../data/vote_models.dart';
 import '../data/vote_results_recipient.dart';
 import '../data/vote_results_recipient_repository.dart';
 import '../data/vote_results_summary_builder.dart';
+import '../data/whatsapp_phone_normalizer.dart';
 import 'vote_award_detail_screen.dart';
+
+typedef LaunchPresidentWhatsApp = Future<bool> Function({
+  required String rawPhone,
+  required String message,
+});
 
 class VoteBestsScreen extends StatefulWidget {
   VoteBestsScreen({
@@ -15,13 +24,17 @@ class VoteBestsScreen extends StatefulWidget {
     VoteBestsRepository? repository,
     VoteResultsRecipientRepository? recipientRepository,
     this.summaryBuilder = const VoteResultsSummaryBuilder(),
+    LaunchPresidentWhatsApp? launchWhatsAppToPresident,
   })  : repository = repository ?? VoteBestsRepository(),
         recipientRepository =
-            recipientRepository ?? VoteResultsRecipientRepository();
+            recipientRepository ?? VoteResultsRecipientRepository(),
+        launchWhatsAppToPresident =
+            launchWhatsAppToPresident ?? launchWhatsAppToPresidentDefault;
 
   final VoteBestsRepository repository;
   final VoteResultsRecipientRepository recipientRepository;
   final VoteResultsSummaryBuilder summaryBuilder;
+  final LaunchPresidentWhatsApp launchWhatsAppToPresident;
 
   @override
   State<VoteBestsScreen> createState() => _VoteBestsScreenState();
@@ -126,31 +139,45 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
     if (!mounted) {
       return;
     }
-    if (recipient == null) {
-      final bool? shouldSetContact = await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text(l10n.voteBestsMissingContactMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(l10n.buttonCancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(l10n.voteBestsSetNow),
-              ),
-            ],
-          );
-        },
-      );
-      if (shouldSetContact == true && mounted) {
-        await _showContactDialog();
-      }
+    if (recipient == null ||
+        normalizeWhatsAppPhone(recipient.phoneNumber) == null) {
+      _showSnackBar(l10n.voteBestsMissingPresidentPhoneNumber);
       return;
     }
-    await _copyResults();
+
+    final Locale locale = Localizations.localeOf(context);
+    final VoteBestsState state = await _stateFuture;
+    final String summary = widget.summaryBuilder.build(
+      state: state,
+      locale: locale,
+    );
+    final bool opened = await widget.launchWhatsAppToPresident(
+      rawPhone: recipient.phoneNumber,
+      message: summary,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (opened) {
+      _showSnackBar(l10n.voteBestsWhatsAppOpened);
+    } else {
+      _copySummaryToClipboard(summary);
+      if (mounted) {
+        _showSnackBar(l10n.voteBestsWhatsAppOpenFailedCopied);
+      }
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _copySummaryToClipboard(String summary) {
+    unawaited(
+      Clipboard.setData(ClipboardData(text: summary)).catchError((_) {}),
+    );
   }
 
   Future<void> _copyResults() async {
@@ -161,11 +188,9 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
       state: state,
       locale: locale,
     );
-    Clipboard.setData(ClipboardData(text: summary));
+    _copySummaryToClipboard(summary);
     if (mounted) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(l10n.voteBestsResultsCopied)));
+      _showSnackBar(l10n.voteBestsResultsCopied);
     }
   }
 
@@ -281,6 +306,45 @@ class _VoteBestsScreenState extends State<VoteBestsScreen> {
         ),
       ),
     );
+  }
+}
+
+Future<bool> launchWhatsAppToPresidentDefault({
+  required String rawPhone,
+  required String message,
+}) async {
+  final String? phone = normalizeWhatsAppPhone(rawPhone);
+  if (phone == null) {
+    return false;
+  }
+
+  final String encodedMessage = Uri.encodeComponent(message);
+  final Uri whatsappUri = Uri.parse(
+    'whatsapp://send?phone=$phone&text=$encodedMessage',
+  );
+  final Uri webFallbackUri = Uri.parse(
+    'https://wa.me/$phone?text=$encodedMessage',
+  );
+
+  try {
+    final bool openedWhatsapp = await launchUrl(
+      whatsappUri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (openedWhatsapp) {
+      return true;
+    }
+  } catch (_) {
+    // Continue to web fallback.
+  }
+
+  try {
+    return await launchUrl(
+      webFallbackUri,
+      mode: LaunchMode.externalApplication,
+    );
+  } catch (_) {
+    return false;
   }
 }
 
