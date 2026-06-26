@@ -573,7 +573,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountDangerZoneHelp =>
-      'Use these actions only when online setup is wrong or this phone should stop using the saved online club.';
+      'Use only if setup is wrong or you want to stop using this online club.';
 
   @override
   String get onlineCountSlugHelp =>
@@ -605,10 +605,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Normal club officers should not need to edit the Backend URL. It is mainly for testing or future backend changes.';
 
   @override
-  String get onlineCountOnlineClubLabel => 'Online club';
+  String get onlineCountOnlineClubLabel => 'Club';
 
   @override
   String get onlineCountClubCodeLabel => 'Club code';
+
+  @override
+  String get onlineCountVotingLinkAvailableBelow =>
+      'Voting link available below.';
 
   @override
   String get onlineCountLinkReadyAfterCreate =>
@@ -619,6 +623,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCurrentMeeting => 'Current Meeting';
+
+  @override
+  String get onlineCountMeetingOpenTitle => 'Meeting Open';
+
+  @override
+  String get onlineCountMeetingClosedTitle => 'Meeting Closed';
+
+  @override
+  String get onlineCountNextStep => 'Next step';
+
+  @override
+  String get onlineCountCurrentVote => 'Current vote';
+
+  @override
+  String get onlineCountNotCreated => 'Not created';
+
+  @override
+  String get onlineCountNotOpened => 'Not opened';
+
+  @override
+  String get onlineCountResultsAreFinal => 'Results are final';
+
+  @override
+  String get onlineCountNextStepAddCandidates =>
+      'Add candidates, then open meeting';
+
+  @override
+  String get onlineCountNextStepCloseVoting => 'Close voting when ready';
+
+  @override
+  String get onlineCountNextStepSendOrDelete =>
+      'Send results or delete meeting';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -667,6 +703,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountNoCurrentMeeting => 'No current meeting';
 
   @override
+  String get onlineCountNoMeetingHelper =>
+      'Create a meeting before adding candidates or opening voting.';
+
+  @override
+  String get onlineCountDraftMeetingHelper =>
+      'Add candidates, then open the meeting.';
+
+  @override
+  String get onlineCountOpenMeetingHelper =>
+      'Open one award voting round at a time. Close the meeting when all voting is finished.';
+
+  @override
+  String get onlineCountClosedMeetingHelper =>
+      'Results are final. Send or copy results before deleting the meeting.';
+
+  @override
   String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
 
   @override
@@ -705,6 +757,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountFinalVotes => 'Final votes';
 
   @override
+  String get onlineCountAwardStatusLabel => 'Status';
+
+  @override
   String get onlineCountRefreshVoteCount => 'Refresh Vote Count';
 
   @override
@@ -726,15 +781,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountPermanentVotingQrHelp =>
-      'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.';
+      'This QR code belongs to this online club.';
 
   @override
   String get onlineCountQrScheduleShareHelp =>
-      'Share this QR code with the person preparing the meeting schedule. This QR code belongs to the online club and can be reused for every meeting.';
+      'Share it with the person preparing the meeting schedule.\nIt can be reused for every meeting.';
 
   @override
   String get onlineCountQrLifecycleReminder =>
-      'Deleting the current meeting does not change this QR code. Starting fresh or deleting the online club will make the old QR code unusable.';
+      'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes the old QR unusable.';
 
   @override
   String get onlineCountChineseVotingPage => 'Chinese voting page';

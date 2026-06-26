@@ -551,7 +551,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountDangerZone => '危险操作';
 
   @override
-  String get onlineCountDangerZoneHelp => '仅在在线设置错误，或本机不应继续使用已保存在线俱乐部时使用这些操作。';
+  String get onlineCountDangerZoneHelp => '仅在设置错误或不再使用此在线俱乐部时使用。';
 
   @override
   String get onlineCountSlugHelp => '用于永久投票链接。请使用小写字母、数字和连字符。';
@@ -579,10 +579,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountBackendUrlHelp => '普通俱乐部执委通常不需要修改后台网址。它主要用于测试或未来更换后台。';
 
   @override
-  String get onlineCountOnlineClubLabel => '在线俱乐部';
+  String get onlineCountOnlineClubLabel => '俱乐部';
 
   @override
   String get onlineCountClubCodeLabel => '俱乐部代号';
+
+  @override
+  String get onlineCountVotingLinkAvailableBelow => '投票链接在下方。';
 
   @override
   String get onlineCountLinkReadyAfterCreate => '创建俱乐部后，永久投票链接即可使用。';
@@ -592,6 +595,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCurrentMeeting => '当前会议';
+
+  @override
+  String get onlineCountMeetingOpenTitle => '会议开放中';
+
+  @override
+  String get onlineCountMeetingClosedTitle => '会议已结束';
+
+  @override
+  String get onlineCountNextStep => '下一步';
+
+  @override
+  String get onlineCountCurrentVote => '当前投票';
+
+  @override
+  String get onlineCountNotCreated => '尚未创建';
+
+  @override
+  String get onlineCountNotOpened => '尚未开放';
+
+  @override
+  String get onlineCountResultsAreFinal => '结果已最终确认';
+
+  @override
+  String get onlineCountNextStepAddCandidates => '添加候选人，然后开放会议';
+
+  @override
+  String get onlineCountNextStepCloseVoting => '准备好后结束投票';
+
+  @override
+  String get onlineCountNextStepSendOrDelete => '发送结果或删除会议';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -637,6 +670,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountNoCurrentMeeting => '当前没有会议';
 
   @override
+  String get onlineCountNoMeetingHelper => '请先创建会议，再添加候选人或开放投票。';
+
+  @override
+  String get onlineCountDraftMeetingHelper => '请添加候选人，然后开放会议。';
+
+  @override
+  String get onlineCountOpenMeetingHelper => '请一次只开放一个奖项投票。全部投票结束后，再结束会议。';
+
+  @override
+  String get onlineCountClosedMeetingHelper => '结果已最终确认。请先发送或复制结果，再删除会议。';
+
+  @override
   String get onlineCountDeleteCurrentMeeting => '删除当前会议';
 
   @override
@@ -673,6 +718,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountFinalVotes => '最终票数';
 
   @override
+  String get onlineCountAwardStatusLabel => '状态';
+
+  @override
   String get onlineCountRefreshVoteCount => '刷新票数';
 
   @override
@@ -691,16 +739,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountPermanentVotingQr => '永久投票二维码';
 
   @override
-  String get onlineCountPermanentVotingQrHelp =>
-      '每次会议都可以使用同一个二维码。投票页面只会显示当前开放的奖项投票。';
+  String get onlineCountPermanentVotingQrHelp => '此二维码属于本在线俱乐部。';
 
   @override
-  String get onlineCountQrScheduleShareHelp =>
-      '可将此二维码分享给制作会议流程表的人。此二维码属于在线俱乐部，可重复用于每次会议。';
+  String get onlineCountQrScheduleShareHelp => '可分享给制作会议流程表的人。\n每次会议都可以重复使用。';
 
   @override
   String get onlineCountQrLifecycleReminder =>
-      '删除当前会议不会改变此二维码。本机重新开始或删除在线俱乐部后，旧二维码将不能继续使用。';
+      '删除会议不会改变二维码。删除俱乐部或本机重新开始后，旧二维码将不能继续使用。';
 
   @override
   String get onlineCountChineseVotingPage => '中文投票页面';

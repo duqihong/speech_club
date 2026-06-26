@@ -1004,6 +1004,20 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return _voteTotalsByAwardType[award.type.value] ?? 0;
   }
 
+  bool get _hasOpenAward => _openAwardForDisplay() != null;
+
+  OnlineAward? _openAwardForDisplay() {
+    if (_activeAward != null) {
+      return _activeAward;
+    }
+    for (final OnlineAward award in _awards) {
+      if (award.status == OnlineRoundStatus.open) {
+        return award;
+      }
+    }
+    return null;
+  }
+
   String _voteCountLabel(OnlineAward award, AppLocalizations l10n) {
     final int voteCount = _voteCountForAward(award);
     return switch (award.status) {
@@ -1011,6 +1025,65 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         '${l10n.onlineCountOpen} · ${l10n.onlineCountVotesReceived}: $voteCount',
       OnlineRoundStatus.closed => '${l10n.onlineCountFinalVotes}: $voteCount',
       OnlineRoundStatus.draft => '${l10n.onlineCountVotesReceived}: $voteCount',
+    };
+  }
+
+  String _statusSummaryTitle(AppLocalizations l10n) {
+    return switch (_uiState) {
+      OnlineCountUiState.noOnlineClub => l10n.onlineCountCloudSetup,
+      OnlineCountUiState.clubReadyNoMeeting => l10n.onlineCountClubReadyTitle,
+      OnlineCountUiState.meetingDraft => l10n.onlineCountClubReadyTitle,
+      OnlineCountUiState.meetingOpen => l10n.onlineCountMeetingOpenTitle,
+      OnlineCountUiState.meetingClosed => l10n.onlineCountMeetingClosedTitle,
+    };
+  }
+
+  List<String> _statusSummaryLines(AppLocalizations l10n) {
+    final Locale locale = Localizations.localeOf(context);
+    return switch (_uiState) {
+      OnlineCountUiState.noOnlineClub => <String>[],
+      OnlineCountUiState.clubReadyNoMeeting => <String>[
+          '${l10n.onlineCountCurrentMeeting}: ${l10n.onlineCountNotCreated}',
+          '${l10n.onlineCountNextStep}: ${l10n.onlineCountCreateCurrentMeeting}',
+        ],
+      OnlineCountUiState.meetingDraft => <String>[
+          '${l10n.onlineCountCurrentMeeting}: ${_session?.meetingTitle ?? ''}',
+          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepAddCandidates}',
+        ],
+      OnlineCountUiState.meetingOpen => <String>[
+          '${l10n.onlineCountCurrentVote}: ${_currentVoteSummary(locale, l10n)}',
+          '${l10n.onlineCountVotesReceived}: ${_currentVoteCount()}',
+          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepCloseVoting}',
+        ],
+      OnlineCountUiState.meetingClosed => <String>[
+          l10n.onlineCountResultsAreFinal,
+          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepSendOrDelete}',
+        ],
+    };
+  }
+
+  String _currentVoteSummary(Locale locale, AppLocalizations l10n) {
+    final OnlineAward? award = _openAwardForDisplay();
+    if (award == null) {
+      return l10n.onlineCountNotOpened;
+    }
+    return onlineAwardLabel(award.type, locale);
+  }
+
+  int _currentVoteCount() {
+    final OnlineAward? award = _openAwardForDisplay();
+    return award == null ? 0 : _voteCountForAward(award);
+  }
+
+  String _meetingHelperText(AppLocalizations l10n) {
+    final OnlineSession? session = _session;
+    if (session == null) {
+      return l10n.onlineCountNoMeetingHelper;
+    }
+    return switch (session.status) {
+      OnlineRoundStatus.draft => l10n.onlineCountDraftMeetingHelper,
+      OnlineRoundStatus.open => l10n.onlineCountOpenMeetingHelper,
+      OnlineRoundStatus.closed => l10n.onlineCountClosedMeetingHelper,
     };
   }
 
@@ -1116,6 +1189,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.clubReadyNoMeeting => <Widget>[
+          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildVotingLinkCard(l10n),
@@ -1123,6 +1197,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingDraft => <Widget>[
+          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildVotingLinkCard(l10n),
@@ -1131,6 +1206,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingOpen => <Widget>[
+          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildVotingLinkCard(l10n),
@@ -1139,6 +1215,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingClosed => <Widget>[
+          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildVotingLinkCard(l10n),
@@ -1147,6 +1224,16 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
     };
+  }
+
+  Widget _buildStatusSummaryCard(AppLocalizations l10n) {
+    return _SectionCard(
+      title: _statusSummaryTitle(l10n),
+      icon: Icons.flag_circle_outlined,
+      children: <Widget>[
+        _InfoBlock(lines: _statusSummaryLines(l10n)),
+      ],
+    );
   }
 
   Widget _buildCloudSetupCard(AppLocalizations l10n) {
@@ -1209,8 +1296,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   Widget _buildLockedClubCard(AppLocalizations l10n) {
     final String clubName = _clubNameController.text.trim();
     final String clubCode = _clubSlugController.text.trim();
-    final String link =
-        clubCode.isEmpty ? '' : _api().votingLinkForClub(clubCode);
 
     return _SectionCard(
       title: l10n.onlineCountClubReadyTitle,
@@ -1220,7 +1305,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           lines: <String>[
             '${l10n.onlineCountOnlineClubLabel}: $clubName',
             '${l10n.onlineCountClubCodeLabel}: $clubCode',
-            '${l10n.onlineCountVotingLink}: $link',
+            l10n.onlineCountVotingLinkAvailableBelow,
             if (_legacyMultipleSessions) l10n.onlineCountLegacySessionsWarning,
             if (_activeAward != null)
               '${l10n.onlineCountVotingRound}: '
@@ -1265,27 +1350,36 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Widget _buildDangerZoneCard(AppLocalizations l10n) {
-    return _SectionCard(
-      title: l10n.onlineCountDangerZone,
-      icon: Icons.warning_amber_outlined,
-      children: <Widget>[
-        _BodyText(l10n.onlineCountDangerZoneHelp),
-        const SizedBox(height: 8),
-        _buttonWrap(
-          <Widget>[
-            OutlinedButton.icon(
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        leading: const Icon(Icons.warning_amber_outlined),
+        title: Text(
+          l10n.onlineCountDangerZone,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        children: <Widget>[
+          _BodyText(l10n.onlineCountDangerZoneHelp),
+          const SizedBox(height: 8),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
               onPressed: _resetOnlineCountOnThisDevice,
               icon: const Icon(Icons.restart_alt_outlined),
               label: Text(l10n.onlineCountResetDeviceSetup),
             ),
-            OutlinedButton.icon(
+          ),
+          const SizedBox(height: 10),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
               onPressed: _startFreshOnThisDevice,
               icon: const Icon(Icons.refresh_outlined),
               label: Text(l10n.onlineCountStartFreshDevice),
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -1295,7 +1389,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       title: l10n.onlineCountCurrentMeeting,
       icon: Icons.event_note_outlined,
       children: <Widget>[
-        _BodyText(l10n.onlineCountMeetingExplanation),
+        _BodyText(_meetingHelperText(l10n)),
         const SizedBox(height: 10),
         if (_session == null)
           _InfoBlock(lines: <String>[l10n.onlineCountNoCurrentMeeting])
@@ -1338,7 +1432,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             _session!.status == OnlineRoundStatus.draft) ...<Widget>[
           const SizedBox(height: 10),
           _fullWidthButton(
-            child: OutlinedButton.icon(
+            child: FilledButton.icon(
               onPressed: _canOpenMeeting && _busyAction != 'openMeeting'
                   ? () => _openMeeting()
                   : null,
@@ -1351,7 +1445,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             _session!.status == OnlineRoundStatus.open) ...<Widget>[
           const SizedBox(height: 10),
           _fullWidthButton(
-            child: OutlinedButton.icon(
+            child: FilledButton.icon(
               onPressed: _canCloseMeeting && _busyAction != 'closeMeeting'
                   ? () => _closeMeeting()
                   : null,
@@ -1360,7 +1454,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             ),
           ),
         ],
-        if (_session != null) ...<Widget>[
+        if (_session != null &&
+            _session!.status != OnlineRoundStatus.closed) ...<Widget>[
           const SizedBox(height: 10),
           _fullWidthButton(
             child: OutlinedButton.icon(
@@ -1440,6 +1535,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   Widget _buildVotingRoundCard(AppLocalizations l10n) {
     final Locale locale = Localizations.localeOf(context);
     final List<OnlineAward> awards = _awardsForVoteCountDisplay();
+    final bool hasOpenAward = _hasOpenAward;
     return _SectionCard(
       title: l10n.onlineCountVotingRound,
       icon: Icons.how_to_vote_outlined,
@@ -1481,9 +1577,15 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               padding: const EdgeInsets.only(bottom: 12),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: award.status == OnlineRoundStatus.open
+                      ? Colors.green.shade50
+                      : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black12),
+                  border: Border.all(
+                    color: award.status == OnlineRoundStatus.open
+                        ? Colors.green.shade300
+                        : Colors.black12,
+                  ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -1509,6 +1611,15 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
+                        '${l10n.onlineCountAwardStatusLabel}: '
+                        '${onlineStatusLabel(award.status, locale)}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
                         _voteCountLabel(award, l10n),
                         style: TextStyle(
                           fontSize: 16,
@@ -1519,30 +1630,31 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _buttonWrap(
-                        <Widget>[
-                          FilledButton.icon(
-                            onPressed: _session?.status ==
-                                        OnlineRoundStatus.open &&
-                                    award.id.isNotEmpty &&
-                                    award.status == OnlineRoundStatus.draft &&
-                                    _busyAction != 'openAward-${award.id}'
-                                ? () => _openAward(award)
-                                : null,
-                            icon: const Icon(Icons.play_arrow_outlined),
-                            label: Text(l10n.onlineCountOpenVoting),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: award.status == OnlineRoundStatus.open &&
-                                    award.id.isNotEmpty &&
+                      if (award.status == OnlineRoundStatus.open)
+                        _fullWidthButton(
+                          child: FilledButton.icon(
+                            onPressed: award.id.isNotEmpty &&
                                     _busyAction != 'closeAward-${award.id}'
                                 ? () => _closeAward(award)
                                 : null,
                             icon: const Icon(Icons.stop_circle_outlined),
                             label: Text(l10n.onlineCountCloseVoting),
                           ),
-                        ],
-                      ),
+                        )
+                      else if (award.status == OnlineRoundStatus.draft)
+                        _fullWidthButton(
+                          child: FilledButton.icon(
+                            onPressed:
+                                _session?.status == OnlineRoundStatus.open &&
+                                        !hasOpenAward &&
+                                        award.id.isNotEmpty &&
+                                        _busyAction != 'openAward-${award.id}'
+                                    ? () => _openAward(award)
+                                    : null,
+                            icon: const Icon(Icons.play_arrow_outlined),
+                            label: Text(l10n.onlineCountOpenVoting),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -1669,26 +1781,32 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           ),
           const SizedBox(height: 12),
           _LinkBlock(link: url),
-          _buttonWrap(
-            <Widget>[
-              FilledButton.icon(
-                onPressed: () => _copyText(url),
-                icon: const Icon(Icons.copy_outlined),
-                label: Text(l10n.onlineCountCopyQrLink),
-              ),
-              OutlinedButton.icon(
-                onPressed: _busyAction == 'shareQrCode'
-                    ? null
-                    : () => _shareQrCode(url: url, type: selectedType),
-                icon: const Icon(Icons.ios_share_outlined),
-                label: Text(l10n.onlineCountShareQrCode),
-              ),
-              OutlinedButton.icon(
-                onPressed: () => _copyText(buildVotingPrintText(url, locale)),
-                icon: const Icon(Icons.print_outlined),
-                label: Text(l10n.onlineCountCopyPrintText),
-              ),
-            ],
+          const SizedBox(height: 8),
+          _fullWidthButton(
+            child: FilledButton.icon(
+              onPressed: _busyAction == 'shareQrCode'
+                  ? null
+                  : () => _shareQrCode(url: url, type: selectedType),
+              icon: const Icon(Icons.ios_share_outlined),
+              label: Text(l10n.onlineCountShareQrCode),
+            ),
+          ),
+          const SizedBox(height: 10),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed: () => _copyText(url),
+              icon: const Icon(Icons.copy_outlined),
+              label: Text(l10n.onlineCountCopyQrLink),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => _copyText(buildVotingPrintText(url, locale)),
+              icon: const Icon(Icons.print_outlined),
+              label: Text(l10n.onlineCountCopyPrintText),
+            ),
           ),
         ],
       ],
@@ -1701,26 +1819,32 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       title: l10n.onlineCountResults,
       icon: Icons.emoji_events_outlined,
       children: <Widget>[
-        _buttonWrap(
-          <Widget>[
-            FilledButton.icon(
-              onPressed: _busyAction == 'refreshResults'
-                  ? null
-                  : () => _refreshResults(),
-              icon: const Icon(Icons.refresh_outlined),
-              label: Text(l10n.onlineCountRefreshResults),
-            ),
-            OutlinedButton.icon(
-              onPressed: _sendResultsToPresident,
-              icon: const Icon(Icons.send_outlined),
-              label: Text(l10n.voteBestsSendResultsToPresident),
-            ),
-            OutlinedButton.icon(
-              onPressed: _copyResults,
-              icon: const Icon(Icons.copy_outlined),
-              label: Text(l10n.onlineCountCopyResults),
-            ),
-          ],
+        _BodyText(l10n.onlineCountClosedMeetingHelper),
+        const SizedBox(height: 8),
+        _fullWidthButton(
+          child: FilledButton.icon(
+            onPressed: _busyAction == 'refreshResults'
+                ? null
+                : () => _refreshResults(),
+            icon: const Icon(Icons.refresh_outlined),
+            label: Text(l10n.onlineCountRefreshResults),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _fullWidthButton(
+          child: OutlinedButton.icon(
+            onPressed: _sendResultsToPresident,
+            icon: const Icon(Icons.send_outlined),
+            label: Text(l10n.voteBestsSendResultsToPresident),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _fullWidthButton(
+          child: OutlinedButton.icon(
+            onPressed: _copyResults,
+            icon: const Icon(Icons.copy_outlined),
+            label: Text(l10n.onlineCountCopyResults),
+          ),
         ),
         const SizedBox(height: 10),
         _buildPresidentContactCard(l10n),
@@ -1747,6 +1871,17 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                 l10n: l10n,
               ),
             ),
+        ],
+        if (_session != null) ...<Widget>[
+          const SizedBox(height: 4),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed:
+                  _busyAction == 'deleteMeeting' ? null : _deleteCurrentMeeting,
+              icon: const Icon(Icons.delete_outline),
+              label: Text(l10n.onlineCountDeleteCurrentMeeting),
+            ),
+          ),
         ],
       ],
     );

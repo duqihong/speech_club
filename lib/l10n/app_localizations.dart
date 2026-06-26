@@ -1163,7 +1163,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountDangerZoneHelp.
   ///
   /// In en, this message translates to:
-  /// **'Use these actions only when online setup is wrong or this phone should stop using the saved online club.'**
+  /// **'Use only if setup is wrong or you want to stop using this online club.'**
   String get onlineCountDangerZoneHelp;
 
   /// No description provided for @onlineCountSlugHelp.
@@ -1217,7 +1217,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountOnlineClubLabel.
   ///
   /// In en, this message translates to:
-  /// **'Online club'**
+  /// **'Club'**
   String get onlineCountOnlineClubLabel;
 
   /// No description provided for @onlineCountClubCodeLabel.
@@ -1225,6 +1225,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Club code'**
   String get onlineCountClubCodeLabel;
+
+  /// No description provided for @onlineCountVotingLinkAvailableBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting link available below.'**
+  String get onlineCountVotingLinkAvailableBelow;
 
   /// No description provided for @onlineCountLinkReadyAfterCreate.
   ///
@@ -1243,6 +1249,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current Meeting'**
   String get onlineCountCurrentMeeting;
+
+  /// No description provided for @onlineCountMeetingOpenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting Open'**
+  String get onlineCountMeetingOpenTitle;
+
+  /// No description provided for @onlineCountMeetingClosedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting Closed'**
+  String get onlineCountMeetingClosedTitle;
+
+  /// No description provided for @onlineCountNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Next step'**
+  String get onlineCountNextStep;
+
+  /// No description provided for @onlineCountCurrentVote.
+  ///
+  /// In en, this message translates to:
+  /// **'Current vote'**
+  String get onlineCountCurrentVote;
+
+  /// No description provided for @onlineCountNotCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not created'**
+  String get onlineCountNotCreated;
+
+  /// No description provided for @onlineCountNotOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Not opened'**
+  String get onlineCountNotOpened;
+
+  /// No description provided for @onlineCountResultsAreFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are final'**
+  String get onlineCountResultsAreFinal;
+
+  /// No description provided for @onlineCountNextStepAddCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates, then open meeting'**
+  String get onlineCountNextStepAddCandidates;
+
+  /// No description provided for @onlineCountNextStepCloseVoting.
+  ///
+  /// In en, this message translates to:
+  /// **'Close voting when ready'**
+  String get onlineCountNextStepCloseVoting;
+
+  /// No description provided for @onlineCountNextStepSendOrDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Send results or delete meeting'**
+  String get onlineCountNextStepSendOrDelete;
 
   /// No description provided for @onlineCountMeetingExplanation.
   ///
@@ -1328,6 +1394,30 @@ abstract class AppLocalizations {
   /// **'No current meeting'**
   String get onlineCountNoCurrentMeeting;
 
+  /// No description provided for @onlineCountNoMeetingHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a meeting before adding candidates or opening voting.'**
+  String get onlineCountNoMeetingHelper;
+
+  /// No description provided for @onlineCountDraftMeetingHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates, then open the meeting.'**
+  String get onlineCountDraftMeetingHelper;
+
+  /// No description provided for @onlineCountOpenMeetingHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Open one award voting round at a time. Close the meeting when all voting is finished.'**
+  String get onlineCountOpenMeetingHelper;
+
+  /// No description provided for @onlineCountClosedMeetingHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Results are final. Send or copy results before deleting the meeting.'**
+  String get onlineCountClosedMeetingHelper;
+
   /// No description provided for @onlineCountDeleteCurrentMeeting.
   ///
   /// In en, this message translates to:
@@ -1400,6 +1490,12 @@ abstract class AppLocalizations {
   /// **'Final votes'**
   String get onlineCountFinalVotes;
 
+  /// No description provided for @onlineCountAwardStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get onlineCountAwardStatusLabel;
+
   /// No description provided for @onlineCountRefreshVoteCount.
   ///
   /// In en, this message translates to:
@@ -1439,19 +1535,19 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountPermanentVotingQrHelp.
   ///
   /// In en, this message translates to:
-  /// **'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.'**
+  /// **'This QR code belongs to this online club.'**
   String get onlineCountPermanentVotingQrHelp;
 
   /// No description provided for @onlineCountQrScheduleShareHelp.
   ///
   /// In en, this message translates to:
-  /// **'Share this QR code with the person preparing the meeting schedule. This QR code belongs to the online club and can be reused for every meeting.'**
+  /// **'Share it with the person preparing the meeting schedule.\nIt can be reused for every meeting.'**
   String get onlineCountQrScheduleShareHelp;
 
   /// No description provided for @onlineCountQrLifecycleReminder.
   ///
   /// In en, this message translates to:
-  /// **'Deleting the current meeting does not change this QR code. Starting fresh or deleting the online club will make the old QR code unusable.'**
+  /// **'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes the old QR unusable.'**
   String get onlineCountQrLifecycleReminder;
 
   /// No description provided for @onlineCountChineseVotingPage.
