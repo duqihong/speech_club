@@ -272,6 +272,204 @@ http://localhost:8787/c/demo-round-club-local?lang=en
 
 The Chinese link should show Chinese only. The English link should show English only.
 
+## Phase 5G one-device owner APIs
+
+Phase 5G adds backend support for the simplified one-device Online Count model:
+
+- one app installation has one private owner token
+- backend stores only `owner_token_hash`
+- one owner token can have only one active online club
+- one online club can have only one current meeting
+- user must delete the current meeting before creating the next meeting
+- user must delete the online club before creating another club
+- meetings expire after 7 days
+- inactive clubs expire after 3 months
+- scheduled cleanup runs daily, with lazy cleanup on API activity as backup
+- Manual Count remains the offline fallback in Flutter
+
+New owner/admin APIs require both headers:
+
+```text
+X-Owner-Token: local-owner-token-5g
+X-Admin-Pin: 123456
+```
+
+Public voter APIs still do not require owner token or admin PIN.
+
+Use a fresh local owner token and club slug:
+
+```sh
+OWNER_TOKEN="local-owner-token-5g"
+CLUB_SLUG="demo-owner-local-club"
+ADMIN_PIN="123456"
+BASE_URL="http://localhost:8787"
+```
+
+### A. Create owner club
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -d '{
+    "clubName": "Demo Owner Local Club",
+    "clubSlug": "demo-owner-local-club",
+    "adminPin": "123456"
+  }'
+```
+
+### B. Verify owner club
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club/$CLUB_SLUG/verify" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+### C. Get owner club status
+
+```sh
+curl "$BASE_URL/api/owner/club/$CLUB_SLUG/status" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+Expected before creating a meeting:
+
+```json
+{
+  "hasCurrentSession": false,
+  "hasActiveAward": false,
+  "canCreateMeeting": true,
+  "canCreateClub": false,
+  "legacyMultipleSessions": false
+}
+```
+
+### D. Create current meeting
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club/$CLUB_SLUG/session" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN" \
+  -d '{
+    "meetingTitle": "Regular Meeting",
+    "meetingDate": "2026-06-26"
+  }'
+```
+
+Save the returned `sessionId` and award IDs.
+
+### E. Attempt to create second meeting and confirm CURRENT_MEETING_EXISTS
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club/$CLUB_SLUG/session" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN" \
+  -d '{
+    "meetingTitle": "Second Meeting",
+    "meetingDate": "2026-06-26"
+  }'
+```
+
+Expected error code:
+
+```text
+CURRENT_MEETING_EXISTS
+```
+
+### F. Add candidates using owner token
+
+```sh
+curl -X POST "$BASE_URL/api/admin/session/SESSION_ID/candidates" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN" \
+  -d '{
+    "awardType": "best_speaker",
+    "candidates": ["Alice", "Bob"]
+  }'
+```
+
+### G. Open session using owner token
+
+```sh
+curl -X POST "$BASE_URL/api/admin/session/SESSION_ID/open" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+### H. Open award using owner token
+
+```sh
+curl -X POST "$BASE_URL/api/admin/session/SESSION_ID/award/BEST_SPEAKER_AWARD_ID/open" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+### I. Public vote
+
+Fetch the active vote:
+
+```sh
+curl "$BASE_URL/api/public/club/$CLUB_SLUG/active-vote"
+```
+
+Submit a vote:
+
+```sh
+curl -X POST "$BASE_URL/api/public/session/SESSION_ID/award/BEST_SPEAKER_AWARD_ID/vote" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterToken": "local-voter-5g-1",
+    "candidateId": "CANDIDATE_ID"
+  }'
+```
+
+### J. Delete current meeting
+
+```sh
+curl -X DELETE "$BASE_URL/api/owner/session/SESSION_ID" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+### K. Confirm new meeting can be created
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club/$CLUB_SLUG/session" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN" \
+  -d '{
+    "meetingTitle": "Next Meeting",
+    "meetingDate": "2026-06-27"
+  }'
+```
+
+### L. Delete online club
+
+```sh
+curl -X DELETE "$BASE_URL/api/owner/club/$CLUB_SLUG" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -H "X-Admin-Pin: $ADMIN_PIN"
+```
+
+### M. Confirm owner can create another club
+
+```sh
+curl -X POST "$BASE_URL/api/owner/club" \
+  -H "Content-Type: application/json" \
+  -H "X-Owner-Token: $OWNER_TOKEN" \
+  -d '{
+    "clubName": "Demo Owner Local Club 2",
+    "clubSlug": "demo-owner-local-club-2",
+    "adminPin": "123456"
+  }'
+```
+
 ## Remote Deployment Test
 
 Current test Worker URL:

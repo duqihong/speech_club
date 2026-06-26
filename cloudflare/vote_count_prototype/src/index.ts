@@ -10,6 +10,10 @@ interface ClubRow {
   club_name: string;
   club_slug: string;
   admin_pin_hash: string;
+  owner_token_hash: string | null;
+  status: 'active' | 'deleted' | 'expired';
+  last_active_at: string | null;
+  expires_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -22,6 +26,7 @@ interface SessionRow {
   status: RoundStatus;
   opened_at: string | null;
   closed_at: string | null;
+  expires_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -63,8 +68,8 @@ const awardLabels: Record<AwardType, { en: string; zh: string }> = {
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Pin',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Pin, X-Owner-Token',
 };
 
 export default {
@@ -79,6 +84,13 @@ export default {
       console.error(error);
       return errorResponse('INTERNAL_ERROR', 'Something went wrong.', 500);
     }
+  },
+  async scheduled(
+    _event: ScheduledEvent,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<void> {
+    ctx.waitUntil(cleanupExpiredData(env));
   },
 };
 
@@ -129,6 +141,61 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
   if (request.method === 'POST' && path === '/api/admin/club') {
     return createClub(request, env);
+  }
+
+  if (request.method === 'POST' && path === '/api/owner/club') {
+    return createOwnerClub(request, env);
+  }
+
+  const verifyOwnerClubMatch = path.match(
+    /^\/api\/owner\/club\/([^/]+)\/verify$/,
+  );
+  if (request.method === 'POST' && verifyOwnerClubMatch) {
+    return verifyOwnerClub(
+      request,
+      env,
+      decodeURIComponent(verifyOwnerClubMatch[1]),
+    );
+  }
+
+  const ownerClubStatusMatch = path.match(
+    /^\/api\/owner\/club\/([^/]+)\/status$/,
+  );
+  if (request.method === 'GET' && ownerClubStatusMatch) {
+    return getOwnerClubStatus(
+      request,
+      env,
+      decodeURIComponent(ownerClubStatusMatch[1]),
+    );
+  }
+
+  const createOwnerSessionMatch = path.match(
+    /^\/api\/owner\/club\/([^/]+)\/session$/,
+  );
+  if (request.method === 'POST' && createOwnerSessionMatch) {
+    return createOwnerSession(
+      request,
+      env,
+      decodeURIComponent(createOwnerSessionMatch[1]),
+    );
+  }
+
+  const deleteOwnerClubMatch = path.match(/^\/api\/owner\/club\/([^/]+)$/);
+  if (request.method === 'DELETE' && deleteOwnerClubMatch) {
+    return deleteOwnerClub(
+      request,
+      env,
+      decodeURIComponent(deleteOwnerClubMatch[1]),
+    );
+  }
+
+  const deleteOwnerSessionMatch = path.match(/^\/api\/owner\/session\/([^/]+)$/);
+  if (request.method === 'DELETE' && deleteOwnerSessionMatch) {
+    return deleteOwnerSession(
+      request,
+      env,
+      decodeURIComponent(deleteOwnerSessionMatch[1]),
+    );
   }
 
   const createSessionMatch = path.match(
@@ -237,20 +304,172 @@ async function createClub(request: Request, env: Env): Promise<Response> {
   });
 }
 
-async function createSession(
+async function createOwnerClub(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const ownerToken = getOwnerToken(request);
+  if (!ownerToken) {
+    return errorResponse('MISSING_OWNER_TOKEN', 'Owner token is required.', 401);
+  }
+
+  const body = await readJson(request);
+  const clubName = getString(body, 'clubName');
+  const rawSlug = getString(body, 'clubSlug');
+  const adminPin = getString(body, 'adminPin');
+
+  if (!clubName || !rawSlug || !adminPin) {
+    return errorResponse(
+      'MISSING_FIELD',
+      'clubName, clubSlug, and adminPin are required.',
+    );
+  }
+
+  const clubSlug = normalizeSlug(rawSlug);
+  if (!clubSlug) {
+    return errorResponse('MISSING_FIELD', 'clubSlug must be URL-safe text.');
+  }
+
+  const ownerTokenHash = await hashOwnerToken(ownerToken);
+  const existingOwnerClub = await env.DB.prepare(
+    `SELECT club_id FROM clubs
+     WHERE owner_token_hash = ? AND status = 'active'
+     LIMIT 1`,
+  )
+    .bind(ownerTokenHash)
+    .first<{ club_id: string }>();
+  if (existingOwnerClub) {
+    return errorResponse(
+      'OWNER_ALREADY_HAS_ACTIVE_CLUB',
+      'This app installation already has an active online club.',
+      409,
+    );
+  }
+
+  const existingSlug = await env.DB.prepare(
+    `SELECT club_id FROM clubs
+     WHERE club_slug = ? AND status = 'active'
+     LIMIT 1`,
+  )
+    .bind(clubSlug)
+    .first<{ club_id: string }>();
+  if (existingSlug) {
+    return errorResponse(
+      'CLUB_SLUG_EXISTS',
+      'A club with this slug already exists.',
+      409,
+    );
+  }
+
+  const clubId = crypto.randomUUID();
+  const adminPinHash = await hashText(`${clubId}:${adminPin}`);
+
+  try {
+    await env.DB.prepare(
+      `INSERT INTO clubs
+       (club_id, club_name, club_slug, admin_pin_hash, owner_token_hash,
+        status, last_active_at, expires_at)
+       VALUES (?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP,
+        datetime(CURRENT_TIMESTAMP, '+3 months'))`,
+    )
+      .bind(clubId, clubName.trim(), clubSlug, adminPinHash, ownerTokenHash)
+      .run();
+  } catch (error) {
+    if (isConstraintError(error)) {
+      return errorResponse(
+        'CLUB_SLUG_EXISTS',
+        'A club with this slug already exists.',
+        409,
+      );
+    }
+    throw error;
+  }
+
+  const club = await getClubById(env, clubId);
+  return jsonResponse({ ok: true, club: ownerClubResponse(club) });
+}
+
+async function verifyOwnerClub(
   request: Request,
   env: Env,
   rawClubSlug: string,
 ): Promise<Response> {
-  const clubSlug = normalizeSlug(rawClubSlug);
-  const club = await getClubBySlug(env, clubSlug);
-  if (!club) {
-    return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
+  await cleanupExpiredData(env);
+
+  const context = await verifyOwnerAndAdminForClub(env, rawClubSlug, request);
+  if (context instanceof Response) {
+    return context;
   }
 
-  const pinError = await verifyAdminPin(request, club);
-  if (pinError) {
-    return pinError;
+  await touchClubActivity(env, context.club.club_id);
+  return jsonResponse({
+    ok: true,
+    club: ownerClubResponse(await getClubById(env, context.club.club_id)),
+  });
+}
+
+async function getOwnerClubStatus(
+  request: Request,
+  env: Env,
+  rawClubSlug: string,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const context = await verifyOwnerAndAdminForClub(env, rawClubSlug, request);
+  if (context instanceof Response) {
+    return context;
+  }
+
+  const sessions = await getCurrentSessionsForClub(env, context.club.club_id);
+  const currentSession = sessions[0] ?? null;
+  const activeAward = currentSession
+    ? await getOpenAwardForSession(env, currentSession.session_id)
+    : null;
+  const legacyMultipleSessions = sessions.length > 1;
+
+  await touchClubActivity(env, context.club.club_id);
+  return jsonResponse({
+    ok: true,
+    club: ownerClubResponse(await getClubById(env, context.club.club_id)),
+    currentSession: currentSession ? ownerSessionResponse(currentSession) : null,
+    activeAward: activeAward ? ownerAwardResponse(activeAward) : null,
+    summary: {
+      hasCurrentSession: currentSession !== null,
+      hasActiveAward: activeAward !== null,
+      canCreateMeeting: currentSession === null,
+      canCreateClub: false,
+      legacyMultipleSessions,
+    },
+  });
+}
+
+async function createOwnerSession(
+  request: Request,
+  env: Env,
+  rawClubSlug: string,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const context = await verifyOwnerAndAdminForClub(env, rawClubSlug, request);
+  if (context instanceof Response) {
+    return context;
+  }
+
+  const currentSession = await env.DB.prepare(
+    `SELECT session_id FROM sessions
+     WHERE club_id = ?
+     LIMIT 1`,
+  )
+    .bind(context.club.club_id)
+    .first<{ session_id: string }>();
+  if (currentSession) {
+    return errorResponse(
+      'CURRENT_MEETING_EXISTS',
+      'Delete the current meeting before creating a new one.',
+      409,
+    );
   }
 
   const body = await readJson(request);
@@ -267,8 +486,139 @@ async function createSession(
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO sessions
-       (session_id, club_id, meeting_title, meeting_date, status)
-       VALUES (?, ?, ?, ?, 'draft')`,
+       (session_id, club_id, meeting_title, meeting_date, status, expires_at)
+       VALUES (?, ?, ?, ?, 'draft', datetime(CURRENT_TIMESTAMP, '+7 days'))`,
+    ).bind(
+      sessionId,
+      context.club.club_id,
+      meetingTitle.trim(),
+      meetingDate.trim(),
+    ),
+    ...defaultAwards.map((award) =>
+      env.DB.prepare(
+        `INSERT INTO awards
+         (award_id, session_id, award_type, display_order, status)
+         VALUES (?, ?, ?, ?, 'draft')`,
+      ).bind(
+        crypto.randomUUID(),
+        sessionId,
+        award.awardType,
+        award.displayOrder,
+      ),
+    ),
+  ]);
+
+  await touchClubActivity(env, context.club.club_id);
+  const session = await getSessionById(env, sessionId);
+  const awards = await getAwardsForSession(env, sessionId);
+  return jsonResponse({
+    ok: true,
+    session: ownerSessionResponse(session),
+    awards: awards.map(ownerAwardResponse),
+  });
+}
+
+async function deleteOwnerSession(
+  request: Request,
+  env: Env,
+  sessionId: string,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const session = await getSessionById(env, sessionId);
+  if (!session) {
+    return errorResponse('SESSION_NOT_FOUND', 'Session not found.', 404);
+  }
+
+  const club = await getClubById(env, session.club_id);
+  if (!club) {
+    return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
+  }
+
+  const verifyError = await verifyOwnerAndAdmin(request, club);
+  if (verifyError) {
+    return verifyError;
+  }
+
+  await deleteSessionTree(env, session.session_id);
+  await touchClubActivity(env, club.club_id);
+  return jsonResponse({ ok: true });
+}
+
+async function deleteOwnerClub(
+  request: Request,
+  env: Env,
+  rawClubSlug: string,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const context = await verifyOwnerAndAdminForClub(env, rawClubSlug, request);
+  if (context instanceof Response) {
+    return context;
+  }
+
+  await deleteClubTree(env, context.club.club_id);
+  return jsonResponse({ ok: true });
+}
+
+async function createSession(
+  request: Request,
+  env: Env,
+  rawClubSlug: string,
+): Promise<Response> {
+  await cleanupExpiredData(env);
+
+  const clubSlug = normalizeSlug(rawClubSlug);
+  const club = await getClubBySlug(env, clubSlug);
+  if (!club) {
+    return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
+  }
+  if (club.status !== 'active') {
+    return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
+  }
+
+  const pinError = await verifyAdminPin(request, club);
+  if (pinError) {
+    return pinError;
+  }
+  const ownerError = await verifyOwnerForOwnedClub(request, club);
+  if (ownerError) {
+    return ownerError;
+  }
+
+  if (club.owner_token_hash) {
+    const currentSession = await env.DB.prepare(
+      `SELECT session_id FROM sessions
+       WHERE club_id = ?
+       LIMIT 1`,
+    )
+      .bind(club.club_id)
+      .first<{ session_id: string }>();
+    if (currentSession) {
+      return errorResponse(
+        'CURRENT_MEETING_EXISTS',
+        'Delete the current meeting before creating a new one.',
+        409,
+      );
+    }
+  }
+
+  const body = await readJson(request);
+  const meetingTitle = getString(body, 'meetingTitle');
+  const meetingDate = getString(body, 'meetingDate');
+  if (!meetingTitle || !meetingDate) {
+    return errorResponse(
+      'MISSING_FIELD',
+      'meetingTitle and meetingDate are required.',
+    );
+  }
+
+  const sessionId = crypto.randomUUID();
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO sessions
+       (session_id, club_id, meeting_title, meeting_date, status, expires_at)
+       VALUES (?, ?, ?, ?, 'draft', datetime(CURRENT_TIMESTAMP, '+7 days'))`,
     ).bind(sessionId, club.club_id, meetingTitle.trim(), meetingDate.trim()),
     ...defaultAwards.map((award) =>
       env.DB.prepare(
@@ -284,6 +634,7 @@ async function createSession(
     ),
   ]);
 
+  await touchClubActivity(env, club.club_id);
   const session = await getSessionById(env, sessionId);
   const awards = await getAwardsForSession(env, sessionId);
   return jsonResponse({ ok: true, session, awards });
@@ -362,6 +713,7 @@ async function setCandidates(
     ),
   ]);
 
+  await touchClubActivity(env, context.club.club_id);
   const candidates = await getCandidatesForAward(env, award.award_id);
   return jsonResponse({ ok: true, candidates });
 }
@@ -401,6 +753,7 @@ async function openSession(
     .run();
 
   const session = await getSessionById(env, context.session.session_id);
+  await touchClubActivity(env, context.club.club_id);
   return jsonResponse({ ok: true, session });
 }
 
@@ -429,6 +782,7 @@ async function closeSession(
   ]);
 
   const session = await getSessionById(env, context.session.session_id);
+  await touchClubActivity(env, context.club.club_id);
   return jsonResponse({ ok: true, session });
 }
 
@@ -492,6 +846,7 @@ async function openAward(
     .bind(award.award_id)
     .run();
 
+  await touchClubActivity(env, context.club.club_id);
   return jsonResponse({ ok: true, award: await getAwardById(env, award.award_id) });
 }
 
@@ -526,6 +881,7 @@ async function closeAward(
     .bind(award.award_id)
     .run();
 
+  await touchClubActivity(env, context.club.club_id);
   return jsonResponse({ ok: true, award: await getAwardById(env, award.award_id) });
 }
 
@@ -580,6 +936,7 @@ async function getResults(
     }),
   );
 
+  await touchClubActivity(env, context.club.club_id);
   return jsonResponse({
     ok: true,
     isFinal: context.session.status === 'closed',
@@ -592,6 +949,8 @@ async function getActiveVote(
   env: Env,
   rawClubSlug: string,
 ): Promise<Response> {
+  await cleanupExpiredData(env);
+
   const activeVote = await loadActiveVote(env, rawClubSlug);
   if (!activeVote) {
     return jsonResponse(
@@ -617,9 +976,11 @@ async function getActiveSession(
   env: Env,
   rawClubSlug: string,
 ): Promise<Response> {
+  await cleanupExpiredData(env);
+
   const clubSlug = normalizeSlug(rawClubSlug);
   const club = await getClubBySlug(env, clubSlug);
-  if (!club) {
+  if (!club || club.status !== 'active') {
     return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
   }
 
@@ -650,6 +1011,8 @@ async function submitAwardVote(
   sessionId: string,
   awardId: string,
 ): Promise<Response> {
+  await cleanupExpiredData(env);
+
   const session = await getSessionById(env, sessionId);
   if (!session) {
     return errorResponse('SESSION_NOT_FOUND', 'Session not found.', 404);
@@ -715,6 +1078,7 @@ async function submitAwardVote(
         voterTokenHash,
       )
       .run();
+    await touchClubActivity(env, session.club_id);
     return jsonResponse({ ok: true, recorded: true, duplicate: false });
   } catch (error) {
     if (isConstraintError(error)) {
@@ -734,6 +1098,8 @@ async function submitVote(
   env: Env,
   sessionId: string,
 ): Promise<Response> {
+  await cleanupExpiredData(env);
+
   const session = await getSessionById(env, sessionId);
   if (!session) {
     return errorResponse('SESSION_NOT_FOUND', 'Session not found.', 404);
@@ -817,6 +1183,9 @@ async function submitVote(
     }
   }
 
+  if (recorded > 0) {
+    await touchClubActivity(env, session.club_id);
+  }
   return jsonResponse({ ok: true, recorded, duplicates });
 }
 
@@ -825,19 +1194,25 @@ async function getAdminSessionContext(
   env: Env,
   sessionId: string,
 ): Promise<Response | { session: SessionRow; club: ClubRow }> {
+  await cleanupExpiredData(env);
+
   const session = await getSessionById(env, sessionId);
   if (!session) {
     return errorResponse('SESSION_NOT_FOUND', 'Session not found.', 404);
   }
 
   const club = await getClubById(env, session.club_id);
-  if (!club) {
+  if (!club || club.status !== 'active') {
     return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
   }
 
   const pinError = await verifyAdminPin(request, club);
   if (pinError) {
     return pinError;
+  }
+  const ownerError = await verifyOwnerForOwnedClub(request, club);
+  if (ownerError) {
+    return ownerError;
   }
 
   return { session, club };
@@ -860,6 +1235,140 @@ async function verifyAdminPin(
   return null;
 }
 
+function getOwnerToken(request: Request): string | null {
+  return request.headers.get('X-Owner-Token')?.trim() || null;
+}
+
+async function hashOwnerToken(ownerToken: string): Promise<string> {
+  return hashText(`owner:${ownerToken}`);
+}
+
+async function verifyOwnerAndAdminForClub(
+  env: Env,
+  rawClubSlug: string,
+  request: Request,
+): Promise<Response | { club: ClubRow }> {
+  const clubSlug = normalizeSlug(rawClubSlug);
+  const club = await getClubBySlug(env, clubSlug);
+  if (!club || club.status !== 'active') {
+    return errorResponse('CLUB_NOT_FOUND', 'Club not found.', 404);
+  }
+
+  const verifyError = await verifyOwnerAndAdmin(request, club);
+  if (verifyError) {
+    return verifyError;
+  }
+
+  return { club };
+}
+
+async function verifyOwnerAndAdmin(
+  request: Request,
+  club: ClubRow,
+): Promise<Response | null> {
+  const ownerToken = getOwnerToken(request);
+  if (!ownerToken) {
+    return errorResponse('MISSING_OWNER_TOKEN', 'Owner token is required.', 401);
+  }
+
+  if (!club.owner_token_hash) {
+    return errorResponse(
+      'OWNER_NOT_CONFIGURED',
+      'This club is not owned by an app installation.',
+      409,
+    );
+  }
+
+  const ownerTokenHash = await hashOwnerToken(ownerToken);
+  if (ownerTokenHash !== club.owner_token_hash) {
+    return errorResponse('INVALID_OWNER_TOKEN', 'Owner token is invalid.', 403);
+  }
+
+  return verifyAdminPin(request, club);
+}
+
+async function verifyOwnerForOwnedClub(
+  request: Request,
+  club: ClubRow,
+): Promise<Response | null> {
+  if (!club.owner_token_hash) {
+    return null;
+  }
+
+  const ownerToken = getOwnerToken(request);
+  if (!ownerToken) {
+    return errorResponse('MISSING_OWNER_TOKEN', 'Owner token is required.', 401);
+  }
+
+  const ownerTokenHash = await hashOwnerToken(ownerToken);
+  if (ownerTokenHash !== club.owner_token_hash) {
+    return errorResponse('INVALID_OWNER_TOKEN', 'Owner token is invalid.', 403);
+  }
+
+  return null;
+}
+
+async function touchClubActivity(env: Env, clubId: string): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE clubs
+     SET last_active_at = CURRENT_TIMESTAMP,
+         expires_at = datetime(CURRENT_TIMESTAMP, '+3 months'),
+         updated_at = CURRENT_TIMESTAMP
+     WHERE club_id = ? AND status = 'active'`,
+  )
+    .bind(clubId)
+    .run();
+}
+
+async function cleanupExpiredData(env: Env): Promise<void> {
+  const expiredSessions = await env.DB.prepare(
+    `SELECT session_id FROM sessions
+     WHERE expires_at IS NOT NULL AND expires_at <= CURRENT_TIMESTAMP`,
+  ).all<{ session_id: string }>();
+
+  for (const session of expiredSessions.results) {
+    await deleteSessionTree(env, session.session_id);
+  }
+
+  const expiredClubs = await env.DB.prepare(
+    `SELECT club_id FROM clubs
+     WHERE (status IS NOT NULL AND status <> 'active')
+        OR (expires_at IS NOT NULL AND expires_at <= CURRENT_TIMESTAMP)`,
+  ).all<{ club_id: string }>();
+
+  for (const club of expiredClubs.results) {
+    await deleteClubTree(env, club.club_id);
+  }
+}
+
+async function deleteSessionTree(env: Env, sessionId: string): Promise<void> {
+  await env.DB.batch([
+    env.DB.prepare(`DELETE FROM votes WHERE session_id = ?`).bind(sessionId),
+    env.DB.prepare(
+      `DELETE FROM candidates
+       WHERE award_id IN (
+         SELECT award_id FROM awards WHERE session_id = ?
+       )`,
+    ).bind(sessionId),
+    env.DB.prepare(`DELETE FROM awards WHERE session_id = ?`).bind(sessionId),
+    env.DB.prepare(`DELETE FROM sessions WHERE session_id = ?`).bind(sessionId),
+  ]);
+}
+
+async function deleteClubTree(env: Env, clubId: string): Promise<void> {
+  const sessions = await env.DB.prepare(
+    `SELECT session_id FROM sessions WHERE club_id = ?`,
+  )
+    .bind(clubId)
+    .all<{ session_id: string }>();
+
+  for (const session of sessions.results) {
+    await deleteSessionTree(env, session.session_id);
+  }
+
+  await env.DB.prepare(`DELETE FROM clubs WHERE club_id = ?`).bind(clubId).run();
+}
+
 async function loadActiveVote(
   env: Env,
   rawClubSlug: string,
@@ -874,7 +1383,7 @@ async function loadActiveVote(
 > {
   const clubSlug = normalizeSlug(rawClubSlug);
   const club = await getClubBySlug(env, clubSlug);
-  if (!club) {
+  if (!club || club.status !== 'active') {
     return null;
   }
 
@@ -915,6 +1424,35 @@ async function getOpenSessionForClub(
   )
     .bind(clubId)
     .first<SessionRow>();
+}
+
+async function getCurrentSessionsForClub(
+  env: Env,
+  clubId: string,
+): Promise<SessionRow[]> {
+  const sessions = await env.DB.prepare(
+    `SELECT * FROM sessions
+     WHERE club_id = ?
+     ORDER BY datetime(updated_at) DESC, datetime(created_at) DESC
+     LIMIT 20`,
+  )
+    .bind(clubId)
+    .all<SessionRow>();
+  return sessions.results;
+}
+
+async function getOpenAwardForSession(
+  env: Env,
+  sessionId: string,
+): Promise<AwardRow | null> {
+  return env.DB.prepare(
+    `SELECT * FROM awards
+     WHERE session_id = ? AND status = 'open'
+     ORDER BY opened_at DESC
+     LIMIT 1`,
+  )
+    .bind(sessionId)
+    .first<AwardRow>();
 }
 
 async function getClubBySlug(
@@ -1027,6 +1565,53 @@ function publicCandidateCamel(candidate: CandidateRow) {
     candidateId: candidate.candidate_id,
     candidateName: candidate.candidate_name,
     displayOrder: candidate.display_order,
+  };
+}
+
+function ownerClubResponse(club: ClubRow | null) {
+  if (!club) {
+    return null;
+  }
+  return {
+    clubId: club.club_id,
+    clubName: club.club_name,
+    clubSlug: club.club_slug,
+    status: club.status,
+    lastActiveAt: club.last_active_at,
+    expiresAt: club.expires_at,
+    createdAt: club.created_at,
+    updatedAt: club.updated_at,
+  };
+}
+
+function ownerSessionResponse(session: SessionRow | null) {
+  if (!session) {
+    return null;
+  }
+  return {
+    sessionId: session.session_id,
+    clubId: session.club_id,
+    meetingTitle: session.meeting_title,
+    meetingDate: session.meeting_date,
+    status: session.status,
+    openedAt: session.opened_at,
+    closedAt: session.closed_at,
+    expiresAt: session.expires_at,
+    createdAt: session.created_at,
+    updatedAt: session.updated_at,
+  };
+}
+
+function ownerAwardResponse(award: AwardRow) {
+  return {
+    awardId: award.award_id,
+    sessionId: award.session_id,
+    awardType: award.award_type,
+    displayOrder: award.display_order,
+    status: award.status,
+    openedAt: award.opened_at,
+    closedAt: award.closed_at,
+    label: awardLabels[award.award_type],
   };
 }
 
