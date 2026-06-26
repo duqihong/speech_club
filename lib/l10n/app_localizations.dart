@@ -1148,6 +1148,24 @@ abstract class AppLocalizations {
   /// **'Reset Online Count on This Device'**
   String get onlineCountResetDeviceSetup;
 
+  /// No description provided for @onlineCountStartFreshDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Fresh on This Device'**
+  String get onlineCountStartFreshDevice;
+
+  /// No description provided for @onlineCountDangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get onlineCountDangerZone;
+
+  /// No description provided for @onlineCountDangerZoneHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use these actions only when online setup is wrong or this phone should stop using the saved online club.'**
+  String get onlineCountDangerZoneHelp;
+
   /// No description provided for @onlineCountSlugHelp.
   ///
   /// In en, this message translates to:
@@ -1601,7 +1619,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountOwnerAlreadyHasClub.
   ///
   /// In en, this message translates to:
-  /// **'This device already has an active online club. Delete the current online club before creating another one.'**
+  /// **'This device already has an active online club in the cloud. Use Start Fresh only if you want to abandon the old online club and create a new one.'**
   String get onlineCountOwnerAlreadyHasClub;
 
   /// No description provided for @onlineCountClubSlugExists.
@@ -1640,6 +1658,12 @@ abstract class AppLocalizations {
   /// **'Online Count setup reset on this device.'**
   String get onlineCountDeviceSetupReset;
 
+  /// No description provided for @onlineCountStartedFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Count started fresh on this device.'**
+  String get onlineCountStartedFresh;
+
   /// No description provided for @onlineCountTypeDeleteToContinue.
   ///
   /// In en, this message translates to:
@@ -1651,6 +1675,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type RESET to continue'**
   String get onlineCountTypeResetToContinue;
+
+  /// No description provided for @onlineCountTypeFreshToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Type FRESH to continue'**
+  String get onlineCountTypeFreshToContinue;
 
   /// No description provided for @onlineCountDeleteCurrentMeetingWarning.
   ///
@@ -1669,6 +1699,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This clears online voting setup saved on this phone.\nIt does not delete cloud records.'**
   String get onlineCountResetDeviceSetupWarning;
+
+  /// No description provided for @onlineCountStartFreshTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start fresh?'**
+  String get onlineCountStartFreshTitle;
+
+  /// No description provided for @onlineCountStartFreshWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will disconnect this phone from the previous online club.\nOld online test data may remain in the cloud until it expires.\nThe old QR code should no longer be used.\nManual Count data will not be deleted.'**
+  String get onlineCountStartFreshWarning;
 
   /// No description provided for @onlineCountLegacySessionsWarning.
   ///

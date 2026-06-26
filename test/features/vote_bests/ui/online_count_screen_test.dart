@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_club/features/vote_bests/data/online_count/online_count_models.dart';
 import 'package:speech_club/features/vote_bests/data/vote_results_recipient_repository.dart';
 import 'package:speech_club/features/vote_bests/ui/online_count_screen.dart';
 import 'package:speech_club/l10n/app_localizations.dart';
@@ -26,7 +27,10 @@ void main() {
     );
   }
 
-  Map<String, Object> savedClubPrefs({bool withSession = false}) {
+  Map<String, Object> savedClubPrefs({
+    bool withSession = false,
+    String sessionStatus = 'draft',
+  }) {
     return <String, Object>{
       'speech_club_online_owner_token_v1': 'owner-token',
       'speech_club_online_base_url_v1':
@@ -38,6 +42,7 @@ void main() {
         'speech_club_online_current_session_id_v1': 'session-1',
         'speech_club_online_current_session_title_v1': 'Regular Meeting',
         'speech_club_online_current_session_date_v1': '2026-06-26',
+        'speech_club_online_current_session_status_v1': sessionStatus,
       },
     };
   }
@@ -57,8 +62,49 @@ void main() {
     expect(textFieldWithLabel('Admin PIN'), findsOneWidget);
     expect(find.text('Current Meeting'), findsNothing);
     expect(find.text('Permanent Voting QR'), findsNothing);
+    expect(find.text('Results'), findsNothing);
     expect(find.text('Backend URL'), findsNothing);
     expect(find.text('Advanced Settings'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Start Fresh on This Device'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Start Fresh on This Device'), findsOneWidget);
+  });
+
+  test('online count UI state helper maps saved setup and meeting status', () {
+    expect(
+      resolveOnlineCountUiState(hasOnlineClub: false),
+      OnlineCountUiState.noOnlineClub,
+    );
+    expect(
+      resolveOnlineCountUiState(hasOnlineClub: true),
+      OnlineCountUiState.clubReadyNoMeeting,
+    );
+    expect(
+      resolveOnlineCountUiState(
+        hasOnlineClub: true,
+        sessionStatus: OnlineRoundStatus.draft,
+      ),
+      OnlineCountUiState.meetingDraft,
+    );
+    expect(
+      resolveOnlineCountUiState(
+        hasOnlineClub: true,
+        sessionStatus: OnlineRoundStatus.open,
+      ),
+      OnlineCountUiState.meetingOpen,
+    );
+    expect(
+      resolveOnlineCountUiState(
+        hasOnlineClub: true,
+        sessionStatus: OnlineRoundStatus.closed,
+      ),
+      OnlineCountUiState.meetingClosed,
+    );
   });
 
   testWidgets('club code auto-generates until manually edited',
@@ -96,11 +142,19 @@ void main() {
     expect(find.text('Club code: demo-club'), findsOneWidget);
     expect(find.text('Check Online Status'), findsOneWidget);
     expect(find.text('Delete Online Club'), findsOneWidget);
-    expect(find.text('Reset Online Count on This Device'), findsOneWidget);
     expect(textFieldWithLabel('Club Name'), findsNothing);
     expect(textFieldWithLabel('Club Code'), findsNothing);
     expect(textFieldWithLabel('Admin PIN'), findsNothing);
     expect(find.text('Backend URL'), findsNothing);
+
+    await tester.scrollUntilVisible(
+      find.text('Start Fresh on This Device'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Reset Online Count on This Device'), findsOneWidget);
+    expect(find.text('Start Fresh on This Device'), findsOneWidget);
   });
 
   testWidgets('saved club with no session shows no current meeting',
@@ -119,9 +173,10 @@ void main() {
     expect(find.text('No current meeting'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsOneWidget);
     expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Results'), findsNothing);
   });
 
-  testWidgets('current meeting blocks creating another meeting',
+  testWidgets('draft current meeting blocks create and hides results',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
 
@@ -137,6 +192,68 @@ void main() {
     expect(find.text('Meeting status: Draft'), findsOneWidget);
     expect(find.text('Delete Current Meeting'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
+    expect(find.text('Candidate Setup'), findsOneWidget);
+    expect(find.text('Results'), findsNothing);
+  });
+
+  testWidgets('open current meeting shows award controls and hides setup',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.open.value,
+      ),
+    );
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Current Meeting'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Meeting status: Open'), findsOneWidget);
+    expect(find.text('Create Current Meeting'), findsNothing);
+    expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Voting Round'), findsOneWidget);
+    expect(find.text('Results'), findsNothing);
+  });
+
+  testWidgets('closed current meeting shows result actions only',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.closed.value,
+      ),
+    );
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Current Meeting'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Meeting status: Closed'), findsOneWidget);
+    expect(find.text('Create Current Meeting'), findsNothing);
+    expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Voting Round'), findsNothing);
+
+    await tester.scrollUntilVisible(
+      find.text('Results'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Refresh Results'), findsOneWidget);
+    expect(find.text('Copy Results'), findsOneWidget);
+    expect(find.text('Send Results to President'), findsOneWidget);
   });
 
   testWidgets('delete current meeting confirmation requires DELETE',
@@ -174,6 +291,12 @@ void main() {
     SharedPreferences.setMockInitialValues(savedClubPrefs());
 
     await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Reset Online Count on This Device'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Reset Online Count on This Device'));
     await tester.pumpAndSettle();
 
@@ -185,6 +308,37 @@ void main() {
 
     await tester.enterText(
         textFieldWithLabel('Type RESET to continue'), 'RESET');
+    await tester.pumpAndSettle();
+
+    okButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'OK'),
+    );
+    expect(okButton.onPressed, isNotNull);
+  });
+
+  testWidgets('start fresh confirmation requires FRESH',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs());
+
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Start Fresh on This Device'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start Fresh on This Device'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Start fresh?'), findsOneWidget);
+    expect(find.text('Type FRESH to continue'), findsOneWidget);
+    FilledButton okButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'OK'),
+    );
+    expect(okButton.onPressed, isNull);
+
+    await tester.enterText(
+        textFieldWithLabel('Type FRESH to continue'), 'FRESH');
     await tester.pumpAndSettle();
 
     okButton = tester.widget<FilledButton>(
@@ -219,7 +373,12 @@ void main() {
 
   testWidgets('results card shows send button and shared president contact',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.closed.value,
+      ),
+    );
     await VoteResultsRecipientRepository().save(
       name: 'Ada President',
       phoneNumber: '+65 9664 5650',
@@ -243,7 +402,12 @@ void main() {
 
   testWidgets('send results asks to refresh before sending stale results',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.closed.value,
+      ),
+    );
 
     await pumpOnlineCountScreen(tester);
 

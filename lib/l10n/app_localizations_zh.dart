@@ -545,6 +545,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountResetDeviceSetup => '重置本机在线计票资料';
 
   @override
+  String get onlineCountStartFreshDevice => '本机重新开始';
+
+  @override
+  String get onlineCountDangerZone => '危险操作';
+
+  @override
+  String get onlineCountDangerZoneHelp => '仅在在线设置错误，或本机不应继续使用已保存在线俱乐部时使用这些操作。';
+
+  @override
   String get onlineCountSlugHelp => '用于永久投票链接。请使用小写字母、数字和连字符。';
 
   @override
@@ -774,7 +783,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountOwnerAlreadyHasClub =>
-      '本机已有一个在线俱乐部。请先删除当前在线俱乐部，再创建新的俱乐部。';
+      '本机在云端已有一个在线俱乐部。如需放弃旧在线俱乐部并创建新的，请使用“本机重新开始”。';
 
   @override
   String get onlineCountClubSlugExists => '这个俱乐部代号已经被使用，请换一个代号。';
@@ -795,10 +804,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountDeviceSetupReset => '本机在线计票设置已重置。';
 
   @override
+  String get onlineCountStartedFresh => '本机在线计票已重新开始。';
+
+  @override
   String get onlineCountTypeDeleteToContinue => '输入 DELETE 继续';
 
   @override
   String get onlineCountTypeResetToContinue => '输入 RESET 继续';
+
+  @override
+  String get onlineCountTypeFreshToContinue => '输入 FRESH 继续';
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
@@ -811,6 +826,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get onlineCountResetDeviceSetupWarning =>
       '这会清除本机保存的在线投票设置。\n不会删除云端记录。';
+
+  @override
+  String get onlineCountStartFreshTitle => '要重新开始吗？';
+
+  @override
+  String get onlineCountStartFreshWarning =>
+      '这会让本机断开之前的在线俱乐部。\n旧的在线测试资料可能会保留在云端，直到自动过期。\n旧二维码不应继续使用。\n本机手动计票资料不会被删除。';
 
   @override
   String get onlineCountLegacySessionsWarning => '云端存在多个旧会议。当前显示最新会议。';

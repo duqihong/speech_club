@@ -566,6 +566,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountResetDeviceSetup => 'Reset Online Count on This Device';
 
   @override
+  String get onlineCountStartFreshDevice => 'Start Fresh on This Device';
+
+  @override
+  String get onlineCountDangerZone => 'Danger Zone';
+
+  @override
+  String get onlineCountDangerZoneHelp =>
+      'Use these actions only when online setup is wrong or this phone should stop using the saved online club.';
+
+  @override
   String get onlineCountSlugHelp =>
       'Used in the permanent voting link. Use lowercase letters, numbers, and hyphens.';
 
@@ -813,7 +823,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountOwnerAlreadyHasClub =>
-      'This device already has an active online club. Delete the current online club before creating another one.';
+      'This device already has an active online club in the cloud. Use Start Fresh only if you want to abandon the old online club and create a new one.';
 
   @override
   String get onlineCountClubSlugExists =>
@@ -838,10 +848,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Online Count setup reset on this device.';
 
   @override
+  String get onlineCountStartedFresh =>
+      'Online Count started fresh on this device.';
+
+  @override
   String get onlineCountTypeDeleteToContinue => 'Type DELETE to continue';
 
   @override
   String get onlineCountTypeResetToContinue => 'Type RESET to continue';
+
+  @override
+  String get onlineCountTypeFreshToContinue => 'Type FRESH to continue';
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
@@ -854,6 +871,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onlineCountResetDeviceSetupWarning =>
       'This clears online voting setup saved on this phone.\nIt does not delete cloud records.';
+
+  @override
+  String get onlineCountStartFreshTitle => 'Start fresh?';
+
+  @override
+  String get onlineCountStartFreshWarning =>
+      'This will disconnect this phone from the previous online club.\nOld online test data may remain in the cloud until it expires.\nThe old QR code should no longer be used.\nManual Count data will not be deleted.';
 
   @override
   String get onlineCountLegacySessionsWarning =>

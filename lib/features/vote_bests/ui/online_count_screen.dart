@@ -15,6 +15,29 @@ import '../data/vote_results_share_helper.dart';
 import '../data/whatsapp_phone_normalizer.dart';
 import 'president_contact_dialog.dart';
 
+enum OnlineCountUiState {
+  noOnlineClub,
+  clubReadyNoMeeting,
+  meetingDraft,
+  meetingOpen,
+  meetingClosed,
+}
+
+OnlineCountUiState resolveOnlineCountUiState({
+  required bool hasOnlineClub,
+  OnlineRoundStatus? sessionStatus,
+}) {
+  if (!hasOnlineClub) {
+    return OnlineCountUiState.noOnlineClub;
+  }
+  return switch (sessionStatus) {
+    null => OnlineCountUiState.clubReadyNoMeeting,
+    OnlineRoundStatus.draft => OnlineCountUiState.meetingDraft,
+    OnlineRoundStatus.open => OnlineCountUiState.meetingOpen,
+    OnlineRoundStatus.closed => OnlineCountUiState.meetingClosed,
+  };
+}
+
 class OnlineCountScreen extends StatefulWidget {
   OnlineCountScreen({
     super.key,
@@ -118,7 +141,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           clubId: '',
           meetingTitle: _meetingTitleController.text,
           meetingDate: _meetingDateController.text,
-          status: OnlineRoundStatus.draft,
+          status: OnlineRoundStatus.fromValue(setup.currentSessionStatus),
         );
       }
       _loaded = true;
@@ -164,6 +187,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         currentSessionId: _session?.id ?? '',
         currentSessionTitle: _meetingTitleController.text.trim(),
         currentSessionDate: _meetingDateController.text.trim(),
+        currentSessionStatus:
+            _session?.status.value ?? OnlineRoundStatus.draft.value,
         ownerToken: _ownerToken,
       ),
     );
@@ -245,6 +270,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         return;
       }
       setState(() => _session = updated.copyWith(awards: _awards));
+      await _saveSetup(showMessage: false);
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -285,6 +311,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             .toList(growable: false);
       });
       await _refreshResults(showErrors: false);
+      await _saveSetup(showMessage: false);
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -530,12 +557,39 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     _showMessage(l10n.onlineCountDeviceSetupReset);
   }
 
+  Future<void> _startFreshOnThisDevice() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final bool confirmed = await _confirmTypedAction(
+      title: l10n.onlineCountStartFreshTitle,
+      message: l10n.onlineCountStartFreshWarning,
+      requiredText: 'FRESH',
+      confirmationLabel: l10n.onlineCountTypeFreshToContinue,
+    );
+    if (!confirmed) {
+      return;
+    }
+    await _storage.startFreshOnThisDevice();
+    final OnlineCountSetup setup = await _storage.load();
+    if (!mounted) {
+      return;
+    }
+    _applyEmptySetup(setup);
+    _showMessage(l10n.onlineCountStartedFresh);
+  }
+
   Future<void> _resetLocalOnlineCount({required bool showMessage}) async {
     await _storage.resetOnlineCountOnThisDevice();
     final OnlineCountSetup setup = await _storage.load();
     if (!mounted) {
       return;
     }
+    _applyEmptySetup(setup);
+    if (showMessage) {
+      _showMessage(AppLocalizations.of(context)!.onlineCountDeviceSetupReset);
+    }
+  }
+
+  void _applyEmptySetup(OnlineCountSetup setup) {
     setState(() {
       _ownerToken = setup.ownerToken;
       _baseUrlController.text = setup.baseUrl;
@@ -557,9 +611,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         controller.clear();
       }
     });
-    if (showMessage) {
-      _showMessage(AppLocalizations.of(context)!.onlineCountDeviceSetupReset);
-    }
   }
 
   void _replaceAward(OnlineAward updated) {
@@ -718,6 +769,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   bool get _canCloseMeeting =>
       _session != null && _session!.status == OnlineRoundStatus.open;
 
+  OnlineCountUiState get _uiState {
+    return resolveOnlineCountUiState(
+      hasOnlineClub: _clubCreated && _hasCloudSetup(),
+      sessionStatus: _session?.status,
+    );
+  }
+
   OnlineAward? _awardForType(OnlineAwardType type) {
     for (final OnlineAward award in _awards) {
       if (award.type == type) {
@@ -856,25 +914,50 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          children: _clubCreated && _hasCloudSetup()
-              ? <Widget>[
-                  _buildLockedClubCard(l10n),
-                  _buildPermanentQrCard(l10n),
-                  _buildVotingLinkCard(l10n),
-                  _buildMeetingCard(l10n),
-                  if (_session != null &&
-                      _session!.status != OnlineRoundStatus.closed)
-                    _buildCandidateSetupCard(l10n),
-                  if (_session?.status == OnlineRoundStatus.open)
-                    _buildVotingRoundCard(l10n),
-                  if (_session != null) _buildResultsCard(l10n),
-                ]
-              : <Widget>[
-                  _buildCloudSetupCard(l10n),
-                ],
+          children: _buildStateSections(l10n),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildStateSections(AppLocalizations l10n) {
+    return switch (_uiState) {
+      OnlineCountUiState.noOnlineClub => <Widget>[
+          _buildCloudSetupCard(l10n),
+          _buildDangerZoneCard(l10n),
+        ],
+      OnlineCountUiState.clubReadyNoMeeting => <Widget>[
+          _buildLockedClubCard(l10n),
+          _buildPermanentQrCard(l10n),
+          _buildVotingLinkCard(l10n),
+          _buildMeetingCard(l10n),
+          _buildDangerZoneCard(l10n),
+        ],
+      OnlineCountUiState.meetingDraft => <Widget>[
+          _buildLockedClubCard(l10n),
+          _buildPermanentQrCard(l10n),
+          _buildVotingLinkCard(l10n),
+          _buildMeetingCard(l10n),
+          _buildCandidateSetupCard(l10n),
+          _buildDangerZoneCard(l10n),
+        ],
+      OnlineCountUiState.meetingOpen => <Widget>[
+          _buildLockedClubCard(l10n),
+          _buildPermanentQrCard(l10n),
+          _buildVotingLinkCard(l10n),
+          _buildMeetingCard(l10n),
+          _buildVotingRoundCard(l10n),
+          _buildDangerZoneCard(l10n),
+        ],
+      OnlineCountUiState.meetingClosed => <Widget>[
+          _buildLockedClubCard(l10n),
+          _buildPermanentQrCard(l10n),
+          _buildVotingLinkCard(l10n),
+          _buildMeetingCard(l10n),
+          _buildResultsCard(l10n),
+          _buildDangerZoneCard(l10n),
+        ],
+    };
   }
 
   Widget _buildCloudSetupCard(AppLocalizations l10n) {
@@ -970,11 +1053,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               icon: const Icon(Icons.delete_forever_outlined),
               label: Text(l10n.onlineCountDeleteOnlineClub),
             ),
-            OutlinedButton.icon(
-              onPressed: _resetOnlineCountOnThisDevice,
-              icon: const Icon(Icons.restart_alt_outlined),
-              label: Text(l10n.onlineCountResetDeviceSetup),
-            ),
           ],
         ),
         ExpansionTile(
@@ -990,6 +1068,31 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               controller: _baseUrlController,
               label: l10n.onlineCountBackendUrl,
               keyboardType: TextInputType.url,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDangerZoneCard(AppLocalizations l10n) {
+    return _SectionCard(
+      title: l10n.onlineCountDangerZone,
+      icon: Icons.warning_amber_outlined,
+      children: <Widget>[
+        _BodyText(l10n.onlineCountDangerZoneHelp),
+        const SizedBox(height: 8),
+        _buttonWrap(
+          <Widget>[
+            OutlinedButton.icon(
+              onPressed: _resetOnlineCountOnThisDevice,
+              icon: const Icon(Icons.restart_alt_outlined),
+              label: Text(l10n.onlineCountResetDeviceSetup),
+            ),
+            OutlinedButton.icon(
+              onPressed: _startFreshOnThisDevice,
+              icon: const Icon(Icons.refresh_outlined),
+              label: Text(l10n.onlineCountStartFreshDevice),
             ),
           ],
         ),

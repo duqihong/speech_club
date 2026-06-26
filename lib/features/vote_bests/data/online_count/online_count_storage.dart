@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'online_count_api.dart';
+import 'online_count_models.dart';
 
 class OnlineCountSetup {
   const OnlineCountSetup({
@@ -14,10 +15,11 @@ class OnlineCountSetup {
     required this.currentSessionId,
     required this.currentSessionTitle,
     required this.currentSessionDate,
+    required this.currentSessionStatus,
   });
 
   factory OnlineCountSetup.empty() {
-    return const OnlineCountSetup(
+    return OnlineCountSetup(
       ownerToken: '',
       baseUrl: OnlineCountApi.defaultBaseUrl,
       clubName: '',
@@ -26,6 +28,7 @@ class OnlineCountSetup {
       currentSessionId: '',
       currentSessionTitle: 'Regular Meeting',
       currentSessionDate: '',
+      currentSessionStatus: OnlineRoundStatus.draft.value,
     );
   }
 
@@ -37,6 +40,7 @@ class OnlineCountSetup {
   final String currentSessionId;
   final String currentSessionTitle;
   final String currentSessionDate;
+  final String currentSessionStatus;
 
   OnlineCountSetup copyWith({
     String? ownerToken,
@@ -47,6 +51,7 @@ class OnlineCountSetup {
     String? currentSessionId,
     String? currentSessionTitle,
     String? currentSessionDate,
+    String? currentSessionStatus,
   }) {
     return OnlineCountSetup(
       ownerToken: ownerToken ?? this.ownerToken,
@@ -57,6 +62,7 @@ class OnlineCountSetup {
       currentSessionId: currentSessionId ?? this.currentSessionId,
       currentSessionTitle: currentSessionTitle ?? this.currentSessionTitle,
       currentSessionDate: currentSessionDate ?? this.currentSessionDate,
+      currentSessionStatus: currentSessionStatus ?? this.currentSessionStatus,
     );
   }
 }
@@ -73,6 +79,8 @@ class OnlineCountStorage {
       'speech_club_online_current_session_title_v1';
   static const String _sessionDateKey =
       'speech_club_online_current_session_date_v1';
+  static const String _sessionStatusKey =
+      'speech_club_online_current_session_status_v1';
 
   Future<OnlineCountSetup> load() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -87,6 +95,8 @@ class OnlineCountStorage {
       currentSessionTitle:
           prefs.getString(_sessionTitleKey) ?? 'Regular Meeting',
       currentSessionDate: prefs.getString(_sessionDateKey) ?? '',
+      currentSessionStatus:
+          prefs.getString(_sessionStatusKey) ?? OnlineRoundStatus.draft.value,
     );
   }
 
@@ -100,11 +110,22 @@ class OnlineCountStorage {
     await prefs.setString(_sessionIdKey, setup.currentSessionId);
     await prefs.setString(_sessionTitleKey, setup.currentSessionTitle);
     await prefs.setString(_sessionDateKey, setup.currentSessionDate);
+    await prefs.setString(_sessionStatusKey, setup.currentSessionStatus);
   }
 
   Future<void> resetOnlineCountOnThisDevice() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await _loadOrCreateOwnerToken(prefs);
+    await _clearLocalSetup(prefs);
+  }
+
+  Future<void> startFreshOnThisDevice() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_ownerTokenKey, _generateOwnerToken());
+    await _clearLocalSetup(prefs);
+  }
+
+  Future<void> _clearLocalSetup(SharedPreferences prefs) async {
     await prefs.setString(_baseUrlKey, OnlineCountApi.defaultBaseUrl);
     await prefs.remove(_clubNameKey);
     await prefs.remove(_clubSlugKey);
@@ -112,6 +133,7 @@ class OnlineCountStorage {
     await prefs.remove(_sessionIdKey);
     await prefs.remove(_sessionTitleKey);
     await prefs.remove(_sessionDateKey);
+    await prefs.remove(_sessionStatusKey);
   }
 
   Future<String> _loadOrCreateOwnerToken(SharedPreferences prefs) async {
@@ -125,7 +147,7 @@ class OnlineCountStorage {
     return token;
   }
 
-  String _generateOwnerToken() {
+  static String _generateOwnerToken() {
     final Random random = Random.secure();
     final int partA = random.nextInt(1 << 32);
     final int partB = random.nextInt(1 << 32);
