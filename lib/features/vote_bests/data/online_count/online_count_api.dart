@@ -53,6 +53,99 @@ class OnlineCountApi {
     });
   }
 
+  Future<OnlineClub> createOwnerClub({
+    required String ownerToken,
+    required String clubName,
+    required String clubSlug,
+    required String adminPin,
+  }) async {
+    final Map<String, dynamic> json = await _postJson(
+      '/api/owner/club',
+      ownerToken: ownerToken,
+      body: <String, String>{
+        'clubName': clubName,
+        'clubSlug': clubSlug,
+        'adminPin': adminPin,
+      },
+    );
+    return OnlineClub.fromJson(_readMap(json['club']));
+  }
+
+  Future<OnlineClub> verifyOwnerClub({
+    required String ownerToken,
+    required String clubSlug,
+    required String adminPin,
+  }) async {
+    final Map<String, dynamic> json = await _postJson(
+      '/api/owner/club/${Uri.encodeComponent(clubSlug)}/verify',
+      ownerToken: ownerToken,
+      adminPin: adminPin,
+    );
+    return OnlineClub.fromJson(_readMap(json['club']));
+  }
+
+  Future<OnlineClubStatus> getOwnerClubStatus({
+    required String ownerToken,
+    required String clubSlug,
+    required String adminPin,
+  }) async {
+    final Map<String, dynamic> json = await _getJson(
+      '/api/owner/club/${Uri.encodeComponent(clubSlug)}/status',
+      ownerToken: ownerToken,
+      adminPin: adminPin,
+    );
+    return OnlineClubStatus.fromJson(json);
+  }
+
+  Future<OnlineSession> createCurrentMeeting({
+    required String ownerToken,
+    required String clubSlug,
+    required String adminPin,
+    required String meetingTitle,
+    required String meetingDate,
+  }) async {
+    final Map<String, dynamic> json = await _postJson(
+      '/api/owner/club/${Uri.encodeComponent(clubSlug)}/session',
+      ownerToken: ownerToken,
+      adminPin: adminPin,
+      body: <String, String>{
+        'meetingTitle': meetingTitle,
+        'meetingDate': meetingDate,
+      },
+    );
+    final List<OnlineAward> awards = _readList(json['awards'])
+        .map(OnlineAward.fromJson)
+        .toList(growable: false);
+    return OnlineSession.fromJson(
+      _readMap(json['session']),
+      awards: awards,
+    );
+  }
+
+  Future<void> deleteCurrentMeeting({
+    required String ownerToken,
+    required String sessionId,
+    required String adminPin,
+  }) async {
+    await _deleteJson(
+      '/api/owner/session/${Uri.encodeComponent(sessionId)}',
+      ownerToken: ownerToken,
+      adminPin: adminPin,
+    );
+  }
+
+  Future<void> deleteOnlineClub({
+    required String ownerToken,
+    required String clubSlug,
+    required String adminPin,
+  }) async {
+    await _deleteJson(
+      '/api/owner/club/${Uri.encodeComponent(clubSlug)}',
+      ownerToken: ownerToken,
+      adminPin: adminPin,
+    );
+  }
+
   Future<OnlineSession> createSession({
     required String clubSlug,
     required String adminPin,
@@ -79,12 +172,14 @@ class OnlineCountApi {
   Future<List<OnlineCandidate>> replaceCandidates({
     required String sessionId,
     required String adminPin,
+    String? ownerToken,
     required String awardType,
     required List<String> candidates,
   }) async {
     final Map<String, dynamic> json = await _postJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/candidates',
       adminPin: adminPin,
+      ownerToken: ownerToken,
       body: <String, dynamic>{
         'awardType': awardType,
         'candidates': candidates,
@@ -98,10 +193,12 @@ class OnlineCountApi {
   Future<OnlineSession> openSession({
     required String sessionId,
     required String adminPin,
+    String? ownerToken,
   }) async {
     final Map<String, dynamic> json = await _postJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/open',
       adminPin: adminPin,
+      ownerToken: ownerToken,
     );
     return OnlineSession.fromJson(_readMap(json['session']));
   }
@@ -110,11 +207,13 @@ class OnlineCountApi {
     required String sessionId,
     required String awardId,
     required String adminPin,
+    String? ownerToken,
   }) async {
     final Map<String, dynamic> json = await _postJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/award/'
       '${Uri.encodeComponent(awardId)}/open',
       adminPin: adminPin,
+      ownerToken: ownerToken,
     );
     return OnlineAward.fromJson(_readMap(json['award']));
   }
@@ -123,11 +222,13 @@ class OnlineCountApi {
     required String sessionId,
     required String awardId,
     required String adminPin,
+    String? ownerToken,
   }) async {
     final Map<String, dynamic> json = await _postJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/award/'
       '${Uri.encodeComponent(awardId)}/close',
       adminPin: adminPin,
+      ownerToken: ownerToken,
     );
     return OnlineAward.fromJson(_readMap(json['award']));
   }
@@ -135,10 +236,12 @@ class OnlineCountApi {
   Future<OnlineSession> closeSession({
     required String sessionId,
     required String adminPin,
+    String? ownerToken,
   }) async {
     final Map<String, dynamic> json = await _postJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/close',
       adminPin: adminPin,
+      ownerToken: ownerToken,
     );
     return OnlineSession.fromJson(_readMap(json['session']));
   }
@@ -146,10 +249,12 @@ class OnlineCountApi {
   Future<OnlineResults> getResults({
     required String sessionId,
     required String adminPin,
+    String? ownerToken,
   }) async {
     final Map<String, dynamic> json = await _getJson(
       '/api/admin/session/${Uri.encodeComponent(sessionId)}/results',
       adminPin: adminPin,
+      ownerToken: ownerToken,
     );
     return OnlineResults.fromJson(json);
   }
@@ -165,9 +270,10 @@ class OnlineCountApi {
   Future<Map<String, dynamic>> _getJson(
     String path, {
     String? adminPin,
+    String? ownerToken,
   }) async {
     final http.Response response = await _client
-        .get(_uri(path), headers: _headers(adminPin))
+        .get(_uri(path), headers: _headers(adminPin, ownerToken: ownerToken))
         .timeout(_timeout);
     return _decodeResponse(response);
   }
@@ -175,24 +281,37 @@ class OnlineCountApi {
   Future<Map<String, dynamic>> _postJson(
     String path, {
     String? adminPin,
+    String? ownerToken,
     Map<String, dynamic>? body,
   }) async {
     final http.Response response = await _client
         .post(
           _uri(path),
-          headers: _headers(adminPin),
+          headers: _headers(adminPin, ownerToken: ownerToken),
           body: jsonEncode(body ?? <String, dynamic>{}),
         )
         .timeout(_timeout);
     return _decodeResponse(response);
   }
 
+  Future<Map<String, dynamic>> _deleteJson(
+    String path, {
+    String? adminPin,
+    String? ownerToken,
+  }) async {
+    final http.Response response = await _client
+        .delete(_uri(path), headers: _headers(adminPin, ownerToken: ownerToken))
+        .timeout(_timeout);
+    return _decodeResponse(response);
+  }
+
   Uri _uri(String path) => Uri.parse('$baseUrl$path');
 
-  Map<String, String> _headers(String? adminPin) {
+  Map<String, String> _headers(String? adminPin, {String? ownerToken}) {
     return <String, String>{
       'Content-Type': 'application/json',
       if (adminPin != null) 'X-Admin-Pin': adminPin,
+      if (ownerToken != null) 'X-Owner-Token': ownerToken,
     };
   }
 

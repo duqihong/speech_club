@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'online_count_api.dart';
 
 class OnlineCountSetup {
   const OnlineCountSetup({
+    required this.ownerToken,
     required this.baseUrl,
     required this.clubName,
     required this.clubSlug,
@@ -15,6 +18,7 @@ class OnlineCountSetup {
 
   factory OnlineCountSetup.empty() {
     return const OnlineCountSetup(
+      ownerToken: '',
       baseUrl: OnlineCountApi.defaultBaseUrl,
       clubName: '',
       clubSlug: '',
@@ -25,6 +29,7 @@ class OnlineCountSetup {
     );
   }
 
+  final String ownerToken;
   final String baseUrl;
   final String clubName;
   final String clubSlug;
@@ -34,6 +39,7 @@ class OnlineCountSetup {
   final String currentSessionDate;
 
   OnlineCountSetup copyWith({
+    String? ownerToken,
     String? baseUrl,
     String? clubName,
     String? clubSlug,
@@ -43,6 +49,7 @@ class OnlineCountSetup {
     String? currentSessionDate,
   }) {
     return OnlineCountSetup(
+      ownerToken: ownerToken ?? this.ownerToken,
       baseUrl: baseUrl ?? this.baseUrl,
       clubName: clubName ?? this.clubName,
       clubSlug: clubSlug ?? this.clubSlug,
@@ -55,6 +62,7 @@ class OnlineCountSetup {
 }
 
 class OnlineCountStorage {
+  static const String _ownerTokenKey = 'speech_club_online_owner_token_v1';
   static const String _baseUrlKey = 'speech_club_online_base_url_v1';
   static const String _clubNameKey = 'speech_club_online_club_name_v1';
   static const String _clubSlugKey = 'speech_club_online_club_slug_v1';
@@ -68,7 +76,9 @@ class OnlineCountStorage {
 
   Future<OnlineCountSetup> load() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String ownerToken = await _loadOrCreateOwnerToken(prefs);
     return OnlineCountSetup(
+      ownerToken: ownerToken,
       baseUrl: prefs.getString(_baseUrlKey) ?? OnlineCountApi.defaultBaseUrl,
       clubName: prefs.getString(_clubNameKey) ?? '',
       clubSlug: prefs.getString(_clubSlugKey) ?? '',
@@ -82,6 +92,7 @@ class OnlineCountStorage {
 
   Future<void> saveSetup(OnlineCountSetup setup) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_ownerTokenKey, setup.ownerToken);
     await prefs.setString(_baseUrlKey, setup.baseUrl);
     await prefs.setString(_clubNameKey, setup.clubName);
     await prefs.setString(_clubSlugKey, setup.clubSlug);
@@ -89,5 +100,35 @@ class OnlineCountStorage {
     await prefs.setString(_sessionIdKey, setup.currentSessionId);
     await prefs.setString(_sessionTitleKey, setup.currentSessionTitle);
     await prefs.setString(_sessionDateKey, setup.currentSessionDate);
+  }
+
+  Future<void> resetOnlineCountOnThisDevice() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _loadOrCreateOwnerToken(prefs);
+    await prefs.setString(_baseUrlKey, OnlineCountApi.defaultBaseUrl);
+    await prefs.remove(_clubNameKey);
+    await prefs.remove(_clubSlugKey);
+    await prefs.remove(_adminPinKey);
+    await prefs.remove(_sessionIdKey);
+    await prefs.remove(_sessionTitleKey);
+    await prefs.remove(_sessionDateKey);
+  }
+
+  Future<String> _loadOrCreateOwnerToken(SharedPreferences prefs) async {
+    final String? existing = prefs.getString(_ownerTokenKey);
+    if (existing != null && existing.isNotEmpty) {
+      return existing;
+    }
+
+    final String token = _generateOwnerToken();
+    await prefs.setString(_ownerTokenKey, token);
+    return token;
+  }
+
+  String _generateOwnerToken() {
+    final Random random = Random.secure();
+    final int partA = random.nextInt(1 << 32);
+    final int partB = random.nextInt(1 << 32);
+    return 'owner-${DateTime.now().microsecondsSinceEpoch}-$partA-$partB';
   }
 }

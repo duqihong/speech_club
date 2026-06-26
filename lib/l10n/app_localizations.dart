@@ -1124,6 +1124,30 @@ abstract class AppLocalizations {
   /// **'Create Online Club'**
   String get onlineCountCreateClub;
 
+  /// No description provided for @onlineCountClubReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Club Ready'**
+  String get onlineCountClubReadyTitle;
+
+  /// No description provided for @onlineCountCheckOnlineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Online Status'**
+  String get onlineCountCheckOnlineStatus;
+
+  /// No description provided for @onlineCountDeleteOnlineClub.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Online Club'**
+  String get onlineCountDeleteOnlineClub;
+
+  /// No description provided for @onlineCountResetDeviceSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Online Count on This Device'**
+  String get onlineCountResetDeviceSetup;
+
   /// No description provided for @onlineCountSlugHelp.
   ///
   /// In en, this message translates to:
@@ -1273,6 +1297,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Meeting'**
   String get onlineCountCreateMeeting;
+
+  /// No description provided for @onlineCountCreateCurrentMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Current Meeting'**
+  String get onlineCountCreateCurrentMeeting;
+
+  /// No description provided for @onlineCountNoCurrentMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'No current meeting'**
+  String get onlineCountNoCurrentMeeting;
+
+  /// No description provided for @onlineCountDeleteCurrentMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Current Meeting'**
+  String get onlineCountDeleteCurrentMeeting;
 
   /// No description provided for @onlineCountOpenMeeting.
   ///
@@ -1555,6 +1597,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Online club may already exist. Try another club code or continue with the saved setup.'**
   String get onlineCountClubMayExist;
+
+  /// No description provided for @onlineCountOwnerAlreadyHasClub.
+  ///
+  /// In en, this message translates to:
+  /// **'This device already has an active online club. Delete the current online club before creating another one.'**
+  String get onlineCountOwnerAlreadyHasClub;
+
+  /// No description provided for @onlineCountClubSlugExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This club code is already used. Please choose another club code.'**
+  String get onlineCountClubSlugExists;
+
+  /// No description provided for @onlineCountCurrentMeetingExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A current meeting already exists. Delete the current meeting before creating a new one.'**
+  String get onlineCountCurrentMeetingExists;
+
+  /// No description provided for @onlineCountOwnerOrAdminInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner token or admin PIN is invalid.'**
+  String get onlineCountOwnerOrAdminInvalid;
+
+  /// No description provided for @onlineCountCurrentMeetingDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Current meeting deleted.'**
+  String get onlineCountCurrentMeetingDeleted;
+
+  /// No description provided for @onlineCountOnlineClubDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Online club deleted.'**
+  String get onlineCountOnlineClubDeleted;
+
+  /// No description provided for @onlineCountDeviceSetupReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Count setup reset on this device.'**
+  String get onlineCountDeviceSetupReset;
+
+  /// No description provided for @onlineCountTypeDeleteToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to continue'**
+  String get onlineCountTypeDeleteToContinue;
+
+  /// No description provided for @onlineCountTypeResetToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Type RESET to continue'**
+  String get onlineCountTypeResetToContinue;
+
+  /// No description provided for @onlineCountDeleteCurrentMeetingWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease copy or send results before deleting.'**
+  String get onlineCountDeleteCurrentMeetingWarning;
+
+  /// No description provided for @onlineCountDeleteOnlineClubWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.'**
+  String get onlineCountDeleteOnlineClubWarning;
+
+  /// No description provided for @onlineCountResetDeviceSetupWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears online voting setup saved on this phone.\nIt does not delete cloud records.'**
+  String get onlineCountResetDeviceSetupWarning;
+
+  /// No description provided for @onlineCountLegacySessionsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'More than one legacy meeting exists online. The newest meeting is shown.'**
+  String get onlineCountLegacySessionsWarning;
 
   /// No description provided for @onlineCountNoSessionYet.
   ///

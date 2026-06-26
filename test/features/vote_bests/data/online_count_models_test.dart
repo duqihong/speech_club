@@ -54,5 +54,45 @@ void main() {
         '最佳点评者',
       );
     });
+
+    test('owner status parses current session and active award', () {
+      final OnlineClubStatus status = OnlineClubStatus.fromJson(
+        <String, dynamic>{
+          'club': <String, dynamic>{
+            'clubId': 'club-1',
+            'clubName': 'Demo Club',
+            'clubSlug': 'demo-club',
+            'expiresAt': '2026-09-26 00:00:00',
+          },
+          'currentSession': <String, dynamic>{
+            'sessionId': 'session-1',
+            'clubId': 'club-1',
+            'meetingTitle': 'Regular Meeting',
+            'meetingDate': '2026-06-26',
+            'status': 'open',
+            'expiresAt': '2026-07-03 00:00:00',
+          },
+          'activeAward': <String, dynamic>{
+            'awardId': 'award-1',
+            'sessionId': 'session-1',
+            'awardType': 'best_speaker',
+            'status': 'open',
+          },
+          'summary': <String, dynamic>{
+            'hasCurrentSession': true,
+            'hasActiveAward': true,
+            'canCreateMeeting': false,
+            'canCreateClub': false,
+            'legacyMultipleSessions': true,
+          },
+        },
+      );
+
+      expect(status.club.expiresAt, '2026-09-26 00:00:00');
+      expect(status.currentSession?.id, 'session-1');
+      expect(status.currentSession?.status, OnlineRoundStatus.open);
+      expect(status.activeAward?.type, OnlineAwardType.bestSpeaker);
+      expect(status.summary.legacyMultipleSessions, isTrue);
+    });
   });
 }

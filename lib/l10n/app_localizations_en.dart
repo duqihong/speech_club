@@ -554,6 +554,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountCreateClub => 'Create Online Club';
 
   @override
+  String get onlineCountClubReadyTitle => 'Online Club Ready';
+
+  @override
+  String get onlineCountCheckOnlineStatus => 'Check Online Status';
+
+  @override
+  String get onlineCountDeleteOnlineClub => 'Delete Online Club';
+
+  @override
+  String get onlineCountResetDeviceSetup => 'Reset Online Count on This Device';
+
+  @override
   String get onlineCountSlugHelp =>
       'Used in the permanent voting link. Use lowercase letters, numbers, and hyphens.';
 
@@ -637,6 +649,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCreateMeeting => 'Create Meeting';
+
+  @override
+  String get onlineCountCreateCurrentMeeting => 'Create Current Meeting';
+
+  @override
+  String get onlineCountNoCurrentMeeting => 'No current meeting';
+
+  @override
+  String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
 
   @override
   String get onlineCountOpenMeeting => 'Open Meeting';
@@ -789,6 +810,54 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onlineCountClubMayExist =>
       'Online club may already exist. Try another club code or continue with the saved setup.';
+
+  @override
+  String get onlineCountOwnerAlreadyHasClub =>
+      'This device already has an active online club. Delete the current online club before creating another one.';
+
+  @override
+  String get onlineCountClubSlugExists =>
+      'This club code is already used. Please choose another club code.';
+
+  @override
+  String get onlineCountCurrentMeetingExists =>
+      'A current meeting already exists. Delete the current meeting before creating a new one.';
+
+  @override
+  String get onlineCountOwnerOrAdminInvalid =>
+      'Owner token or admin PIN is invalid.';
+
+  @override
+  String get onlineCountCurrentMeetingDeleted => 'Current meeting deleted.';
+
+  @override
+  String get onlineCountOnlineClubDeleted => 'Online club deleted.';
+
+  @override
+  String get onlineCountDeviceSetupReset =>
+      'Online Count setup reset on this device.';
+
+  @override
+  String get onlineCountTypeDeleteToContinue => 'Type DELETE to continue';
+
+  @override
+  String get onlineCountTypeResetToContinue => 'Type RESET to continue';
+
+  @override
+  String get onlineCountDeleteCurrentMeetingWarning =>
+      'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease copy or send results before deleting.';
+
+  @override
+  String get onlineCountDeleteOnlineClubWarning =>
+      'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.';
+
+  @override
+  String get onlineCountResetDeviceSetupWarning =>
+      'This clears online voting setup saved on this phone.\nIt does not delete cloud records.';
+
+  @override
+  String get onlineCountLegacySessionsWarning =>
+      'More than one legacy meeting exists online. The newest meeting is shown.';
 
   @override
   String get onlineCountNoSessionYet =>

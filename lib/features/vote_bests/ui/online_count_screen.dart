@@ -57,11 +57,14 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   OnlineSession? _session;
   List<OnlineAward> _awards = <OnlineAward>[];
   OnlineResults? _results;
+  String _ownerToken = '';
   String? _busyAction;
   String _lastGeneratedClubCode = '';
   bool _clubCodeManuallyEdited = false;
   bool _clubCreated = false;
   bool _loaded = false;
+  bool _legacyMultipleSessions = false;
+  OnlineAward? _activeAward;
   _QrLinkType? _selectedQrType;
   late Future<VoteResultsRecipient?> _recipientFuture;
 
@@ -94,6 +97,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       return;
     }
     setState(() {
+      _ownerToken = setup.ownerToken;
       _baseUrlController.text = setup.baseUrl;
       _clubNameController.text = setup.clubName;
       _clubSlugController.text = setup.clubSlug;
@@ -107,6 +111,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _meetingDateController.text = setup.currentSessionDate.isEmpty
           ? _todayText()
           : setup.currentSessionDate;
+      _clubCreated = _hasSavedClub(setup);
       if (setup.currentSessionId.isNotEmpty) {
         _session = OnlineSession(
           id: setup.currentSessionId,
@@ -159,6 +164,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         currentSessionId: _session?.id ?? '',
         currentSessionTitle: _meetingTitleController.text.trim(),
         currentSessionDate: _meetingDateController.text.trim(),
+        ownerToken: _ownerToken,
       ),
     );
     if (showMessage) {
@@ -173,7 +179,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       return;
     }
     await _runAction('createClub', () async {
-      await _api().createClub(
+      await _api().createOwnerClub(
+        ownerToken: _ownerToken,
         clubName: _clubNameController.text.trim(),
         clubSlug: _clubSlugController.text.trim(),
         adminPin: _adminPinController.text.trim(),
@@ -183,6 +190,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       }
       setState(() => _clubCreated = true);
       await _saveSetup(showMessage: false);
+      await _syncOnlineStatusFromCloud(showMessage: false);
       _showMessage(l10n.onlineCountClubReady);
     });
   }
@@ -194,7 +202,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       return;
     }
     await _runAction('createMeeting', () async {
-      final OnlineSession session = await _api().createSession(
+      final OnlineSession session = await _api().createCurrentMeeting(
+        ownerToken: _ownerToken,
         clubSlug: _clubSlugController.text.trim(),
         adminPin: _adminPinController.text.trim(),
         meetingTitle: _meetingTitleController.text.trim(),
@@ -207,6 +216,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _session = session;
         _awards = session.awards;
         _results = null;
+        _activeAward = null;
+        _legacyMultipleSessions = false;
       });
       await _saveSetup(showMessage: false);
       _showMessage(l10n.onlineCountActionComplete);
@@ -228,6 +239,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       final OnlineSession updated = await _api().openSession(
         sessionId: session.id,
         adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
       );
       if (!mounted) {
         return;
@@ -252,6 +264,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       final OnlineSession updated = await _api().closeSession(
         sessionId: session.id,
         adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
       );
       if (!mounted) {
         return;
@@ -301,6 +314,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         adminPin: _adminPinController.text.trim(),
         awardType: type.value,
         candidates: candidates,
+        ownerToken: _ownerToken,
       );
       _showMessage(l10n.onlineCountSaved);
     });
@@ -326,8 +340,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         sessionId: session.id,
         awardId: award.id,
         adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
       );
       _replaceAward(updated);
+      setState(() => _activeAward = updated);
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -348,8 +364,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         sessionId: session.id,
         awardId: award.id,
         adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
       );
       _replaceAward(updated);
+      setState(() => _activeAward = null);
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -367,6 +385,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       final OnlineResults results = await _api().getResults(
         sessionId: session.id,
         adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
       );
       if (!mounted) {
         return;
@@ -376,6 +395,171 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _showMessage(l10n.onlineCountActionComplete);
       }
     });
+  }
+
+  Future<void> _checkOnlineStatus({bool showMessage = true}) async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (!_hasCloudSetup()) {
+      _showMessage(l10n.onlineCountPleaseCompleteSetup);
+      return;
+    }
+    await _runAction(
+      'checkStatus',
+      () => _syncOnlineStatusFromCloud(showMessage: showMessage),
+    );
+  }
+
+  Future<void> _syncOnlineStatusFromCloud({required bool showMessage}) async {
+    final String actionCompleteMessage =
+        AppLocalizations.of(context)!.onlineCountActionComplete;
+    final OnlineClubStatus status = await _api().getOwnerClubStatus(
+      ownerToken: _ownerToken,
+      clubSlug: _clubSlugController.text.trim(),
+      adminPin: _adminPinController.text.trim(),
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _clubCreated = true;
+      _legacyMultipleSessions = status.summary.legacyMultipleSessions;
+      _activeAward = status.activeAward;
+      if (status.currentSession == null) {
+        _session = null;
+        _awards = <OnlineAward>[];
+        _results = null;
+        _meetingTitleController.text = _meetingTitleController.text.isEmpty
+            ? 'Regular Meeting'
+            : _meetingTitleController.text;
+        _meetingDateController.text = _meetingDateController.text.isEmpty
+            ? _todayText()
+            : _meetingDateController.text;
+      } else {
+        _session = status.currentSession;
+        _meetingTitleController.text = status.currentSession!.meetingTitle;
+        _meetingDateController.text = status.currentSession!.meetingDate;
+      }
+    });
+    await _saveSetup(showMessage: false);
+    if (showMessage) {
+      _showMessage(actionCompleteMessage);
+    }
+  }
+
+  Future<void> _deleteCurrentMeeting() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final OnlineSession? session = _session;
+    if (session == null) {
+      _showMessage(l10n.onlineCountCreateMeetingFirst);
+      return;
+    }
+    final bool confirmed = await _confirmTypedAction(
+      title: l10n.onlineCountDeleteCurrentMeeting,
+      message: l10n.onlineCountDeleteCurrentMeetingWarning,
+      requiredText: 'DELETE',
+      confirmationLabel: l10n.onlineCountTypeDeleteToContinue,
+    );
+    if (!confirmed) {
+      return;
+    }
+    await _runAction('deleteMeeting', () async {
+      await _api().deleteCurrentMeeting(
+        ownerToken: _ownerToken,
+        sessionId: session.id,
+        adminPin: _adminPinController.text.trim(),
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _session = null;
+        _awards = <OnlineAward>[];
+        _results = null;
+        _activeAward = null;
+        _legacyMultipleSessions = false;
+        _meetingTitleController.text = 'Regular Meeting';
+        _meetingDateController.text = _todayText();
+        for (final TextEditingController controller
+            in _candidateControllers.values) {
+          controller.clear();
+        }
+      });
+      await _saveSetup(showMessage: false);
+      _showMessage(l10n.onlineCountCurrentMeetingDeleted);
+    });
+  }
+
+  Future<void> _deleteOnlineClub() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (!_hasCloudSetup()) {
+      _showMessage(l10n.onlineCountPleaseCompleteSetup);
+      return;
+    }
+    final bool confirmed = await _confirmTypedAction(
+      title: l10n.onlineCountDeleteOnlineClub,
+      message: l10n.onlineCountDeleteOnlineClubWarning,
+      requiredText: 'DELETE',
+      confirmationLabel: l10n.onlineCountTypeDeleteToContinue,
+    );
+    if (!confirmed) {
+      return;
+    }
+    await _runAction('deleteClub', () async {
+      await _api().deleteOnlineClub(
+        ownerToken: _ownerToken,
+        clubSlug: _clubSlugController.text.trim(),
+        adminPin: _adminPinController.text.trim(),
+      );
+      await _resetLocalOnlineCount(showMessage: false);
+      _showMessage(l10n.onlineCountOnlineClubDeleted);
+    });
+  }
+
+  Future<void> _resetOnlineCountOnThisDevice() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final bool confirmed = await _confirmTypedAction(
+      title: l10n.onlineCountResetDeviceSetup,
+      message: l10n.onlineCountResetDeviceSetupWarning,
+      requiredText: 'RESET',
+      confirmationLabel: l10n.onlineCountTypeResetToContinue,
+    );
+    if (!confirmed) {
+      return;
+    }
+    await _resetLocalOnlineCount(showMessage: false);
+    _showMessage(l10n.onlineCountDeviceSetupReset);
+  }
+
+  Future<void> _resetLocalOnlineCount({required bool showMessage}) async {
+    await _storage.resetOnlineCountOnThisDevice();
+    final OnlineCountSetup setup = await _storage.load();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _ownerToken = setup.ownerToken;
+      _baseUrlController.text = setup.baseUrl;
+      _clubNameController.clear();
+      _clubSlugController.clear();
+      _adminPinController.clear();
+      _meetingTitleController.text = 'Regular Meeting';
+      _meetingDateController.text = _todayText();
+      _lastGeneratedClubCode = '';
+      _clubCodeManuallyEdited = false;
+      _clubCreated = false;
+      _session = null;
+      _awards = <OnlineAward>[];
+      _results = null;
+      _activeAward = null;
+      _legacyMultipleSessions = false;
+      for (final TextEditingController controller
+          in _candidateControllers.values) {
+        controller.clear();
+      }
+    });
+    if (showMessage) {
+      _showMessage(AppLocalizations.of(context)!.onlineCountDeviceSetupReset);
+    }
   }
 
   void _replaceAward(OnlineAward updated) {
@@ -520,12 +704,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _adminPinController.text.trim().isNotEmpty;
   }
 
-  bool get _canSaveSetup => _hasCloudSetup();
-
   bool get _canCreateOnlineClub => _hasCloudSetup();
 
   bool get _canCreateMeeting =>
       _hasCloudSetup() &&
+      _session == null &&
       _meetingTitleController.text.trim().isNotEmpty &&
       _meetingDateController.text.trim().isNotEmpty;
 
@@ -545,6 +728,20 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   String _friendlyError(OnlineCountApiException error, AppLocalizations l10n) {
+    if (error.code == 'OWNER_ALREADY_HAS_ACTIVE_CLUB') {
+      return l10n.onlineCountOwnerAlreadyHasClub;
+    }
+    if (error.code == 'CLUB_SLUG_EXISTS') {
+      return l10n.onlineCountClubSlugExists;
+    }
+    if (error.code == 'CURRENT_MEETING_EXISTS') {
+      return l10n.onlineCountCurrentMeetingExists;
+    }
+    if (error.code == 'MISSING_OWNER_TOKEN' ||
+        error.code == 'INVALID_OWNER_TOKEN' ||
+        error.code == 'INVALID_ADMIN_PIN') {
+      return l10n.onlineCountOwnerOrAdminInvalid;
+    }
     if (error.code == 'OPEN_AWARD_EXISTS') {
       return l10n.onlineCountAnotherAwardOpen;
     }
@@ -563,6 +760,73 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return error.message.isEmpty
         ? l10n.onlineCountCouldNotConnect
         : error.message;
+  }
+
+  bool _hasSavedClub(OnlineCountSetup setup) {
+    return setup.clubName.isNotEmpty &&
+        setup.clubSlug.isNotEmpty &&
+        setup.adminPin.isNotEmpty;
+  }
+
+  Future<bool> _confirmTypedAction({
+    required String title,
+    required String message,
+    required String requiredText,
+    required String confirmationLabel,
+  }) async {
+    final TextEditingController controller = TextEditingController();
+    try {
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (
+              BuildContext context,
+              StateSetter setDialogState,
+            ) {
+              final bool canConfirm = controller.text.trim() == requiredText;
+              return AlertDialog(
+                title: Text(title),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(message),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: controller,
+                      autofocus: true,
+                      onChanged: (_) => setDialogState(() {}),
+                      decoration: InputDecoration(
+                        labelText: confirmationLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(
+                        MaterialLocalizations.of(context).cancelButtonLabel),
+                  ),
+                  FilledButton(
+                    onPressed: canConfirm
+                        ? () => Navigator.of(context).pop(true)
+                        : null,
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+      return confirmed == true;
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showMessage(String message) {
@@ -592,15 +856,22 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          children: <Widget>[
-            _buildCloudSetupCard(l10n),
-            _buildMeetingCard(l10n),
-            _buildCandidateSetupCard(l10n),
-            _buildVotingRoundCard(l10n),
-            _buildPermanentQrCard(l10n),
-            _buildVotingLinkCard(l10n),
-            _buildResultsCard(l10n),
-          ],
+          children: _clubCreated && _hasCloudSetup()
+              ? <Widget>[
+                  _buildLockedClubCard(l10n),
+                  _buildPermanentQrCard(l10n),
+                  _buildVotingLinkCard(l10n),
+                  _buildMeetingCard(l10n),
+                  if (_session != null &&
+                      _session!.status != OnlineRoundStatus.closed)
+                    _buildCandidateSetupCard(l10n),
+                  if (_session?.status == OnlineRoundStatus.open)
+                    _buildVotingRoundCard(l10n),
+                  if (_session != null) _buildResultsCard(l10n),
+                ]
+              : <Widget>[
+                  _buildCloudSetupCard(l10n),
+                ],
         ),
       ),
     );
@@ -634,14 +905,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _BodyText(l10n.onlineCountSetupButtonHelp),
         const SizedBox(height: 8),
         _fullWidthButton(
-          child: FilledButton.icon(
-            onPressed: _canSaveSetup ? () => _saveSetup() : null,
-            icon: const Icon(Icons.save_outlined),
-            label: Text(l10n.onlineCountSaveSetup),
-          ),
-        ),
-        const SizedBox(height: 10),
-        _fullWidthButton(
           child: OutlinedButton.icon(
             onPressed: _canCreateOnlineClub && _busyAction != 'createClub'
                 ? () => _createClub()
@@ -650,9 +913,70 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             label: Text(l10n.onlineCountCreateClub),
           ),
         ),
-        const SizedBox(height: 14),
-        _buildSetupStatus(l10n),
         const SizedBox(height: 8),
+        ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: EdgeInsets.zero,
+          title: Text(
+            l10n.onlineCountAdvancedSettings,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          children: <Widget>[
+            _BodyText(l10n.onlineCountBackendUrlHelp),
+            _textField(
+              controller: _baseUrlController,
+              label: l10n.onlineCountBackendUrl,
+              keyboardType: TextInputType.url,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLockedClubCard(AppLocalizations l10n) {
+    final String clubName = _clubNameController.text.trim();
+    final String clubCode = _clubSlugController.text.trim();
+    final String link =
+        clubCode.isEmpty ? '' : _api().votingLinkForClub(clubCode);
+
+    return _SectionCard(
+      title: l10n.onlineCountClubReadyTitle,
+      icon: Icons.verified_outlined,
+      children: <Widget>[
+        _InfoBlock(
+          lines: <String>[
+            '${l10n.onlineCountOnlineClubLabel}: $clubName',
+            '${l10n.onlineCountClubCodeLabel}: $clubCode',
+            '${l10n.onlineCountVotingLink}: $link',
+            if (_legacyMultipleSessions) l10n.onlineCountLegacySessionsWarning,
+            if (_activeAward != null)
+              '${l10n.onlineCountVotingRound}: '
+                  '${onlineAwardLabel(_activeAward!.type, Localizations.localeOf(context))}',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buttonWrap(
+          <Widget>[
+            FilledButton.icon(
+              onPressed: _busyAction == 'checkStatus'
+                  ? null
+                  : () => _checkOnlineStatus(),
+              icon: const Icon(Icons.cloud_sync_outlined),
+              label: Text(l10n.onlineCountCheckOnlineStatus),
+            ),
+            OutlinedButton.icon(
+              onPressed: _busyAction == 'deleteClub' ? null : _deleteOnlineClub,
+              icon: const Icon(Icons.delete_forever_outlined),
+              label: Text(l10n.onlineCountDeleteOnlineClub),
+            ),
+            OutlinedButton.icon(
+              onPressed: _resetOnlineCountOnThisDevice,
+              icon: const Icon(Icons.restart_alt_outlined),
+              label: Text(l10n.onlineCountResetDeviceSetup),
+            ),
+          ],
+        ),
         ExpansionTile(
           tilePadding: EdgeInsets.zero,
           childrenPadding: EdgeInsets.zero,
@@ -681,60 +1005,80 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       children: <Widget>[
         _BodyText(l10n.onlineCountMeetingExplanation),
         const SizedBox(height: 10),
-        _MeetingGuide(l10n: l10n),
-        const SizedBox(height: 14),
-        _textField(
-          controller: _meetingTitleController,
-          label: l10n.onlineCountMeetingTitle,
-        ),
-        _textField(
-          controller: _meetingDateController,
-          label: l10n.onlineCountMeetingDate,
-          keyboardType: TextInputType.datetime,
-        ),
         if (_session == null)
-          Text(
-            l10n.onlineCountNoSessionYet,
-            style: const TextStyle(fontSize: 15, color: Colors.black54),
-          )
-        else
+          _InfoBlock(lines: <String>[l10n.onlineCountNoCurrentMeeting])
+        else ...<Widget>[
           _InfoBlock(
             lines: <String>[
+              '${l10n.onlineCountMeetingTitle}: ${_session!.meetingTitle}',
+              '${l10n.onlineCountMeetingDate}: ${_session!.meetingDate}',
               '${l10n.onlineCountSessionStatus}: '
                   '${_sessionStatusLabel(_session!.status, locale)}',
               _sessionStatusHelp(_session!.status, l10n),
             ],
           ),
-        const SizedBox(height: 10),
-        _fullWidthButton(
-          child: FilledButton.icon(
-            onPressed: _canCreateMeeting && _busyAction != 'createMeeting'
-                ? () => _createMeeting()
-                : null,
-            icon: const Icon(Icons.add_circle_outline),
-            label: Text(l10n.onlineCountCreateMeeting),
+          const SizedBox(height: 10),
+        ],
+        if (_session == null) ...<Widget>[
+          const SizedBox(height: 14),
+          _textField(
+            controller: _meetingTitleController,
+            label: l10n.onlineCountMeetingTitle,
           ),
-        ),
-        const SizedBox(height: 10),
-        _fullWidthButton(
-          child: OutlinedButton.icon(
-            onPressed: _canOpenMeeting && _busyAction != 'openMeeting'
-                ? () => _openMeeting()
-                : null,
-            icon: const Icon(Icons.play_arrow_outlined),
-            label: Text(l10n.onlineCountOpenMeeting),
+          _textField(
+            controller: _meetingDateController,
+            label: l10n.onlineCountMeetingDate,
+            keyboardType: TextInputType.datetime,
           ),
-        ),
+        ],
         const SizedBox(height: 10),
-        _fullWidthButton(
-          child: OutlinedButton.icon(
-            onPressed: _canCloseMeeting && _busyAction != 'closeMeeting'
-                ? () => _closeMeeting()
-                : null,
-            icon: const Icon(Icons.stop_circle_outlined),
-            label: Text(l10n.onlineCountCloseMeeting),
+        if (_session == null)
+          _fullWidthButton(
+            child: FilledButton.icon(
+              onPressed: _canCreateMeeting && _busyAction != 'createMeeting'
+                  ? () => _createMeeting()
+                  : null,
+              icon: const Icon(Icons.add_circle_outline),
+              label: Text(l10n.onlineCountCreateCurrentMeeting),
+            ),
           ),
-        ),
+        if (_session != null &&
+            _session!.status == OnlineRoundStatus.draft) ...<Widget>[
+          const SizedBox(height: 10),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed: _canOpenMeeting && _busyAction != 'openMeeting'
+                  ? () => _openMeeting()
+                  : null,
+              icon: const Icon(Icons.play_arrow_outlined),
+              label: Text(l10n.onlineCountOpenMeeting),
+            ),
+          ),
+        ],
+        if (_session != null &&
+            _session!.status == OnlineRoundStatus.open) ...<Widget>[
+          const SizedBox(height: 10),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed: _canCloseMeeting && _busyAction != 'closeMeeting'
+                  ? () => _closeMeeting()
+                  : null,
+              icon: const Icon(Icons.stop_circle_outlined),
+              label: Text(l10n.onlineCountCloseMeeting),
+            ),
+          ),
+        ],
+        if (_session != null) ...<Widget>[
+          const SizedBox(height: 10),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed:
+                  _busyAction == 'deleteMeeting' ? null : _deleteCurrentMeeting,
+              icon: const Icon(Icons.delete_outline),
+              label: Text(l10n.onlineCountDeleteCurrentMeeting),
+            ),
+          ),
+        ],
         if (_session != null)
           ExpansionTile(
             tilePadding: EdgeInsets.zero,
@@ -1129,24 +1473,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     );
   }
 
-  Widget _buildSetupStatus(AppLocalizations l10n) {
-    final String clubName = _clubNameController.text.trim();
-    final String clubCode = _clubSlugController.text.trim();
-    if (clubName.isEmpty && clubCode.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return _InfoBlock(
-      lines: <String>[
-        if (clubName.isNotEmpty)
-          '${l10n.onlineCountOnlineClubLabel}: $clubName',
-        if (clubCode.isNotEmpty) '${l10n.onlineCountClubCodeLabel}: $clubCode',
-        _clubCreated
-            ? l10n.onlineCountClubReady
-            : l10n.onlineCountLinkReadyAfterCreate,
-      ],
-    );
-  }
-
   Widget _fullWidthButton({required Widget child}) {
     return SizedBox(width: double.infinity, height: 50, child: child);
   }
@@ -1277,78 +1603,6 @@ class _BodyText extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(fontSize: 15, color: Colors.black54, height: 1.35),
-    );
-  }
-}
-
-class _MeetingGuide extends StatelessWidget {
-  const _MeetingGuide({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blue.shade100),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _GuideStep(
-              title: l10n.onlineCountMeetingStep1Title,
-              body: l10n.onlineCountMeetingStep1Body,
-            ),
-            _GuideStep(
-              title: l10n.onlineCountMeetingStep2Title,
-              body: l10n.onlineCountMeetingStep2Body,
-            ),
-            _GuideStep(
-              title: l10n.onlineCountMeetingStep3Title,
-              body: l10n.onlineCountMeetingStep3Body,
-            ),
-            _GuideStep(
-              title: l10n.onlineCountMeetingStep4Title,
-              body: l10n.onlineCountMeetingStep4Body,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GuideStep extends StatelessWidget {
-  const _GuideStep({
-    required this.title,
-    required this.body,
-  });
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            body,
-            style: const TextStyle(color: Colors.black54, height: 1.25),
-          ),
-        ],
-      ),
     );
   }
 }

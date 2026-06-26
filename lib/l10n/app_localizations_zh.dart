@@ -533,6 +533,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountCreateClub => '创建在线俱乐部';
 
   @override
+  String get onlineCountClubReadyTitle => '在线俱乐部已准备好';
+
+  @override
+  String get onlineCountCheckOnlineStatus => '检查云端状态';
+
+  @override
+  String get onlineCountDeleteOnlineClub => '删除在线俱乐部';
+
+  @override
+  String get onlineCountResetDeviceSetup => '重置本机在线计票资料';
+
+  @override
   String get onlineCountSlugHelp => '用于永久投票链接。请使用小写字母、数字和连字符。';
 
   @override
@@ -608,6 +620,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCreateMeeting => '创建会议';
+
+  @override
+  String get onlineCountCreateCurrentMeeting => '创建当前会议';
+
+  @override
+  String get onlineCountNoCurrentMeeting => '当前没有会议';
+
+  @override
+  String get onlineCountDeleteCurrentMeeting => '删除当前会议';
 
   @override
   String get onlineCountOpenMeeting => '开放会议';
@@ -750,6 +771,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountClubMayExist => '在线俱乐部可能已经存在。请换一个俱乐部代号，或继续使用已保存的设置。';
+
+  @override
+  String get onlineCountOwnerAlreadyHasClub =>
+      '本机已有一个在线俱乐部。请先删除当前在线俱乐部，再创建新的俱乐部。';
+
+  @override
+  String get onlineCountClubSlugExists => '这个俱乐部代号已经被使用，请换一个代号。';
+
+  @override
+  String get onlineCountCurrentMeetingExists => '当前已有一个会议。请先删除当前会议，再创建新的会议。';
+
+  @override
+  String get onlineCountOwnerOrAdminInvalid => '设备凭证或管理员密码不正确。';
+
+  @override
+  String get onlineCountCurrentMeetingDeleted => '当前会议已删除。';
+
+  @override
+  String get onlineCountOnlineClubDeleted => '在线俱乐部已删除。';
+
+  @override
+  String get onlineCountDeviceSetupReset => '本机在线计票设置已重置。';
+
+  @override
+  String get onlineCountTypeDeleteToContinue => '输入 DELETE 继续';
+
+  @override
+  String get onlineCountTypeResetToContinue => '输入 RESET 继续';
+
+  @override
+  String get onlineCountDeleteCurrentMeetingWarning =>
+      '要删除当前在线会议吗？\n这会删除本次会议的候选人、投票和结果。\n请先复制或发送结果。';
+
+  @override
+  String get onlineCountDeleteOnlineClubWarning =>
+      '要删除在线俱乐部吗？\n这会删除云端俱乐部、当前会议、候选人、投票和结果。\n此操作无法撤销。\n本机手动计票资料不会被删除。';
+
+  @override
+  String get onlineCountResetDeviceSetupWarning =>
+      '这会清除本机保存的在线投票设置。\n不会删除云端记录。';
+
+  @override
+  String get onlineCountLegacySessionsWarning => '云端存在多个旧会议。当前显示最新会议。';
 
   @override
   String get onlineCountNoSessionYet => '请先创建会议，再设置候选人或开放投票。';

@@ -43,17 +43,23 @@ class OnlineClub {
     required this.id,
     required this.name,
     required this.slug,
+    this.status = '',
+    this.expiresAt = '',
   });
 
   final String id;
   final String name;
   final String slug;
+  final String status;
+  final String expiresAt;
 
   factory OnlineClub.fromJson(Map<String, dynamic> json) {
     return OnlineClub(
       id: _readString(json, 'clubId', 'club_id'),
       name: _readString(json, 'clubName', 'club_name'),
       slug: _readString(json, 'clubSlug', 'club_slug'),
+      status: _readString(json, 'status'),
+      expiresAt: _readString(json, 'expiresAt', 'expires_at'),
     );
   }
 }
@@ -65,6 +71,7 @@ class OnlineSession {
     required this.meetingTitle,
     required this.meetingDate,
     required this.status,
+    this.expiresAt = '',
     this.awards = const <OnlineAward>[],
   });
 
@@ -73,6 +80,7 @@ class OnlineSession {
   final String meetingTitle;
   final String meetingDate;
   final OnlineRoundStatus status;
+  final String expiresAt;
   final List<OnlineAward> awards;
 
   factory OnlineSession.fromJson(
@@ -87,12 +95,14 @@ class OnlineSession {
       status: OnlineRoundStatus.fromValue(
         _readString(json, 'status', 'status'),
       ),
+      expiresAt: _readString(json, 'expiresAt', 'expires_at'),
       awards: awards,
     );
   }
 
   OnlineSession copyWith({
     OnlineRoundStatus? status,
+    String? expiresAt,
     List<OnlineAward>? awards,
   }) {
     return OnlineSession(
@@ -101,6 +111,7 @@ class OnlineSession {
       meetingTitle: meetingTitle,
       meetingDate: meetingDate,
       status: status ?? this.status,
+      expiresAt: expiresAt ?? this.expiresAt,
       awards: awards ?? this.awards,
     );
   }
@@ -228,6 +239,62 @@ class OnlineCandidateResult {
       id: _readString(json, 'candidateId', 'candidate_id'),
       name: _readString(json, 'candidateName', 'candidate_name'),
       voteCount: _readInt(json, 'voteCount', 'vote_count'),
+    );
+  }
+}
+
+class OnlineClubStatus {
+  const OnlineClubStatus({
+    required this.club,
+    required this.summary,
+    this.currentSession,
+    this.activeAward,
+  });
+
+  final OnlineClub club;
+  final OnlineSession? currentSession;
+  final OnlineAward? activeAward;
+  final OnlineClubStatusSummary summary;
+
+  factory OnlineClubStatus.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> currentSessionJson =
+        _readMap(json['currentSession']);
+    final Map<String, dynamic> activeAwardJson = _readMap(json['activeAward']);
+    return OnlineClubStatus(
+      club: OnlineClub.fromJson(_readMap(json['club'])),
+      currentSession: currentSessionJson.isEmpty
+          ? null
+          : OnlineSession.fromJson(currentSessionJson),
+      activeAward: activeAwardJson.isEmpty
+          ? null
+          : OnlineAward.fromJson(activeAwardJson),
+      summary: OnlineClubStatusSummary.fromJson(_readMap(json['summary'])),
+    );
+  }
+}
+
+class OnlineClubStatusSummary {
+  const OnlineClubStatusSummary({
+    required this.hasCurrentSession,
+    required this.hasActiveAward,
+    required this.canCreateMeeting,
+    required this.canCreateClub,
+    required this.legacyMultipleSessions,
+  });
+
+  final bool hasCurrentSession;
+  final bool hasActiveAward;
+  final bool canCreateMeeting;
+  final bool canCreateClub;
+  final bool legacyMultipleSessions;
+
+  factory OnlineClubStatusSummary.fromJson(Map<String, dynamic> json) {
+    return OnlineClubStatusSummary(
+      hasCurrentSession: json['hasCurrentSession'] == true,
+      hasActiveAward: json['hasActiveAward'] == true,
+      canCreateMeeting: json['canCreateMeeting'] == true,
+      canCreateClub: json['canCreateClub'] == true,
+      legacyMultipleSessions: json['legacyMultipleSessions'] == true,
     );
   }
 }
