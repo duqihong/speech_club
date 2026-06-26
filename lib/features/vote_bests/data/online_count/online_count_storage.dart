@@ -83,6 +83,10 @@ class OnlineCountStorage {
       'speech_club_online_current_session_status_v1';
   static const String _candidateDraftPrefix =
       'speech_club_online_candidate_draft_';
+  static const String _candidateSavedPrefix =
+      'speech_club_online_candidate_saved_text_';
+  static const String _awardIdPrefix = 'speech_club_online_award_id_';
+  static const String _awardStatusPrefix = 'speech_club_online_award_status_';
 
   Future<OnlineCountSetup> load() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -119,14 +123,14 @@ class OnlineCountStorage {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await _loadOrCreateOwnerToken(prefs);
     await _clearLocalSetup(prefs);
-    await _clearCandidateDrafts(prefs);
+    await _clearOnlineSessionState(prefs);
   }
 
   Future<void> startFreshOnThisDevice() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_ownerTokenKey, _generateOwnerToken());
     await _clearLocalSetup(prefs);
-    await _clearCandidateDrafts(prefs);
+    await _clearOnlineSessionState(prefs);
   }
 
   Future<void> saveCandidateDraft({
@@ -168,6 +172,126 @@ class OnlineCountStorage {
     await _clearCandidateDrafts(prefs);
   }
 
+  Future<void> saveCandidateSavedText({
+    required String sessionId,
+    required String awardType,
+    required String normalizedText,
+  }) async {
+    if (sessionId.isEmpty || awardType.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _candidateSavedKey(sessionId, awardType),
+      normalizedText,
+    );
+  }
+
+  Future<String?> loadCandidateSavedText({
+    required String sessionId,
+    required String awardType,
+  }) async {
+    if (sessionId.isEmpty || awardType.isEmpty) {
+      return null;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_candidateSavedKey(sessionId, awardType));
+  }
+
+  Future<void> clearCandidateSavedStateForSession(String sessionId) async {
+    if (sessionId.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _clearPrefixedKeys(
+      prefs,
+      _sessionScopedPrefix(_candidateSavedPrefix, sessionId),
+    );
+  }
+
+  Future<void> saveAwardState({
+    required String sessionId,
+    required OnlineAwardType awardType,
+    required String awardId,
+    required OnlineRoundStatus status,
+  }) async {
+    if (sessionId.isEmpty || awardId.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_awardIdKey(sessionId, awardType.value), awardId);
+    await prefs.setString(
+      _awardStatusKey(sessionId, awardType.value),
+      status.value,
+    );
+  }
+
+  Future<void> saveAwardStates({
+    required String sessionId,
+    required List<OnlineAward> awards,
+  }) async {
+    if (sessionId.isEmpty) {
+      return;
+    }
+    for (final OnlineAward award in awards) {
+      await saveAwardState(
+        sessionId: sessionId,
+        awardType: award.type,
+        awardId: award.id,
+        status: award.status,
+      );
+    }
+  }
+
+  Future<List<OnlineAward>> loadAwardStates(String sessionId) async {
+    if (sessionId.isEmpty) {
+      return <OnlineAward>[];
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<OnlineAward> awards = <OnlineAward>[];
+    for (final OnlineAwardType type in OnlineAwardType.values) {
+      final String awardId = prefs.getString(
+            _awardIdKey(sessionId, type.value),
+          ) ??
+          '';
+      if (awardId.isEmpty) {
+        continue;
+      }
+      awards.add(
+        OnlineAward(
+          id: awardId,
+          sessionId: sessionId,
+          type: type,
+          status: OnlineRoundStatus.fromValue(
+            prefs.getString(_awardStatusKey(sessionId, type.value)),
+          ),
+        ),
+      );
+    }
+    return awards;
+  }
+
+  Future<void> clearAwardStatesForSession(String sessionId) async {
+    if (sessionId.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _clearPrefixedKeys(
+      prefs,
+      _sessionScopedPrefix(_awardIdPrefix, sessionId),
+    );
+    await _clearPrefixedKeys(
+      prefs,
+      _sessionScopedPrefix(_awardStatusPrefix, sessionId),
+    );
+  }
+
+  Future<void> clearOnlineStateForSession(String sessionId) async {
+    await clearCandidateDraftsForSession(sessionId);
+    await clearCandidateSavedStateForSession(sessionId);
+    await clearAwardStatesForSession(sessionId);
+  }
+
   Future<void> _clearLocalSetup(SharedPreferences prefs) async {
     await prefs.setString(_baseUrlKey, OnlineCountApi.defaultBaseUrl);
     await prefs.remove(_clubNameKey);
@@ -203,7 +327,26 @@ class OnlineCountStorage {
   }
 
   static String _candidateDraftSessionPrefix(String sessionId) {
-    return '$_candidateDraftPrefix${Uri.encodeComponent(sessionId)}_';
+    return _sessionScopedPrefix(_candidateDraftPrefix, sessionId);
+  }
+
+  static String _candidateSavedKey(String sessionId, String awardType) {
+    return '${_sessionScopedPrefix(_candidateSavedPrefix, sessionId)}'
+        '${Uri.encodeComponent(awardType)}_v1';
+  }
+
+  static String _awardIdKey(String sessionId, String awardType) {
+    return '${_sessionScopedPrefix(_awardIdPrefix, sessionId)}'
+        '${Uri.encodeComponent(awardType)}_v1';
+  }
+
+  static String _awardStatusKey(String sessionId, String awardType) {
+    return '${_sessionScopedPrefix(_awardStatusPrefix, sessionId)}'
+        '${Uri.encodeComponent(awardType)}_v1';
+  }
+
+  static String _sessionScopedPrefix(String prefix, String sessionId) {
+    return '$prefix${Uri.encodeComponent(sessionId)}_';
   }
 
   Future<void> _clearCandidateDrafts(
@@ -211,9 +354,25 @@ class OnlineCountStorage {
     String? sessionPrefix,
   }) async {
     final String prefix = sessionPrefix ?? _candidateDraftPrefix;
+    await _clearPrefixedKeys(prefs, prefix);
+  }
+
+  Future<void> _clearOnlineSessionState(SharedPreferences prefs) async {
+    await _clearPrefixedKeys(prefs, _candidateDraftPrefix);
+    await _clearPrefixedKeys(prefs, _candidateSavedPrefix);
+    await _clearPrefixedKeys(prefs, _awardIdPrefix);
+    await _clearPrefixedKeys(prefs, _awardStatusPrefix);
+  }
+
+  Future<void> _clearPrefixedKeys(
+    SharedPreferences prefs,
+    String prefix,
+  ) async {
     final Iterable<String> keys = prefs
         .getKeys()
-        .where((String key) => key.startsWith(prefix))
+        .where(
+          (String key) => key.startsWith(prefix),
+        )
         .toList(growable: false);
     for (final String key in keys) {
       await prefs.remove(key);

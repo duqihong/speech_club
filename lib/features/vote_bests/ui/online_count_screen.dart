@@ -159,6 +159,9 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   Future<void> _loadSetup() async {
     final OnlineCountSetup setup = await _storage.load();
+    final List<OnlineAward> storedAwards = setup.currentSessionId.isEmpty
+        ? <OnlineAward>[]
+        : await _storage.loadAwardStates(setup.currentSessionId);
     if (!_canUpdateState) {
       return;
     }
@@ -183,12 +186,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           meetingDate: _meetingDateController.text,
           status: OnlineRoundStatus.fromValue(setup.currentSessionStatus),
         );
-        _awards = widget.debugInitialAwards;
+        _awards =
+            storedAwards.isNotEmpty ? storedAwards : widget.debugInitialAwards;
       }
       _loaded = true;
     });
     if (setup.currentSessionId.isNotEmpty) {
-      await _restoreCandidateDraftsForSession(setup.currentSessionId);
+      await _restoreCandidateStateForSession(setup.currentSessionId);
     }
     _syncVoteCountPolling();
   }
@@ -212,13 +216,19 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     );
   }
 
-  Future<void> _restoreCandidateDraftsForSession(String sessionId) async {
+  Future<void> _restoreCandidateStateForSession(String sessionId) async {
     if (sessionId.isEmpty) {
       return;
     }
     final Map<OnlineAwardType, String?> drafts = <OnlineAwardType, String?>{};
+    final Map<OnlineAwardType, String?> savedTexts =
+        <OnlineAwardType, String?>{};
     for (final OnlineAwardType type in OnlineAwardType.values) {
       drafts[type] = await _storage.loadCandidateDraft(
+        sessionId: sessionId,
+        awardType: type.value,
+      );
+      savedTexts[type] = await _storage.loadCandidateSavedText(
         sessionId: sessionId,
         awardType: type.value,
       );
@@ -238,7 +248,24 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _restoringCandidateDrafts = false;
     }
     if (_canUpdateState) {
-      setState(() {});
+      setState(() {
+        _savedCandidateFingerprints
+          ..clear()
+          ..addEntries(
+            savedTexts.entries
+                .where(
+                  (MapEntry<OnlineAwardType, String?> entry) =>
+                      entry.value != null,
+                )
+                .map(
+                  (MapEntry<OnlineAwardType, String?> entry) =>
+                      MapEntry<OnlineAwardType, String>(
+                    entry.key,
+                    entry.value!,
+                  ),
+                ),
+          );
+      });
     }
   }
 
@@ -348,6 +375,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _savedCandidateFingerprints.clear();
         _clearVoteCountState();
       });
+      await _storage.saveAwardStates(
+        sessionId: session.id,
+        awards: session.awards,
+      );
       await _saveSetup(showMessage: false);
       _syncVoteCountPolling();
       _showMessage(l10n.onlineCountActionComplete);
@@ -376,6 +407,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       }
       setState(() => _session = updated.copyWith(awards: _awards));
       await _saveSetup(showMessage: false);
+      await _storage.saveAwardStates(
+        sessionId: session.id,
+        awards: _awards,
+      );
       _syncVoteCountPolling();
       _showMessage(l10n.onlineCountActionComplete);
     });
@@ -415,7 +450,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                   : award,
             )
             .toList(growable: false);
+        _activeAward = null;
       });
+      await _storage.saveAwardStates(
+        sessionId: session.id,
+        awards: _awards,
+      );
       await _refreshResults(showErrors: false);
       await _saveSetup(showMessage: false);
       _syncVoteCountPolling();
@@ -456,6 +496,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _savedCandidateFingerprints[type] = _candidateFingerprint(candidates);
         });
       }
+      await _storage.saveCandidateSavedText(
+        sessionId: session.id,
+        awardType: type.value,
+        normalizedText: _candidateFingerprint(candidates),
+      );
       _showMessage(l10n.onlineCountCandidatesSaved);
     });
   }
@@ -484,6 +529,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       );
       _replaceAward(updated);
       setState(() => _activeAward = updated);
+      await _storage.saveAwardState(
+        sessionId: session.id,
+        awardType: updated.type,
+        awardId: updated.id,
+        status: updated.status,
+      );
       unawaited(_refreshVoteCounts(showError: false));
       _showMessage(l10n.onlineCountActionComplete);
     });
@@ -509,6 +560,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       );
       _replaceAward(updated);
       setState(() => _activeAward = null);
+      await _storage.saveAwardState(
+        sessionId: session.id,
+        awardType: updated.type,
+        awardId: updated.id,
+        status: updated.status,
+      );
       unawaited(_refreshVoteCounts(showError: false));
       _showMessage(l10n.onlineCountActionComplete);
     });
@@ -569,6 +626,19 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     }
     final String? previousSessionId = _session?.id;
     final String? refreshedSessionId = status.currentSession?.id;
+    final List<OnlineAward> storedAwards = refreshedSessionId == null
+        ? <OnlineAward>[]
+        : await _storage.loadAwardStates(refreshedSessionId);
+    if (!_canUpdateState) {
+      return;
+    }
+    final List<OnlineAward> refreshedAwards = _awardsForStatusRefresh(
+      sessionId: refreshedSessionId,
+      previousSessionId: previousSessionId,
+      cloudAwards: status.currentSession?.awards ?? <OnlineAward>[],
+      storedAwards: storedAwards,
+      activeAward: status.activeAward,
+    );
     setState(() {
       _clubCreated = true;
       _legacyMultipleSessions = status.summary.legacyMultipleSessions;
@@ -586,15 +656,21 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             : _meetingDateController.text;
       } else {
         _session = status.currentSession;
-        _awards = status.currentSession!.awards;
+        _awards = refreshedAwards;
         _meetingTitleController.text = status.currentSession!.meetingTitle;
         _meetingDateController.text = status.currentSession!.meetingDate;
       }
     });
+    if (refreshedSessionId != null && refreshedAwards.isNotEmpty) {
+      await _storage.saveAwardStates(
+        sessionId: refreshedSessionId,
+        awards: refreshedAwards,
+      );
+    }
     if (refreshedSessionId != null &&
         refreshedSessionId.isNotEmpty &&
         refreshedSessionId != previousSessionId) {
-      await _restoreCandidateDraftsForSession(refreshedSessionId);
+      await _restoreCandidateStateForSession(refreshedSessionId);
     }
     await _saveSetup(showMessage: false);
     _syncVoteCountPolling();
@@ -644,7 +720,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           controller.clear();
         }
       });
-      await _storage.clearCandidateDraftsForSession(session.id);
+      await _storage.clearOnlineStateForSession(session.id);
       await _saveSetup(showMessage: false);
       _syncVoteCountPolling();
       _showMessage(l10n.onlineCountCurrentMeetingDeleted);
@@ -749,6 +825,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _results = null;
       _activeAward = null;
       _legacyMultipleSessions = false;
+      _savedCandidateFingerprints.clear();
       _clearVoteCountState();
       for (final TextEditingController controller
           in _candidateControllers.values) {
@@ -847,6 +924,40 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           )
           .toList(growable: false);
     });
+  }
+
+  List<OnlineAward> _awardsForStatusRefresh({
+    required String? sessionId,
+    required String? previousSessionId,
+    required List<OnlineAward> cloudAwards,
+    required List<OnlineAward> storedAwards,
+    required OnlineAward? activeAward,
+  }) {
+    if (sessionId == null || sessionId.isEmpty) {
+      return <OnlineAward>[];
+    }
+    final List<OnlineAward> sameSessionAwards =
+        sessionId == previousSessionId ? _awards : <OnlineAward>[];
+    final List<OnlineAward> baseAwards = cloudAwards.isNotEmpty
+        ? cloudAwards
+        : storedAwards.isNotEmpty
+            ? storedAwards
+            : sameSessionAwards;
+    if (activeAward == null || activeAward.sessionId != sessionId) {
+      return baseAwards;
+    }
+    bool replaced = false;
+    final List<OnlineAward> merged = baseAwards.map((OnlineAward award) {
+      if (award.type != activeAward.type) {
+        return award;
+      }
+      replaced = true;
+      return activeAward;
+    }).toList(growable: true);
+    if (!replaced) {
+      merged.add(activeAward);
+    }
+    return merged;
   }
 
   Future<void> _copyText(String text) async {

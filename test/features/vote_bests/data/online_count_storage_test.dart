@@ -156,6 +156,111 @@ void main() {
     );
   });
 
+  test('candidate saved text is saved and loaded by session and award',
+      () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final OnlineCountStorage storage = OnlineCountStorage();
+
+    await storage.saveCandidateSavedText(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker.value,
+      normalizedText: 'Alice\nBen',
+    );
+    await storage.saveCandidateSavedText(
+      sessionId: 'session-2',
+      awardType: OnlineAwardType.bestSpeaker.value,
+      normalizedText: 'Cara',
+    );
+
+    expect(
+      await storage.loadCandidateSavedText(
+        sessionId: 'session-1',
+        awardType: OnlineAwardType.bestSpeaker.value,
+      ),
+      'Alice\nBen',
+    );
+    expect(
+      await storage.loadCandidateSavedText(
+        sessionId: 'session-2',
+        awardType: OnlineAwardType.bestSpeaker.value,
+      ),
+      'Cara',
+    );
+  });
+
+  test('award IDs and statuses are saved and restored by session', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final OnlineCountStorage storage = OnlineCountStorage();
+
+    await storage.saveAwardStates(
+      sessionId: 'session-1',
+      awards: const <OnlineAward>[
+        OnlineAward(
+          id: 'award-1',
+          sessionId: 'session-1',
+          type: OnlineAwardType.bestSpeaker,
+          status: OnlineRoundStatus.draft,
+        ),
+        OnlineAward(
+          id: 'award-2',
+          sessionId: 'session-1',
+          type: OnlineAwardType.bestTableTopics,
+          status: OnlineRoundStatus.open,
+        ),
+      ],
+    );
+
+    final List<OnlineAward> awards = await storage.loadAwardStates('session-1');
+
+    expect(awards, hasLength(2));
+    expect(awards[0].id, 'award-1');
+    expect(awards[0].type, OnlineAwardType.bestSpeaker);
+    expect(awards[0].status, OnlineRoundStatus.draft);
+    expect(awards[1].id, 'award-2');
+    expect(awards[1].type, OnlineAwardType.bestTableTopics);
+    expect(awards[1].status, OnlineRoundStatus.open);
+  });
+
+  test('clearing session state removes drafts saved text and awards', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final OnlineCountStorage storage = OnlineCountStorage();
+
+    await storage.saveCandidateDraft(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker.value,
+      text: 'Alice',
+    );
+    await storage.saveCandidateSavedText(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker.value,
+      normalizedText: 'Alice',
+    );
+    await storage.saveAwardState(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker,
+      awardId: 'award-1',
+      status: OnlineRoundStatus.draft,
+    );
+
+    await storage.clearOnlineStateForSession('session-1');
+
+    expect(
+      await storage.loadCandidateDraft(
+        sessionId: 'session-1',
+        awardType: OnlineAwardType.bestSpeaker.value,
+      ),
+      isNull,
+    );
+    expect(
+      await storage.loadCandidateSavedText(
+        sessionId: 'session-1',
+        awardType: OnlineAwardType.bestSpeaker.value,
+      ),
+      isNull,
+    );
+    expect(await storage.loadAwardStates('session-1'), isEmpty);
+  });
+
   test('start fresh replaces owner token and clears only online state',
       () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
@@ -185,6 +290,17 @@ void main() {
       awardType: OnlineAwardType.bestSpeaker.value,
       text: 'Alice',
     );
+    await storage.saveCandidateSavedText(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker.value,
+      normalizedText: 'Alice',
+    );
+    await storage.saveAwardState(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestSpeaker,
+      awardId: 'award-1',
+      status: OnlineRoundStatus.open,
+    );
 
     await storage.startFreshOnThisDevice();
     final OnlineCountSetup fresh = await storage.load();
@@ -207,6 +323,14 @@ void main() {
       ),
       isNull,
     );
+    expect(
+      await storage.loadCandidateSavedText(
+        sessionId: 'session-1',
+        awardType: OnlineAwardType.bestSpeaker.value,
+      ),
+      isNull,
+    );
+    expect(await storage.loadAwardStates('session-1'), isEmpty);
     expect(recipient?.name, 'Ada President');
     expect(recipient?.phoneNumber, '+65 9664 5650');
   });
@@ -225,6 +349,17 @@ void main() {
       awardType: OnlineAwardType.bestEvaluator.value,
       text: 'Eva',
     );
+    await storage.saveCandidateSavedText(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestEvaluator.value,
+      normalizedText: 'Eva',
+    );
+    await storage.saveAwardState(
+      sessionId: 'session-1',
+      awardType: OnlineAwardType.bestEvaluator,
+      awardId: 'award-3',
+      status: OnlineRoundStatus.draft,
+    );
 
     await storage.resetOnlineCountOnThisDevice();
     final recipient = await recipientRepository.load();
@@ -236,6 +371,14 @@ void main() {
       ),
       isNull,
     );
+    expect(
+      await storage.loadCandidateSavedText(
+        sessionId: 'session-1',
+        awardType: OnlineAwardType.bestEvaluator.value,
+      ),
+      isNull,
+    );
+    expect(await storage.loadAwardStates('session-1'), isEmpty);
     expect(recipient?.name, 'Ada President');
     expect(recipient?.phoneNumber, '+65 9664 5650');
   });
