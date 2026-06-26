@@ -677,6 +677,14 @@ class AppLocalizationsZh extends AppLocalizations {
       '每次会议都可以使用同一个二维码。投票页面只会显示当前开放的奖项投票。';
 
   @override
+  String get onlineCountQrScheduleShareHelp =>
+      '可将此二维码分享给制作会议流程表的人。此二维码属于在线俱乐部，可重复用于每次会议。';
+
+  @override
+  String get onlineCountQrLifecycleReminder =>
+      '删除当前会议不会改变此二维码。本机重新开始或删除在线俱乐部后，旧二维码将不能继续使用。';
+
+  @override
   String get onlineCountChineseVotingPage => '中文投票页面';
 
   @override
@@ -696,6 +704,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCopyQrLink => '复制二维码链接';
+
+  @override
+  String get onlineCountShareQrCode => '分享二维码';
 
   @override
   String get onlineCountCopyPrintText => '复制打印文字';
@@ -759,6 +770,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCopied => '已复制。';
+
+  @override
+  String get onlineCountQrReadyToShare => '二维码已准备分享。';
+
+  @override
+  String get onlineCountCouldNotShareQr => '无法分享二维码。';
 
   @override
   String get onlineCountPleaseCompleteSetup => '请先完成设置';

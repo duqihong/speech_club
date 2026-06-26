@@ -709,6 +709,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.';
 
   @override
+  String get onlineCountQrScheduleShareHelp =>
+      'Share this QR code with the person preparing the meeting schedule. This QR code belongs to the online club and can be reused for every meeting.';
+
+  @override
+  String get onlineCountQrLifecycleReminder =>
+      'Deleting the current meeting does not change this QR code. Starting fresh or deleting the online club will make the old QR code unusable.';
+
+  @override
   String get onlineCountChineseVotingPage => 'Chinese voting page';
 
   @override
@@ -728,6 +736,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCopyQrLink => 'Copy QR Link';
+
+  @override
+  String get onlineCountShareQrCode => 'Share QR Code';
 
   @override
   String get onlineCountCopyPrintText => 'Copy Print Text';
@@ -795,6 +806,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCopied => 'Copied.';
+
+  @override
+  String get onlineCountQrReadyToShare => 'QR code is ready to share.';
+
+  @override
+  String get onlineCountCouldNotShareQr => 'Could not share QR code.';
 
   @override
   String get onlineCountPleaseCompleteSetup => 'Please complete setup first';

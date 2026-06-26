@@ -1406,6 +1406,18 @@ abstract class AppLocalizations {
   /// **'Use the same QR code for every meeting. The voting page will show only the award currently open for voting.'**
   String get onlineCountPermanentVotingQrHelp;
 
+  /// No description provided for @onlineCountQrScheduleShareHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this QR code with the person preparing the meeting schedule. This QR code belongs to the online club and can be reused for every meeting.'**
+  String get onlineCountQrScheduleShareHelp;
+
+  /// No description provided for @onlineCountQrLifecycleReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting the current meeting does not change this QR code. Starting fresh or deleting the online club will make the old QR code unusable.'**
+  String get onlineCountQrLifecycleReminder;
+
   /// No description provided for @onlineCountChineseVotingPage.
   ///
   /// In en, this message translates to:
@@ -1447,6 +1459,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy QR Link'**
   String get onlineCountCopyQrLink;
+
+  /// No description provided for @onlineCountShareQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Share QR Code'**
+  String get onlineCountShareQrCode;
 
   /// No description provided for @onlineCountCopyPrintText.
   ///
@@ -1573,6 +1591,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied.'**
   String get onlineCountCopied;
+
+  /// No description provided for @onlineCountQrReadyToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code is ready to share.'**
+  String get onlineCountQrReadyToShare;
+
+  /// No description provided for @onlineCountCouldNotShareQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share QR code.'**
+  String get onlineCountCouldNotShareQr;
 
   /// No description provided for @onlineCountPleaseCompleteSetup.
   ///

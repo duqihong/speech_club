@@ -62,6 +62,7 @@ void main() {
     expect(textFieldWithLabel('Admin PIN'), findsOneWidget);
     expect(find.text('Current Meeting'), findsNothing);
     expect(find.text('Permanent Voting QR'), findsNothing);
+    expect(find.text('Share QR Code'), findsNothing);
     expect(find.text('Results'), findsNothing);
     expect(find.text('Backend URL'), findsNothing);
     expect(find.text('Advanced Settings'), findsOneWidget);
@@ -361,7 +362,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('English voting page'), findsOneWidget);
+    expect(
+      find.text(
+        'Share this QR code with the person preparing the meeting schedule. This QR code belongs to the online club and can be reused for every meeting.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'Deleting the current meeting does not change this QR code. Starting fresh or deleting the online club will make the old QR code unusable.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Copy QR Link'), findsOneWidget);
+    expect(find.text('Share QR Code'), findsOneWidget);
     expect(find.text('Copy Print Text'), findsOneWidget);
     expect(
       find.text(

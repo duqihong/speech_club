@@ -7,6 +7,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/online_count/online_count_api.dart';
 import '../data/online_count/online_count_models.dart';
+import '../data/online_count/online_count_qr_share_helper.dart';
 import '../data/online_count/online_count_results_summary_builder.dart';
 import '../data/online_count/online_count_storage.dart';
 import '../data/vote_results_recipient.dart';
@@ -628,6 +629,39 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         AppLocalizations.of(context)!.onlineCountCopied;
     await Clipboard.setData(ClipboardData(text: text));
     _showMessage(copiedMessage);
+  }
+
+  Future<void> _shareQrCode({
+    required String url,
+    required _QrLinkType type,
+  }) async {
+    if (_busyAction != null || url.isEmpty || !_hasCloudSetup()) {
+      return;
+    }
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Locale locale = Localizations.localeOf(context);
+    final String clubName = _clubNameController.text.trim();
+    final String clubCode = _clubSlugController.text.trim();
+    setState(() => _busyAction = 'shareQrCode');
+    try {
+      await shareVotingQrCode(
+        url: url,
+        clubName: clubName,
+        clubCode: clubCode,
+        languageCode: type.name,
+        shareText: buildVotingQrShareText(
+          clubName: clubName,
+          languageCode: locale.languageCode,
+        ),
+      );
+      _showMessage(l10n.onlineCountQrReadyToShare);
+    } catch (_) {
+      _showMessage(l10n.onlineCountCouldNotShareQr);
+    } finally {
+      if (mounted) {
+        setState(() => _busyAction = null);
+      }
+    }
   }
 
   Future<void> _copyResults() async {
@@ -1379,6 +1413,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       icon: Icons.qr_code_2_outlined,
       children: <Widget>[
         _BodyText(l10n.onlineCountPermanentVotingQrHelp),
+        _BodyText(l10n.onlineCountQrScheduleShareHelp),
+        _BodyText(l10n.onlineCountQrLifecycleReminder),
         const SizedBox(height: 12),
         if (baseUrl.isEmpty)
           Text(
@@ -1444,6 +1480,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                 onPressed: () => _copyText(url),
                 icon: const Icon(Icons.copy_outlined),
                 label: Text(l10n.onlineCountCopyQrLink),
+              ),
+              OutlinedButton.icon(
+                onPressed: _busyAction == 'shareQrCode'
+                    ? null
+                    : () => _shareQrCode(url: url, type: selectedType),
+                icon: const Icon(Icons.ios_share_outlined),
+                label: Text(l10n.onlineCountShareQrCode),
               ),
               OutlinedButton.icon(
                 onPressed: () => _copyText(buildVotingPrintText(url, locale)),
