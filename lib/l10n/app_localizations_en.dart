@@ -584,7 +584,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountSetupPurpose =>
-      'Set up the permanent online club identity and voting link.';
+      'Enter your club name. The app will create a permanent online voting QR code for this club.';
 
   @override
   String get onlineCountAdminPinHelp =>
@@ -611,8 +611,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountClubCodeLabel => 'Club code';
 
   @override
-  String get onlineCountVotingLinkAvailableBelow =>
-      'Voting link available below.';
+  String get onlineCountVotingLinkAvailableBelow => 'Voting QR is ready below.';
 
   @override
   String get onlineCountLinkReadyAfterCreate =>
@@ -620,6 +619,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountClubReady => 'Online club is ready.';
+
+  @override
+  String get onlineCountCurrentStatus => 'Current Status';
 
   @override
   String get onlineCountCurrentMeeting => 'Current Meeting';
@@ -719,6 +721,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Results are final. Send or copy results before deleting the meeting.';
 
   @override
+  String get onlineCountReadyToStartVoting => 'Ready to start voting?';
+
+  @override
+  String get onlineCountAddAllCandidatesBeforeOpening =>
+      'Add candidates for all awards before opening the meeting.';
+
+  @override
   String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
 
   @override
@@ -785,7 +794,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountQrScheduleShareHelp =>
-      'Share it with the person preparing the meeting schedule.\nIt can be reused for every meeting.';
+      'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.';
 
   @override
   String get onlineCountQrLifecycleReminder =>
@@ -810,7 +819,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountQrAuto => 'Auto';
 
   @override
-  String get onlineCountCopyQrLink => 'Copy QR Link';
+  String get onlineCountCopyQrLink => 'Copy Link';
 
   @override
   String get onlineCountShareQrCode => 'Share QR Code';
@@ -887,6 +896,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCouldNotShareQr => 'Could not share QR code.';
+
+  @override
+  String get onlineCountCouldNotCheckStatus => 'Could not check online status.';
 
   @override
   String get onlineCountPleaseCompleteSetup => 'Please complete setup first';
@@ -997,6 +1009,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onlineCountVotingLinkHelp =>
       'The same link is used for every award. Open one award voting round at a time.';
+
+  @override
+  String get onlineCountTechnicalSettings => 'Technical Settings';
+
+  @override
+  String get onlineCountTechnicalSettingsHelp =>
+      'Only change this if you know which online voting backend to use.';
 
   @override
   String onlineCountWinner(String name) {

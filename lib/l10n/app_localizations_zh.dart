@@ -560,7 +560,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSaveSetup => '保存设置';
 
   @override
-  String get onlineCountSetupPurpose => '设置永久在线俱乐部身份和投票链接。';
+  String get onlineCountSetupPurpose => '请输入俱乐部名称。系统会为此俱乐部创建一个永久在线投票二维码。';
 
   @override
   String get onlineCountAdminPinHelp => '管理员密码用于执委管理在线投票，请不要分享给投票者。';
@@ -585,13 +585,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountClubCodeLabel => '俱乐部代号';
 
   @override
-  String get onlineCountVotingLinkAvailableBelow => '投票链接在下方。';
+  String get onlineCountVotingLinkAvailableBelow => '投票二维码已在下方准备好。';
 
   @override
   String get onlineCountLinkReadyAfterCreate => '创建俱乐部后，永久投票链接即可使用。';
 
   @override
   String get onlineCountClubReady => '在线俱乐部已准备好。';
+
+  @override
+  String get onlineCountCurrentStatus => '当前状态';
 
   @override
   String get onlineCountCurrentMeeting => '当前会议';
@@ -682,6 +685,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountClosedMeetingHelper => '结果已最终确认。请先发送或复制结果，再删除会议。';
 
   @override
+  String get onlineCountReadyToStartVoting => '准备开始投票了吗？';
+
+  @override
+  String get onlineCountAddAllCandidatesBeforeOpening => '请先为所有奖项添加候选人，再开放会议。';
+
+  @override
   String get onlineCountDeleteCurrentMeeting => '删除当前会议';
 
   @override
@@ -742,7 +751,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountPermanentVotingQrHelp => '此二维码属于本在线俱乐部。';
 
   @override
-  String get onlineCountQrScheduleShareHelp => '可分享给制作会议流程表的人。\n每次会议都可以重复使用。';
+  String get onlineCountQrScheduleShareHelp => '每次会议都可以重复使用。\n投票页面会跟随投票者手机的语言。';
 
   @override
   String get onlineCountQrLifecycleReminder =>
@@ -767,7 +776,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountQrAuto => 'Auto';
 
   @override
-  String get onlineCountCopyQrLink => '复制二维码链接';
+  String get onlineCountCopyQrLink => '复制链接';
 
   @override
   String get onlineCountShareQrCode => '分享二维码';
@@ -840,6 +849,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCouldNotShareQr => '无法分享二维码。';
+
+  @override
+  String get onlineCountCouldNotCheckStatus => '无法检查云端状态。';
 
   @override
   String get onlineCountPleaseCompleteSetup => '请先完成设置';
@@ -938,6 +950,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountVotingLinkHelp => '每个奖项都使用同一个链接。请一次只开放一个奖项投票。';
+
+  @override
+  String get onlineCountTechnicalSettings => '技术设置';
+
+  @override
+  String get onlineCountTechnicalSettingsHelp => '只有在知道要使用哪个在线投票后台时才修改这里。';
 
   @override
   String onlineCountWinner(String name) {

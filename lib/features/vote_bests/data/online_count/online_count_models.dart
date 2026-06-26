@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 enum OnlineAwardType {
@@ -319,14 +320,21 @@ List<String> parseOnlineCandidateLines(String value) {
 }
 
 String generateClubCode(String clubName) {
-  final String code = clubName
+  final String baseCode = clubName
       .trim()
       .toLowerCase()
       .replaceAll(RegExp(r'\s+'), '-')
       .replaceAll(RegExp(r'[^a-z0-9-]'), '')
       .replaceAll(RegExp(r'-+'), '-')
       .replaceAll(RegExp(r'^-+|-+$'), '');
-  return code.isEmpty ? 'speech-club' : code;
+  final String prefix = baseCode.isEmpty ? 'speech-club' : baseCode;
+  final int suffix = Random.secure().nextInt(9000) + 1000;
+  return '$prefix-$suffix';
+}
+
+String generateAdminPin() {
+  final int pin = Random.secure().nextInt(1000000);
+  return pin.toString().padLeft(6, '0');
 }
 
 String buildVotingPrintText(String url, Locale locale) {

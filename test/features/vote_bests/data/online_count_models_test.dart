@@ -12,11 +12,27 @@ void main() {
       );
     });
 
-    test('club code generation normalizes names', () {
-      expect(generateClubCode('Demo App Test Club'), 'demo-app-test-club');
-      expect(generateClubCode('Jiangyin Speech Club'), 'jiangyin-speech-club');
-      expect(generateClubCode('  My   Club! 2026  '), 'my-club-2026');
-      expect(generateClubCode('中文俱乐部'), 'speech-club');
+    test('club code generation normalizes names and adds suffix', () {
+      expect(
+        generateClubCode('Minister Toastmasters Club'),
+        matches(RegExp(r'^minister-toastmasters-club-\d{4}$')),
+      );
+      expect(
+        generateClubCode('Demo Club'),
+        matches(RegExp(r'^demo-club-\d{4}$')),
+      );
+      expect(
+        generateClubCode('  My   Club! 2026  '),
+        matches(RegExp(r'^my-club-2026-\d{4}$')),
+      );
+      expect(
+        generateClubCode('中文俱乐部'),
+        matches(RegExp(r'^speech-club-\d{4}$')),
+      );
+    });
+
+    test('admin pin generation returns six digits', () {
+      expect(generateAdminPin(), matches(RegExp(r'^\d{6}$')));
     });
 
     test('print text is localized and includes voting URL', () {

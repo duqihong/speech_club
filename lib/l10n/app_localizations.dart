@@ -1181,7 +1181,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountSetupPurpose.
   ///
   /// In en, this message translates to:
-  /// **'Set up the permanent online club identity and voting link.'**
+  /// **'Enter your club name. The app will create a permanent online voting QR code for this club.'**
   String get onlineCountSetupPurpose;
 
   /// No description provided for @onlineCountAdminPinHelp.
@@ -1229,7 +1229,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountVotingLinkAvailableBelow.
   ///
   /// In en, this message translates to:
-  /// **'Voting link available below.'**
+  /// **'Voting QR is ready below.'**
   String get onlineCountVotingLinkAvailableBelow;
 
   /// No description provided for @onlineCountLinkReadyAfterCreate.
@@ -1243,6 +1243,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Online club is ready.'**
   String get onlineCountClubReady;
+
+  /// No description provided for @onlineCountCurrentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Status'**
+  String get onlineCountCurrentStatus;
 
   /// No description provided for @onlineCountCurrentMeeting.
   ///
@@ -1418,6 +1424,18 @@ abstract class AppLocalizations {
   /// **'Results are final. Send or copy results before deleting the meeting.'**
   String get onlineCountClosedMeetingHelper;
 
+  /// No description provided for @onlineCountReadyToStartVoting.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to start voting?'**
+  String get onlineCountReadyToStartVoting;
+
+  /// No description provided for @onlineCountAddAllCandidatesBeforeOpening.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates for all awards before opening the meeting.'**
+  String get onlineCountAddAllCandidatesBeforeOpening;
+
   /// No description provided for @onlineCountDeleteCurrentMeeting.
   ///
   /// In en, this message translates to:
@@ -1541,7 +1559,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountQrScheduleShareHelp.
   ///
   /// In en, this message translates to:
-  /// **'Share it with the person preparing the meeting schedule.\nIt can be reused for every meeting.'**
+  /// **'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.'**
   String get onlineCountQrScheduleShareHelp;
 
   /// No description provided for @onlineCountQrLifecycleReminder.
@@ -1589,7 +1607,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCopyQrLink.
   ///
   /// In en, this message translates to:
-  /// **'Copy QR Link'**
+  /// **'Copy Link'**
   String get onlineCountCopyQrLink;
 
   /// No description provided for @onlineCountShareQrCode.
@@ -1735,6 +1753,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not share QR code.'**
   String get onlineCountCouldNotShareQr;
+
+  /// No description provided for @onlineCountCouldNotCheckStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check online status.'**
+  String get onlineCountCouldNotCheckStatus;
 
   /// No description provided for @onlineCountPleaseCompleteSetup.
   ///
@@ -1921,6 +1945,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The same link is used for every award. Open one award voting round at a time.'**
   String get onlineCountVotingLinkHelp;
+
+  /// No description provided for @onlineCountTechnicalSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Settings'**
+  String get onlineCountTechnicalSettings;
+
+  /// No description provided for @onlineCountTechnicalSettingsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Only change this if you know which online voting backend to use.'**
+  String get onlineCountTechnicalSettingsHelp;
 
   /// No description provided for @onlineCountWinner.
   ///

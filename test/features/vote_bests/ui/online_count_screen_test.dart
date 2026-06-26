@@ -109,14 +109,14 @@ void main() {
     expect(find.text('Online Club Setup'), findsOneWidget);
     expect(find.text('Create Online Club'), findsOneWidget);
     expect(textFieldWithLabel('Club Name'), findsOneWidget);
-    expect(textFieldWithLabel('Club Code'), findsOneWidget);
-    expect(textFieldWithLabel('Admin PIN'), findsOneWidget);
+    expect(textFieldWithLabel('Club Code'), findsNothing);
+    expect(textFieldWithLabel('Admin PIN'), findsNothing);
     expect(find.text('Current Meeting'), findsNothing);
     expect(find.text('Permanent Voting QR'), findsNothing);
     expect(find.text('Share QR Code'), findsNothing);
     expect(find.text('Results'), findsNothing);
     expect(find.text('Backend URL'), findsNothing);
-    expect(find.text('Advanced Settings'), findsOneWidget);
+    expect(find.text('Advanced Settings'), findsNothing);
     expect(find.text('Start Fresh on This Device'), findsNothing);
 
     await openDangerZone(tester, actionLabel: 'Start Fresh on This Device');
@@ -155,42 +155,19 @@ void main() {
     );
   });
 
-  testWidgets('club code auto-generates until manually edited',
-      (WidgetTester tester) async {
-    await pumpOnlineCountScreen(tester);
-
-    await tester.enterText(
-      textFieldWithLabel('Club Name'),
-      'Demo App Test Club',
-    );
-    await tester.pump();
-
-    TextField codeField = tester.widget<TextField>(
-      textFieldWithLabel('Club Code'),
-    );
-    expect(codeField.controller!.text, 'demo-app-test-club');
-
-    await tester.enterText(textFieldWithLabel('Club Code'), 'custom-code');
-    await tester.pump();
-    await tester.enterText(textFieldWithLabel('Club Name'), 'Changed Club');
-    await tester.pump();
-
-    codeField = tester.widget<TextField>(textFieldWithLabel('Club Code'));
-    expect(codeField.controller!.text, 'custom-code');
-  });
-
   testWidgets('saved club shows locked summary and no editable setup fields',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(savedClubPrefs());
 
     await pumpOnlineCountScreen(tester);
 
-    expect(find.text('Online Club Ready'), findsWidgets);
+    expect(find.text('Current Status'), findsOneWidget);
+    expect(find.text('Online Club Ready'), findsOneWidget);
     expect(find.text('Current Meeting: Not created'), findsOneWidget);
     expect(find.text('Next step: Create Current Meeting'), findsOneWidget);
     expect(find.text('Club: Demo Club'), findsOneWidget);
     expect(find.text('Club code: demo-club'), findsOneWidget);
-    expect(find.text('Voting link available below.'), findsOneWidget);
+    expect(find.text('Voting QR is ready below.'), findsOneWidget);
     expect(
       find.text(
         'Voting Link: https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
@@ -210,6 +187,7 @@ void main() {
     await openDangerZone(tester, actionLabel: 'Start Fresh on This Device');
     expect(find.text('Reset Online Count on This Device'), findsOneWidget);
     expect(find.text('Start Fresh on This Device'), findsOneWidget);
+    expect(find.text('Technical Settings'), findsOneWidget);
   });
 
   testWidgets('saved club with no session shows no current meeting',
@@ -256,6 +234,21 @@ void main() {
     expect(find.text('Delete Current Meeting'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Ready to start voting?'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Ready to start voting?'), findsOneWidget);
+    expect(
+      find.text('Add candidates for all awards before opening the meeting.'),
+      findsOneWidget,
+    );
+    final FilledButton openMeetingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Open Meeting'),
+    );
+    expect(openMeetingButton.onPressed, isNull);
     expect(find.text('Results'), findsNothing);
   });
 
@@ -497,7 +490,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('English voting page'), findsOneWidget);
+    expect(find.text('English voting page'), findsNothing);
+    expect(find.text('中文'), findsNothing);
+    expect(find.text('Auto'), findsNothing);
     expect(
       find.text(
         'This QR code belongs to this online club.',
@@ -506,7 +501,7 @@ void main() {
     );
     expect(
       find.text(
-        'Share it with the person preparing the meeting schedule.\nIt can be reused for every meeting.',
+        'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.',
       ),
       findsOneWidget,
     );
@@ -516,14 +511,15 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('Copy QR Link'), findsOneWidget);
+    expect(find.text('Copy Link'), findsOneWidget);
     expect(find.text('Share QR Code'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Share QR Code'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'Copy QR Link'), findsOneWidget);
-    expect(find.text('Copy Print Text'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Copy Link'), findsOneWidget);
+    expect(find.text('Copy Print Text'), findsNothing);
+    expect(find.text('Voting Link'), findsNothing);
     expect(
       find.text(
-        'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club?lang=en',
+        'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
       ),
       findsOneWidget,
     );

@@ -92,7 +92,8 @@ void main() {
 
     expect(find.text('Online Count'), findsOneWidget);
     expect(find.text('Online Club Setup'), findsOneWidget);
-    expect(find.text('Club Code'), findsOneWidget);
+    expect(find.text('Club Name'), findsOneWidget);
+    expect(find.text('Club Code'), findsNothing);
     expect(find.text('Create Online Club'), findsOneWidget);
   });
 
@@ -105,7 +106,8 @@ void main() {
 
     expect(find.text('在线计票'), findsOneWidget);
     expect(find.text('在线俱乐部设置'), findsOneWidget);
-    expect(find.text('俱乐部代号'), findsOneWidget);
+    expect(find.text('俱乐部名称'), findsOneWidget);
+    expect(find.text('俱乐部代号'), findsNothing);
     expect(find.text('创建在线俱乐部'), findsOneWidget);
   });
 }
