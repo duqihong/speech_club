@@ -273,6 +273,59 @@ void main() {
     expect(find.text('Results'), findsNothing);
   });
 
+  testWidgets('disposing while vote polling is active does not throw',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.open.value,
+      ),
+    );
+
+    await pumpOnlineCountScreen(
+      tester,
+      debugInitialAwards: debugAwardsForSession(),
+    );
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 6));
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('start fresh cancels active vote polling without throwing',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.open.value,
+      ),
+    );
+
+    await pumpOnlineCountScreen(
+      tester,
+      debugInitialAwards: debugAwardsForSession(),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Start Fresh on This Device'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start Fresh on This Device'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      textFieldWithLabel('Type FRESH to continue'),
+      'FRESH',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'OK'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 6));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Online Club Setup'), findsOneWidget);
+  });
+
   testWidgets('closed current meeting shows result actions only',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(

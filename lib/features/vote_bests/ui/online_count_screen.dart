@@ -98,6 +98,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   DateTime? _lastVoteCountRefreshAt;
   Map<String, int> _voteTotalsByAwardType = <String, int>{};
   late Future<VoteResultsRecipient?> _recipientFuture;
+  bool _elementActive = true;
+
+  bool get _canUseContext => mounted && _elementActive;
+  bool get _canUpdateState => mounted && _elementActive;
 
   @override
   void initState() {
@@ -109,6 +113,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   @override
   void dispose() {
+    _elementActive = false;
     _stopVoteCountPolling();
     _baseUrlController.dispose();
     _clubNameController.dispose();
@@ -123,9 +128,23 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     super.dispose();
   }
 
+  @override
+  void deactivate() {
+    _elementActive = false;
+    _stopVoteCountPolling();
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _elementActive = true;
+    _syncVoteCountPolling();
+  }
+
   Future<void> _loadSetup() async {
     final OnlineCountSetup setup = await _storage.load();
-    if (!mounted) {
+    if (!_canUpdateState) {
       return;
     }
     setState(() {
@@ -167,7 +186,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     String action,
     Future<void> Function() operation,
   ) async {
-    if (_busyAction != null) {
+    if (_busyAction != null || !_canUseContext) {
       return;
     }
     final AppLocalizations l10n = AppLocalizations.of(context)!;
@@ -181,14 +200,16 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     } catch (_) {
       _showMessage(l10n.onlineCountCouldNotConnect);
     } finally {
-      if (mounted) {
+      if (_canUpdateState) {
         setState(() => _busyAction = null);
       }
     }
   }
 
   Future<void> _saveSetup({bool showMessage = true}) async {
-    final String savedMessage = AppLocalizations.of(context)!.onlineCountSaved;
+    final String savedMessage = showMessage && _canUseContext
+        ? AppLocalizations.of(context)!.onlineCountSaved
+        : '';
     await _storage.saveSetup(
       OnlineCountSetup(
         baseUrl: _baseUrlController.text.trim(),
@@ -203,7 +224,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         ownerToken: _ownerToken,
       ),
     );
-    if (showMessage) {
+    if (showMessage && savedMessage.isNotEmpty) {
       _showMessage(savedMessage);
     }
   }
@@ -221,7 +242,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         clubSlug: _clubSlugController.text.trim(),
         adminPin: _adminPinController.text.trim(),
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() => _clubCreated = true);
@@ -245,7 +266,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         meetingTitle: _meetingTitleController.text.trim(),
         meetingDate: _meetingDateController.text.trim(),
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() {
@@ -279,7 +300,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         adminPin: _adminPinController.text.trim(),
         ownerToken: _ownerToken,
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() => _session = updated.copyWith(awards: _awards));
@@ -306,7 +327,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         adminPin: _adminPinController.text.trim(),
         ownerToken: _ownerToken,
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() {
@@ -431,7 +452,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         adminPin: _adminPinController.text.trim(),
         ownerToken: _ownerToken,
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() {
@@ -466,7 +487,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       clubSlug: _clubSlugController.text.trim(),
       adminPin: _adminPinController.text.trim(),
     );
-    if (!mounted) {
+    if (!_canUpdateState) {
       return;
     }
     setState(() {
@@ -514,13 +535,14 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     if (!confirmed) {
       return;
     }
+    _stopVoteCountPolling();
     await _runAction('deleteMeeting', () async {
       await _api().deleteCurrentMeeting(
         ownerToken: _ownerToken,
         sessionId: session.id,
         adminPin: _adminPinController.text.trim(),
       );
-      if (!mounted) {
+      if (!_canUpdateState) {
         return;
       }
       setState(() {
@@ -558,6 +580,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     if (!confirmed) {
       return;
     }
+    _stopVoteCountPolling();
     await _runAction('deleteClub', () async {
       await _api().deleteOnlineClub(
         ownerToken: _ownerToken,
@@ -580,6 +603,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     if (!confirmed) {
       return;
     }
+    _stopVoteCountPolling();
     await _resetLocalOnlineCount(showMessage: false);
     _showMessage(l10n.onlineCountDeviceSetupReset);
   }
@@ -595,9 +619,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     if (!confirmed) {
       return;
     }
+    _stopVoteCountPolling();
     await _storage.startFreshOnThisDevice();
     final OnlineCountSetup setup = await _storage.load();
-    if (!mounted) {
+    if (!_canUpdateState) {
       return;
     }
     _applyEmptySetup(setup);
@@ -605,18 +630,24 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Future<void> _resetLocalOnlineCount({required bool showMessage}) async {
+    final String resetMessage = showMessage && _canUseContext
+        ? AppLocalizations.of(context)!.onlineCountDeviceSetupReset
+        : '';
     await _storage.resetOnlineCountOnThisDevice();
     final OnlineCountSetup setup = await _storage.load();
-    if (!mounted) {
+    if (!_canUpdateState) {
       return;
     }
     _applyEmptySetup(setup);
-    if (showMessage) {
-      _showMessage(AppLocalizations.of(context)!.onlineCountDeviceSetupReset);
+    if (showMessage && resetMessage.isNotEmpty) {
+      _showMessage(resetMessage);
     }
   }
 
   void _applyEmptySetup(OnlineCountSetup setup) {
+    if (!_canUpdateState) {
+      return;
+    }
     _stopVoteCountPolling();
     setState(() {
       _ownerToken = setup.ownerToken;
@@ -643,6 +674,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   void _syncVoteCountPolling() {
+    if (!_canUpdateState) {
+      _stopVoteCountPolling();
+      return;
+    }
     if (_session?.status == OnlineRoundStatus.open && _hasCloudSetup()) {
       _startVoteCountPolling();
     } else {
@@ -651,7 +686,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   void _startVoteCountPolling() {
-    if (_voteCountTimer != null) {
+    if (!_canUpdateState || _voteCountTimer != null) {
       return;
     }
     _voteCountTimer = Timer.periodic(
@@ -666,22 +701,28 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Future<void> _refreshVoteCounts({required bool showError}) async {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (!_canUpdateState) {
+      return;
+    }
+    final String refreshErrorMessage = showError && _canUseContext
+        ? AppLocalizations.of(context)!.onlineCountCouldNotRefreshVoteCount
+        : '';
     final OnlineSession? session = _session;
     if (_voteCountRefreshInFlight || session == null || !_hasCloudSetup()) {
       return;
     }
+    final String sessionId = session.id;
     _voteCountRefreshInFlight = true;
     if (showError) {
       setState(() => _busyAction = 'refreshVoteCount');
     }
     try {
       final OnlineResults results = await _api().getResults(
-        sessionId: session.id,
+        sessionId: sessionId,
         adminPin: _adminPinController.text.trim(),
         ownerToken: _ownerToken,
       );
-      if (!mounted) {
+      if (!_canUpdateState || _session?.id != sessionId || !_hasCloudSetup()) {
         return;
       }
       setState(() {
@@ -690,16 +731,16 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _voteCountRefreshFailed = false;
       });
     } catch (_) {
-      if (!mounted) {
+      if (!_canUpdateState || _session?.id != sessionId || !_hasCloudSetup()) {
         return;
       }
       setState(() => _voteCountRefreshFailed = true);
-      if (showError) {
-        _showMessage(l10n.onlineCountCouldNotRefreshVoteCount);
+      if (showError && refreshErrorMessage.isNotEmpty) {
+        _showMessage(refreshErrorMessage);
       }
     } finally {
       _voteCountRefreshInFlight = false;
-      if (mounted && showError && _busyAction == 'refreshVoteCount') {
+      if (_canUpdateState && showError && _busyAction == 'refreshVoteCount') {
         setState(() => _busyAction = null);
       }
     }
@@ -712,6 +753,9 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   void _replaceAward(OnlineAward updated) {
+    if (!_canUpdateState) {
+      return;
+    }
     setState(() {
       _awards = _awards
           .map(
@@ -722,6 +766,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Future<void> _copyText(String text) async {
+    if (!mounted) {
+      return;
+    }
+    if (!_elementActive) {
+      return;
+    }
     final String copiedMessage =
         AppLocalizations.of(context)!.onlineCountCopied;
     await Clipboard.setData(ClipboardData(text: text));
@@ -732,7 +782,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     required String url,
     required _QrLinkType type,
   }) async {
-    if (_busyAction != null || url.isEmpty || !_hasCloudSetup()) {
+    if (_busyAction != null ||
+        url.isEmpty ||
+        !_hasCloudSetup() ||
+        !_canUseContext) {
       return;
     }
     final AppLocalizations l10n = AppLocalizations.of(context)!;
@@ -751,17 +804,26 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           languageCode: locale.languageCode,
         ),
       );
+      if (!_canUseContext) {
+        return;
+      }
       _showMessage(l10n.onlineCountQrReadyToShare);
     } catch (_) {
+      if (!_canUseContext) {
+        return;
+      }
       _showMessage(l10n.onlineCountCouldNotShareQr);
     } finally {
-      if (mounted) {
+      if (_canUpdateState) {
         setState(() => _busyAction = null);
       }
     }
   }
 
   Future<void> _copyResults() async {
+    if (!_canUseContext) {
+      return;
+    }
     final OnlineResults? results = _results;
     if (results == null) {
       _showMessage(AppLocalizations.of(context)!.onlineCountNoResultsYet);
@@ -771,6 +833,9 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Future<void> _sendResultsToPresident() async {
+    if (!_canUseContext) {
+      return;
+    }
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     if (_session == null) {
       _showMessage(l10n.onlineCountCreateMeetingFirst);
@@ -784,7 +849,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
     final VoteResultsRecipient? recipient =
         await widget.recipientRepository.load();
-    if (!mounted) {
+    if (!_canUseContext) {
       return;
     }
     if (recipient == null ||
@@ -798,14 +863,14 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       rawPhone: recipient.phoneNumber,
       message: summary,
     );
-    if (!mounted) {
+    if (!_canUseContext) {
       return;
     }
     if (opened) {
       _showMessage(l10n.voteBestsWhatsAppOpened);
     } else {
       _copySummaryToClipboard(summary);
-      if (mounted) {
+      if (_canUseContext) {
         _showMessage(l10n.voteBestsWhatsAppOpenFailedCopied);
       }
     }
@@ -815,6 +880,9 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     final VoteResultsRecipient? currentRecipient =
         await widget.recipientRepository.load();
     if (!mounted) {
+      return;
+    }
+    if (!_elementActive) {
       return;
     }
 
@@ -827,7 +895,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       ),
     );
 
-    if (input == null) {
+    if (input == null || !_canUseContext) {
       return;
     }
     final VoteResultsRecipient recipient =
@@ -835,7 +903,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       name: input.name,
       phoneNumber: input.phoneNumber,
     );
-    if (mounted) {
+    if (_canUpdateState) {
       setState(() {
         _recipientFuture = Future<VoteResultsRecipient?>.value(recipient);
       });
@@ -993,63 +1061,23 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     required String requiredText,
     required String confirmationLabel,
   }) async {
-    final TextEditingController controller = TextEditingController();
-    try {
-      final bool? confirmed = await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-            builder: (
-              BuildContext context,
-              StateSetter setDialogState,
-            ) {
-              final bool canConfirm = controller.text.trim() == requiredText;
-              return AlertDialog(
-                title: Text(title),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(message),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: controller,
-                      autofocus: true,
-                      onChanged: (_) => setDialogState(() {}),
-                      decoration: InputDecoration(
-                        labelText: confirmationLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: Text(
-                        MaterialLocalizations.of(context).cancelButtonLabel),
-                  ),
-                  FilledButton(
-                    onPressed: canConfirm
-                        ? () => Navigator.of(context).pop(true)
-                        : null,
-                    child:
-                        Text(MaterialLocalizations.of(context).okButtonLabel),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-      return confirmed == true;
-    } finally {
-      controller.dispose();
+    if (!_canUseContext) {
+      return false;
     }
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => _TypedConfirmationDialog(
+        title: title,
+        message: message,
+        requiredText: requiredText,
+        confirmationLabel: confirmationLabel,
+      ),
+    );
+    return _canUseContext && confirmed == true;
   }
 
   void _showMessage(String message) {
-    if (!mounted) {
+    if (!_canUseContext) {
       return;
     }
     ScaffoldMessenger.of(context)
@@ -1861,6 +1889,71 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 }
 
 enum _QrLinkType { zh, en, auto }
+
+class _TypedConfirmationDialog extends StatefulWidget {
+  const _TypedConfirmationDialog({
+    required this.title,
+    required this.message,
+    required this.requiredText,
+    required this.confirmationLabel,
+  });
+
+  final String title;
+  final String message;
+  final String requiredText;
+  final String confirmationLabel;
+
+  @override
+  State<_TypedConfirmationDialog> createState() =>
+      _TypedConfirmationDialogState();
+}
+
+class _TypedConfirmationDialogState extends State<_TypedConfirmationDialog> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool canConfirm = _controller.text.trim() == widget.requiredText;
+    final MaterialLocalizations materialLocalizations =
+        MaterialLocalizations.of(context);
+    return AlertDialog(
+      title: Text(widget.title),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(widget.message),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              labelText: widget.confirmationLabel,
+              border: const OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(materialLocalizations.cancelButtonLabel),
+        ),
+        FilledButton(
+          onPressed: canConfirm ? () => Navigator.of(context).pop(true) : null,
+          child: Text(materialLocalizations.okButtonLabel),
+        ),
+      ],
+    );
+  }
+}
 
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
