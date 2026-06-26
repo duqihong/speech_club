@@ -667,6 +667,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountCloseVoting => '结束投票';
 
   @override
+  String get onlineCountVotesReceived => '已收到票数';
+
+  @override
+  String get onlineCountFinalVotes => '最终票数';
+
+  @override
+  String get onlineCountRefreshVoteCount => '刷新票数';
+
+  @override
+  String get onlineCountVoteCountsAutoRefresh => '票数每 5 秒自动刷新。';
+
+  @override
+  String get onlineCountVoteCountsLastUpdated => '最后更新：刚刚';
+
+  @override
+  String get onlineCountCouldNotRefreshVoteCount => '无法刷新票数。';
+
+  @override
   String get onlineCountVotingLink => '投票链接';
 
   @override

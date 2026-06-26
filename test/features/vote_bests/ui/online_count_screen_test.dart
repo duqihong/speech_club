@@ -9,12 +9,15 @@ import 'package:speech_club/l10n/app_localizations.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<void> pumpOnlineCountScreen(WidgetTester tester) async {
+  Future<void> pumpOnlineCountScreen(
+    WidgetTester tester, {
+    List<OnlineAward> debugInitialAwards = const <OnlineAward>[],
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: OnlineCountScreen(),
+        home: OnlineCountScreen(debugInitialAwards: debugInitialAwards),
       ),
     );
     await tester.pumpAndSettle();
@@ -47,13 +50,39 @@ void main() {
     };
   }
 
+  List<OnlineAward> debugAwardsForSession() {
+    return const <OnlineAward>[
+      OnlineAward(
+        id: 'award-1',
+        sessionId: 'session-1',
+        type: OnlineAwardType.bestSpeaker,
+        status: OnlineRoundStatus.open,
+      ),
+      OnlineAward(
+        id: 'award-2',
+        sessionId: 'session-1',
+        type: OnlineAwardType.bestTableTopics,
+        status: OnlineRoundStatus.draft,
+      ),
+      OnlineAward(
+        id: 'award-3',
+        sessionId: 'session-1',
+        type: OnlineAwardType.bestEvaluator,
+        status: OnlineRoundStatus.closed,
+      ),
+    ];
+  }
+
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
 
   testWidgets('no club shows setup mode only and hides backend URL',
       (WidgetTester tester) async {
-    await pumpOnlineCountScreen(tester);
+    await pumpOnlineCountScreen(
+      tester,
+      debugInitialAwards: debugAwardsForSession(),
+    );
 
     expect(find.text('Online Club Setup'), findsOneWidget);
     expect(find.text('Create Online Club'), findsOneWidget);
@@ -162,7 +191,10 @@ void main() {
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(savedClubPrefs());
 
-    await pumpOnlineCountScreen(tester);
+    await pumpOnlineCountScreen(
+      tester,
+      debugInitialAwards: debugAwardsForSession(),
+    );
 
     await tester.scrollUntilVisible(
       find.text('Current Meeting'),
@@ -206,7 +238,10 @@ void main() {
       ),
     );
 
-    await pumpOnlineCountScreen(tester);
+    await pumpOnlineCountScreen(
+      tester,
+      debugInitialAwards: debugAwardsForSession(),
+    );
 
     await tester.scrollUntilVisible(
       find.text('Current Meeting'),
@@ -219,6 +254,22 @@ void main() {
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Voting Round'), findsOneWidget);
+    expect(find.text('Refresh Vote Count'), findsOneWidget);
+    expect(
+      find.text('Vote counts auto-refresh every 5 seconds.'),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Open · Votes received: 0'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Open · Votes received: 0'), findsOneWidget);
+    expect(find.text('Votes received: 0'), findsOneWidget);
+    expect(find.text('Final votes: 0'), findsOneWidget);
     expect(find.text('Results'), findsNothing);
   });
 
@@ -253,6 +304,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Refresh Results'), findsOneWidget);
+    expect(find.text('Refresh Vote Count'), findsNothing);
     expect(find.text('Copy Results'), findsOneWidget);
     expect(find.text('Send Results to President'), findsOneWidget);
   });

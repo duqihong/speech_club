@@ -699,6 +699,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountCloseVoting => 'Close Voting';
 
   @override
+  String get onlineCountVotesReceived => 'Votes received';
+
+  @override
+  String get onlineCountFinalVotes => 'Final votes';
+
+  @override
+  String get onlineCountRefreshVoteCount => 'Refresh Vote Count';
+
+  @override
+  String get onlineCountVoteCountsAutoRefresh =>
+      'Vote counts auto-refresh every 5 seconds.';
+
+  @override
+  String get onlineCountVoteCountsLastUpdated => 'Last updated: just now';
+
+  @override
+  String get onlineCountCouldNotRefreshVoteCount =>
+      'Could not refresh vote count.';
+
+  @override
   String get onlineCountVotingLink => 'Voting Link';
 
   @override

@@ -45,6 +45,7 @@ class OnlineCountScreen extends StatefulWidget {
     VoteResultsRecipientRepository? recipientRepository,
     OnlineCountResultsSummaryBuilder? summaryBuilder,
     LaunchPresidentWhatsApp? launchWhatsAppToPresident,
+    this.debugInitialAwards = const <OnlineAward>[],
   })  : recipientRepository =
             recipientRepository ?? VoteResultsRecipientRepository(),
         summaryBuilder =
@@ -55,6 +56,7 @@ class OnlineCountScreen extends StatefulWidget {
   final VoteResultsRecipientRepository recipientRepository;
   final OnlineCountResultsSummaryBuilder summaryBuilder;
   final LaunchPresidentWhatsApp launchWhatsAppToPresident;
+  final List<OnlineAward> debugInitialAwards;
 
   @override
   State<OnlineCountScreen> createState() => _OnlineCountScreenState();
@@ -90,6 +92,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   bool _legacyMultipleSessions = false;
   OnlineAward? _activeAward;
   _QrLinkType? _selectedQrType;
+  Timer? _voteCountTimer;
+  bool _voteCountRefreshInFlight = false;
+  bool _voteCountRefreshFailed = false;
+  DateTime? _lastVoteCountRefreshAt;
+  Map<String, int> _voteTotalsByAwardType = <String, int>{};
   late Future<VoteResultsRecipient?> _recipientFuture;
 
   @override
@@ -102,6 +109,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   @override
   void dispose() {
+    _stopVoteCountPolling();
     _baseUrlController.dispose();
     _clubNameController.dispose();
     _clubSlugController.dispose();
@@ -144,9 +152,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           meetingDate: _meetingDateController.text,
           status: OnlineRoundStatus.fromValue(setup.currentSessionStatus),
         );
+        _awards = widget.debugInitialAwards;
       }
       _loaded = true;
     });
+    _syncVoteCountPolling();
   }
 
   OnlineCountApi _api() {
@@ -244,8 +254,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _results = null;
         _activeAward = null;
         _legacyMultipleSessions = false;
+        _clearVoteCountState();
       });
       await _saveSetup(showMessage: false);
+      _syncVoteCountPolling();
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -272,6 +284,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       }
       setState(() => _session = updated.copyWith(awards: _awards));
       await _saveSetup(showMessage: false);
+      _syncVoteCountPolling();
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -313,6 +326,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       });
       await _refreshResults(showErrors: false);
       await _saveSetup(showMessage: false);
+      _syncVoteCountPolling();
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -372,6 +386,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       );
       _replaceAward(updated);
       setState(() => _activeAward = updated);
+      unawaited(_refreshVoteCounts(showError: false));
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -396,6 +411,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       );
       _replaceAward(updated);
       setState(() => _activeAward = null);
+      unawaited(_refreshVoteCounts(showError: false));
       _showMessage(l10n.onlineCountActionComplete);
     });
   }
@@ -418,7 +434,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _results = results);
+      setState(() {
+        _results = results;
+        _voteTotalsByAwardType = buildAwardVoteTotals(results);
+        _lastVoteCountRefreshAt = DateTime.now();
+        _voteCountRefreshFailed = false;
+      });
       if (showErrors) {
         _showMessage(l10n.onlineCountActionComplete);
       }
@@ -456,6 +477,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _session = null;
         _awards = <OnlineAward>[];
         _results = null;
+        _clearVoteCountState();
         _meetingTitleController.text = _meetingTitleController.text.isEmpty
             ? 'Regular Meeting'
             : _meetingTitleController.text;
@@ -464,11 +486,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             : _meetingDateController.text;
       } else {
         _session = status.currentSession;
+        _awards = status.currentSession!.awards;
         _meetingTitleController.text = status.currentSession!.meetingTitle;
         _meetingDateController.text = status.currentSession!.meetingDate;
       }
     });
     await _saveSetup(showMessage: false);
+    _syncVoteCountPolling();
     if (showMessage) {
       _showMessage(actionCompleteMessage);
     }
@@ -505,6 +529,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _results = null;
         _activeAward = null;
         _legacyMultipleSessions = false;
+        _clearVoteCountState();
         _meetingTitleController.text = 'Regular Meeting';
         _meetingDateController.text = _todayText();
         for (final TextEditingController controller
@@ -513,6 +538,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         }
       });
       await _saveSetup(showMessage: false);
+      _syncVoteCountPolling();
       _showMessage(l10n.onlineCountCurrentMeetingDeleted);
     });
   }
@@ -591,6 +617,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   void _applyEmptySetup(OnlineCountSetup setup) {
+    _stopVoteCountPolling();
     setState(() {
       _ownerToken = setup.ownerToken;
       _baseUrlController.text = setup.baseUrl;
@@ -607,11 +634,81 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _results = null;
       _activeAward = null;
       _legacyMultipleSessions = false;
+      _clearVoteCountState();
       for (final TextEditingController controller
           in _candidateControllers.values) {
         controller.clear();
       }
     });
+  }
+
+  void _syncVoteCountPolling() {
+    if (_session?.status == OnlineRoundStatus.open && _hasCloudSetup()) {
+      _startVoteCountPolling();
+    } else {
+      _stopVoteCountPolling();
+    }
+  }
+
+  void _startVoteCountPolling() {
+    if (_voteCountTimer != null) {
+      return;
+    }
+    _voteCountTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => unawaited(_refreshVoteCounts(showError: false)),
+    );
+  }
+
+  void _stopVoteCountPolling() {
+    _voteCountTimer?.cancel();
+    _voteCountTimer = null;
+  }
+
+  Future<void> _refreshVoteCounts({required bool showError}) async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final OnlineSession? session = _session;
+    if (_voteCountRefreshInFlight || session == null || !_hasCloudSetup()) {
+      return;
+    }
+    _voteCountRefreshInFlight = true;
+    if (showError) {
+      setState(() => _busyAction = 'refreshVoteCount');
+    }
+    try {
+      final OnlineResults results = await _api().getResults(
+        sessionId: session.id,
+        adminPin: _adminPinController.text.trim(),
+        ownerToken: _ownerToken,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _voteTotalsByAwardType = buildAwardVoteTotals(results);
+        _lastVoteCountRefreshAt = DateTime.now();
+        _voteCountRefreshFailed = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _voteCountRefreshFailed = true);
+      if (showError) {
+        _showMessage(l10n.onlineCountCouldNotRefreshVoteCount);
+      }
+    } finally {
+      _voteCountRefreshInFlight = false;
+      if (mounted && showError && _busyAction == 'refreshVoteCount') {
+        setState(() => _busyAction = null);
+      }
+    }
+  }
+
+  void _clearVoteCountState() {
+    _voteTotalsByAwardType = <String, int>{};
+    _lastVoteCountRefreshAt = null;
+    _voteCountRefreshFailed = false;
   }
 
   void _replaceAward(OnlineAward updated) {
@@ -817,6 +914,36 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       }
     }
     return null;
+  }
+
+  List<OnlineAward> _awardsForVoteCountDisplay() {
+    final OnlineSession? session = _session;
+    if (_awards.isNotEmpty || session == null) {
+      return _awards;
+    }
+    return <OnlineAward>[
+      for (final OnlineAwardType type in OnlineAwardType.values)
+        OnlineAward(
+          id: '',
+          sessionId: session.id,
+          type: type,
+          status: OnlineRoundStatus.draft,
+        ),
+    ];
+  }
+
+  int _voteCountForAward(OnlineAward award) {
+    return _voteTotalsByAwardType[award.type.value] ?? 0;
+  }
+
+  String _voteCountLabel(OnlineAward award, AppLocalizations l10n) {
+    final int voteCount = _voteCountForAward(award);
+    return switch (award.status) {
+      OnlineRoundStatus.open =>
+        '${l10n.onlineCountOpen} · ${l10n.onlineCountVotesReceived}: $voteCount',
+      OnlineRoundStatus.closed => '${l10n.onlineCountFinalVotes}: $voteCount',
+      OnlineRoundStatus.draft => '${l10n.onlineCountVotesReceived}: $voteCount',
+    };
   }
 
   String _friendlyError(OnlineCountApiException error, AppLocalizations l10n) {
@@ -1284,17 +1411,44 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   Widget _buildVotingRoundCard(AppLocalizations l10n) {
     final Locale locale = Localizations.localeOf(context);
+    final List<OnlineAward> awards = _awardsForVoteCountDisplay();
     return _SectionCard(
       title: l10n.onlineCountVotingRound,
       icon: Icons.how_to_vote_outlined,
       children: <Widget>[
-        if (_awards.isEmpty)
+        _buttonWrap(
+          <Widget>[
+            OutlinedButton.icon(
+              onPressed: _busyAction == 'refreshVoteCount'
+                  ? null
+                  : () => _refreshVoteCounts(showError: true),
+              icon: const Icon(Icons.refresh_outlined),
+              label: Text(l10n.onlineCountRefreshVoteCount),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          _lastVoteCountRefreshAt == null
+              ? l10n.onlineCountVoteCountsAutoRefresh
+              : l10n.onlineCountVoteCountsLastUpdated,
+          style: const TextStyle(fontSize: 14, color: Colors.black54),
+        ),
+        if (_voteCountRefreshFailed) ...<Widget>[
+          const SizedBox(height: 6),
+          Text(
+            l10n.onlineCountCouldNotRefreshVoteCount,
+            style: const TextStyle(fontSize: 14, color: Colors.redAccent),
+          ),
+        ],
+        const SizedBox(height: 12),
+        if (awards.isEmpty)
           Text(
             l10n.onlineCountNoSessionYet,
             style: const TextStyle(fontSize: 15, color: Colors.black54),
           )
         else
-          for (final OnlineAward award in _awards)
+          for (final OnlineAward award in awards)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: DecoratedBox(
@@ -1325,12 +1479,24 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _voteCountLabel(award, l10n),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: award.status == OnlineRoundStatus.open
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       _buttonWrap(
                         <Widget>[
                           FilledButton.icon(
                             onPressed: _session?.status ==
                                         OnlineRoundStatus.open &&
+                                    award.id.isNotEmpty &&
                                     award.status == OnlineRoundStatus.draft &&
                                     _busyAction != 'openAward-${award.id}'
                                 ? () => _openAward(award)
@@ -1340,6 +1506,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                           ),
                           OutlinedButton.icon(
                             onPressed: award.status == OnlineRoundStatus.open &&
+                                    award.id.isNotEmpty &&
                                     _busyAction != 'closeAward-${award.id}'
                                 ? () => _closeAward(award)
                                 : null,

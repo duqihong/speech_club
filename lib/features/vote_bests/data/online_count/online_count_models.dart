@@ -243,6 +243,17 @@ class OnlineCandidateResult {
   }
 }
 
+Map<String, int> buildAwardVoteTotals(OnlineResults results) {
+  return <String, int>{
+    for (final OnlineAwardResult award in results.awards)
+      award.type.value: award.candidates.fold<int>(
+        0,
+        (int total, OnlineCandidateResult candidate) =>
+            total + candidate.voteCount,
+      ),
+  };
+}
+
 class OnlineClubStatus {
   const OnlineClubStatus({
     required this.club,

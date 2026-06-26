@@ -94,5 +94,58 @@ void main() {
       expect(status.activeAward?.type, OnlineAwardType.bestSpeaker);
       expect(status.summary.legacyMultipleSessions, isTrue);
     });
+
+    test('award vote totals sum candidate votes by award type', () {
+      final Map<String, int> totals = buildAwardVoteTotals(
+        const OnlineResults(
+          isFinal: false,
+          session: OnlineSession(
+            id: 'session-1',
+            clubId: 'club-1',
+            meetingTitle: 'Regular Meeting',
+            meetingDate: '2026-06-26',
+            status: OnlineRoundStatus.open,
+          ),
+          awards: <OnlineAwardResult>[
+            OnlineAwardResult(
+              awardId: 'award-1',
+              type: OnlineAwardType.bestSpeaker,
+              status: OnlineRoundStatus.open,
+              hasTie: false,
+              winners: <OnlineCandidateResult>[],
+              candidates: <OnlineCandidateResult>[
+                OnlineCandidateResult(
+                  id: 'candidate-1',
+                  name: 'Alice',
+                  voteCount: 3,
+                ),
+                OnlineCandidateResult(
+                  id: 'candidate-2',
+                  name: 'Bob',
+                  voteCount: 2,
+                ),
+              ],
+            ),
+            OnlineAwardResult(
+              awardId: 'award-2',
+              type: OnlineAwardType.bestEvaluator,
+              status: OnlineRoundStatus.draft,
+              hasTie: false,
+              winners: <OnlineCandidateResult>[],
+              candidates: <OnlineCandidateResult>[
+                OnlineCandidateResult(
+                  id: 'candidate-3',
+                  name: 'Chen',
+                  voteCount: 0,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
+      expect(totals[OnlineAwardType.bestSpeaker.value], 5);
+      expect(totals[OnlineAwardType.bestEvaluator.value], 0);
+    });
   });
 }

@@ -1388,6 +1388,42 @@ abstract class AppLocalizations {
   /// **'Close Voting'**
   String get onlineCountCloseVoting;
 
+  /// No description provided for @onlineCountVotesReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Votes received'**
+  String get onlineCountVotesReceived;
+
+  /// No description provided for @onlineCountFinalVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Final votes'**
+  String get onlineCountFinalVotes;
+
+  /// No description provided for @onlineCountRefreshVoteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Vote Count'**
+  String get onlineCountRefreshVoteCount;
+
+  /// No description provided for @onlineCountVoteCountsAutoRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote counts auto-refresh every 5 seconds.'**
+  String get onlineCountVoteCountsAutoRefresh;
+
+  /// No description provided for @onlineCountVoteCountsLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: just now'**
+  String get onlineCountVoteCountsLastUpdated;
+
+  /// No description provided for @onlineCountCouldNotRefreshVoteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh vote count.'**
+  String get onlineCountCouldNotRefreshVoteCount;
+
   /// No description provided for @onlineCountVotingLink.
   ///
   /// In en, this message translates to:
