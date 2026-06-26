@@ -539,6 +539,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountCheckOnlineStatus => '检查云端状态';
 
   @override
+  String get onlineCountCheckOnlineStatusHelp => '仅在页面状态看起来与云端投票不同步时使用。';
+
+  @override
   String get onlineCountDeleteOnlineClub => '删除在线俱乐部';
 
   @override
@@ -688,7 +691,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountReadyToStartVoting => '准备开始投票了吗？';
 
   @override
-  String get onlineCountAddAllCandidatesBeforeOpening => '请先为所有奖项添加候选人，再开放会议。';
+  String get onlineCountAddAllCandidatesBeforeOpening => '请先保存所有奖项的候选人，再开放会议。';
 
   @override
   String get onlineCountDeleteCurrentMeeting => '删除当前会议';
@@ -842,6 +845,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSaved => '已保存';
 
   @override
+  String get onlineCountCandidatesSaved => '候选人已保存。';
+
+  @override
   String get onlineCountCopied => '已复制。';
 
   @override
@@ -849,6 +855,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCouldNotShareQr => '无法分享二维码。';
+
+  @override
+  String get onlineCountOnlineStatusUpdated => '云端状态已更新。';
+
+  @override
+  String get onlineCountNoCurrentMeetingFound => '没有当前会议。';
 
   @override
   String get onlineCountCouldNotCheckStatus => '无法检查云端状态。';

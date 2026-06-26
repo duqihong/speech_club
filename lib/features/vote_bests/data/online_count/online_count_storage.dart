@@ -81,6 +81,8 @@ class OnlineCountStorage {
       'speech_club_online_current_session_date_v1';
   static const String _sessionStatusKey =
       'speech_club_online_current_session_status_v1';
+  static const String _candidateDraftPrefix =
+      'speech_club_online_candidate_draft_';
 
   Future<OnlineCountSetup> load() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -117,12 +119,53 @@ class OnlineCountStorage {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await _loadOrCreateOwnerToken(prefs);
     await _clearLocalSetup(prefs);
+    await _clearCandidateDrafts(prefs);
   }
 
   Future<void> startFreshOnThisDevice() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_ownerTokenKey, _generateOwnerToken());
     await _clearLocalSetup(prefs);
+    await _clearCandidateDrafts(prefs);
+  }
+
+  Future<void> saveCandidateDraft({
+    required String sessionId,
+    required String awardType,
+    required String text,
+  }) async {
+    if (sessionId.isEmpty || awardType.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_candidateDraftKey(sessionId, awardType), text);
+  }
+
+  Future<String?> loadCandidateDraft({
+    required String sessionId,
+    required String awardType,
+  }) async {
+    if (sessionId.isEmpty || awardType.isEmpty) {
+      return null;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_candidateDraftKey(sessionId, awardType));
+  }
+
+  Future<void> clearCandidateDraftsForSession(String sessionId) async {
+    if (sessionId.isEmpty) {
+      return;
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _clearCandidateDrafts(
+      prefs,
+      sessionPrefix: _candidateDraftSessionPrefix(sessionId),
+    );
+  }
+
+  Future<void> clearAllOnlineCandidateDrafts() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _clearCandidateDrafts(prefs);
   }
 
   Future<void> _clearLocalSetup(SharedPreferences prefs) async {
@@ -152,5 +195,28 @@ class OnlineCountStorage {
     final int partA = random.nextInt(1 << 32);
     final int partB = random.nextInt(1 << 32);
     return 'owner-${DateTime.now().microsecondsSinceEpoch}-$partA-$partB';
+  }
+
+  static String _candidateDraftKey(String sessionId, String awardType) {
+    return '${_candidateDraftSessionPrefix(sessionId)}'
+        '${Uri.encodeComponent(awardType)}_v1';
+  }
+
+  static String _candidateDraftSessionPrefix(String sessionId) {
+    return '$_candidateDraftPrefix${Uri.encodeComponent(sessionId)}_';
+  }
+
+  Future<void> _clearCandidateDrafts(
+    SharedPreferences prefs, {
+    String? sessionPrefix,
+  }) async {
+    final String prefix = sessionPrefix ?? _candidateDraftPrefix;
+    final Iterable<String> keys = prefs
+        .getKeys()
+        .where((String key) => key.startsWith(prefix))
+        .toList(growable: false);
+    for (final String key in keys) {
+      await prefs.remove(key);
+    }
   }
 }

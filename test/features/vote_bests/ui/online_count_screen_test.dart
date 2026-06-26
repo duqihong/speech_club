@@ -52,6 +52,18 @@ void main() {
     }
   }
 
+  Future<void> openTechnicalSettings(WidgetTester tester) async {
+    await openDangerZone(tester);
+    await tester.scrollUntilVisible(
+      find.text('Technical Settings'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Technical Settings'));
+    await tester.pumpAndSettle();
+  }
+
   Map<String, Object> savedClubPrefs({
     bool withSession = false,
     String sessionStatus = 'draft',
@@ -174,7 +186,7 @@ void main() {
       ),
       findsNothing,
     );
-    expect(find.text('Check Online Status'), findsOneWidget);
+    expect(find.text('Check Online Status'), findsNothing);
     expect(find.text('Delete Online Club'), findsOneWidget);
     expect(textFieldWithLabel('Club Name'), findsNothing);
     expect(textFieldWithLabel('Club Code'), findsNothing);
@@ -188,6 +200,26 @@ void main() {
     expect(find.text('Reset Online Count on This Device'), findsOneWidget);
     expect(find.text('Start Fresh on This Device'), findsOneWidget);
     expect(find.text('Technical Settings'), findsOneWidget);
+  });
+
+  testWidgets('check online status lives under technical settings',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs());
+
+    await pumpOnlineCountScreen(tester);
+
+    expect(find.text('Check Online Status'), findsNothing);
+
+    await openTechnicalSettings(tester);
+
+    expect(find.text('Check Online Status'), findsOneWidget);
+    expect(
+      find.text(
+        'Use this only if the screen looks out of sync with online voting.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Done'), findsNothing);
   });
 
   testWidgets('saved club with no session shows no current meeting',
@@ -234,6 +266,14 @@ void main() {
     expect(find.text('Delete Current Meeting'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsOneWidget);
+    final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
+      textFieldWithLabel('One candidate per line'),
+    );
+    expect(candidateFields.length, 3);
+    expect(
+      candidateFields.every((TextField field) => field.enabled == true),
+      isTrue,
+    );
     await tester.scrollUntilVisible(
       find.text('Ready to start voting?'),
       700,
@@ -242,7 +282,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ready to start voting?'), findsOneWidget);
     expect(
-      find.text('Add candidates for all awards before opening the meeting.'),
+      find.text('Save candidates for all awards before opening the meeting.'),
       findsOneWidget,
     );
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
@@ -250,6 +290,78 @@ void main() {
     );
     expect(openMeetingButton.onPressed, isNull);
     expect(find.text('Results'), findsNothing);
+  });
+
+  testWidgets(
+      'draft candidates restore from local draft storage and stay editable',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      'speech_club_online_candidate_draft_session-1_best_speaker_v1':
+          'Alice\nBen',
+      'speech_club_online_candidate_draft_session-1_best_table_topics_v1':
+          'Cara',
+      'speech_club_online_candidate_draft_session-1_best_evaluator_v1': 'Eva',
+    });
+
+    await pumpOnlineCountScreen(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alice\nBen'), findsOneWidget);
+    expect(find.text('Cara'), findsOneWidget);
+    expect(find.text('Eva'), findsOneWidget);
+    final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
+      textFieldWithLabel('One candidate per line'),
+    );
+    expect(
+      candidateFields.every((TextField field) => field.enabled == true),
+      isTrue,
+    );
+    final OutlinedButton saveSpeakerButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Save Best Speaker Candidates'),
+    );
+    expect(saveSpeakerButton.onPressed, isNotNull);
+  });
+
+  testWidgets('typing candidate text persists after rebuilding screen',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      textFieldWithLabel('One candidate per line').first,
+      'Alice',
+    );
+    await tester.pumpAndSettle();
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alice'), findsOneWidget);
+    final OutlinedButton saveSpeakerButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Save Best Speaker Candidates'),
+    );
+    expect(saveSpeakerButton.onPressed, isNotNull);
   });
 
   testWidgets('open current meeting shows award controls and hides setup',

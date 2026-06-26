@@ -560,6 +560,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountCheckOnlineStatus => 'Check Online Status';
 
   @override
+  String get onlineCountCheckOnlineStatusHelp =>
+      'Use this only if the screen looks out of sync with online voting.';
+
+  @override
   String get onlineCountDeleteOnlineClub => 'Delete Online Club';
 
   @override
@@ -725,7 +729,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountAddAllCandidatesBeforeOpening =>
-      'Add candidates for all awards before opening the meeting.';
+      'Save candidates for all awards before opening the meeting.';
 
   @override
   String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
@@ -889,6 +893,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountSaved => 'Saved';
 
   @override
+  String get onlineCountCandidatesSaved => 'Candidates saved.';
+
+  @override
   String get onlineCountCopied => 'Copied.';
 
   @override
@@ -896,6 +903,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCouldNotShareQr => 'Could not share QR code.';
+
+  @override
+  String get onlineCountOnlineStatusUpdated => 'Online status updated.';
+
+  @override
+  String get onlineCountNoCurrentMeetingFound => 'No current meeting found.';
 
   @override
   String get onlineCountCouldNotCheckStatus => 'Could not check online status.';

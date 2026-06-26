@@ -79,6 +79,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     for (final OnlineAwardType type in OnlineAwardType.values)
       type: TextEditingController(),
   };
+  final Map<OnlineAwardType, VoidCallback> _candidateDraftListeners =
+      <OnlineAwardType, VoidCallback>{};
 
   OnlineSession? _session;
   List<OnlineAward> _awards = <OnlineAward>[];
@@ -98,6 +100,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   Map<String, int> _voteTotalsByAwardType = <String, int>{};
   late Future<VoteResultsRecipient?> _recipientFuture;
   bool _elementActive = true;
+  bool _restoringCandidateDrafts = false;
 
   bool get _canUseContext => mounted && _elementActive;
   bool get _canUpdateState => mounted && _elementActive;
@@ -107,6 +110,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     super.initState();
     _meetingDateController.text = _todayText();
     _recipientFuture = widget.recipientRepository.load();
+    for (final MapEntry<OnlineAwardType, TextEditingController> entry
+        in _candidateControllers.entries) {
+      void listener() => _onCandidateDraftChanged(entry.key);
+      _candidateDraftListeners[entry.key] = listener;
+      entry.value.addListener(listener);
+    }
     _loadSetup();
   }
 
@@ -114,6 +123,13 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   void dispose() {
     _elementActive = false;
     _stopVoteCountPolling();
+    for (final MapEntry<OnlineAwardType, TextEditingController> entry
+        in _candidateControllers.entries) {
+      final VoidCallback? listener = _candidateDraftListeners[entry.key];
+      if (listener != null) {
+        entry.value.removeListener(listener);
+      }
+    }
     _baseUrlController.dispose();
     _clubNameController.dispose();
     _clubSlugController.dispose();
@@ -171,7 +187,59 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       }
       _loaded = true;
     });
+    if (setup.currentSessionId.isNotEmpty) {
+      await _restoreCandidateDraftsForSession(setup.currentSessionId);
+    }
     _syncVoteCountPolling();
+  }
+
+  void _onCandidateDraftChanged(OnlineAwardType type) {
+    if (_restoringCandidateDrafts || !_canUpdateState) {
+      return;
+    }
+    setState(() {});
+    final String? sessionId = _session?.id;
+    if (sessionId == null || sessionId.isEmpty) {
+      return;
+    }
+    final String text = _candidateControllers[type]?.text ?? '';
+    unawaited(
+      _storage.saveCandidateDraft(
+        sessionId: sessionId,
+        awardType: type.value,
+        text: text,
+      ),
+    );
+  }
+
+  Future<void> _restoreCandidateDraftsForSession(String sessionId) async {
+    if (sessionId.isEmpty) {
+      return;
+    }
+    final Map<OnlineAwardType, String?> drafts = <OnlineAwardType, String?>{};
+    for (final OnlineAwardType type in OnlineAwardType.values) {
+      drafts[type] = await _storage.loadCandidateDraft(
+        sessionId: sessionId,
+        awardType: type.value,
+      );
+    }
+    if (!_canUpdateState || _session?.id != sessionId) {
+      return;
+    }
+    _restoringCandidateDrafts = true;
+    try {
+      for (final OnlineAwardType type in OnlineAwardType.values) {
+        final String? draft = drafts[type];
+        if (draft != null) {
+          _candidateControllers[type]?.text = draft;
+        }
+      }
+    } finally {
+      _restoringCandidateDrafts = false;
+    }
+    if (_canUpdateState) {
+      setState(() {});
+    }
   }
 
   OnlineCountApi _api() {
@@ -359,11 +427,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final OnlineSession? session = _session;
     final OnlineAward? award = _awardForType(type);
-    if (session == null || award == null) {
+    if (session == null) {
       _showMessage(l10n.onlineCountCreateMeetingFirst);
       return;
     }
-    if (award.status != OnlineRoundStatus.draft) {
+    if (session.status != OnlineRoundStatus.draft ||
+        (award != null && award.status != OnlineRoundStatus.draft)) {
       _showMessage(l10n.onlineCountAddCandidatesFirst);
       return;
     }
@@ -387,7 +456,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _savedCandidateFingerprints[type] = _candidateFingerprint(candidates);
         });
       }
-      _showMessage(l10n.onlineCountSaved);
+      _showMessage(l10n.onlineCountCandidatesSaved);
     });
   }
 
@@ -475,7 +544,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     });
   }
 
-  Future<void> _checkOnlineStatus({bool showMessage = false}) async {
+  Future<void> _checkOnlineStatus({bool showMessage = true}) async {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     if (!_hasCloudSetup()) {
       _showMessage(l10n.onlineCountPleaseCompleteSetup);
@@ -489,8 +558,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Future<void> _syncOnlineStatusFromCloud({required bool showMessage}) async {
-    final String actionCompleteMessage =
-        AppLocalizations.of(context)!.onlineCountActionComplete;
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final OnlineClubStatus status = await _api().getOwnerClubStatus(
       ownerToken: _ownerToken,
       clubSlug: _clubSlugController.text.trim(),
@@ -499,6 +567,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     if (!_canUpdateState) {
       return;
     }
+    final String? previousSessionId = _session?.id;
+    final String? refreshedSessionId = status.currentSession?.id;
     setState(() {
       _clubCreated = true;
       _legacyMultipleSessions = status.summary.legacyMultipleSessions;
@@ -521,10 +591,15 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _meetingDateController.text = status.currentSession!.meetingDate;
       }
     });
+    if (refreshedSessionId != null &&
+        refreshedSessionId.isNotEmpty &&
+        refreshedSessionId != previousSessionId) {
+      await _restoreCandidateDraftsForSession(refreshedSessionId);
+    }
     await _saveSetup(showMessage: false);
     _syncVoteCountPolling();
-    if (showMessage) {
-      _showMessage(actionCompleteMessage);
+    if (showMessage && status.currentSession == null) {
+      _showMessage(l10n.onlineCountNoCurrentMeetingFound);
     }
   }
 
@@ -569,6 +644,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           controller.clear();
         }
       });
+      await _storage.clearCandidateDraftsForSession(session.id);
       await _saveSetup(showMessage: false);
       _syncVoteCountPolling();
       _showMessage(l10n.onlineCountCurrentMeetingDeleted);
@@ -984,6 +1060,20 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     });
   }
 
+  bool _canEditCandidatesForAward(OnlineAward? award) {
+    final OnlineSession? session = _session;
+    if (session == null || session.status != OnlineRoundStatus.draft) {
+      return false;
+    }
+    return award == null || award.status == OnlineRoundStatus.draft;
+  }
+
+  bool _hasCandidateLines(OnlineAwardType type) {
+    return parseOnlineCandidateLines(
+      _candidateControllers[type]?.text ?? '',
+    ).isNotEmpty;
+  }
+
   String _candidateFingerprint(List<String> candidates) {
     return candidates.join('\n');
   }
@@ -1285,13 +1375,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _buttonWrap(
           <Widget>[
             OutlinedButton.icon(
-              onPressed: _busyAction == 'checkStatus'
-                  ? null
-                  : () => _checkOnlineStatus(),
-              icon: const Icon(Icons.cloud_sync_outlined),
-              label: Text(l10n.onlineCountCheckOnlineStatus),
-            ),
-            OutlinedButton.icon(
               onPressed: _busyAction == 'deleteClub' ? null : _deleteOnlineClub,
               icon: const Icon(Icons.delete_forever_outlined),
               label: Text(l10n.onlineCountDeleteOnlineClub),
@@ -1341,6 +1424,19 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             ),
             children: <Widget>[
               _BodyText(l10n.onlineCountTechnicalSettingsHelp),
+              const SizedBox(height: 8),
+              _fullWidthButton(
+                child: OutlinedButton.icon(
+                  onPressed: _busyAction == 'checkStatus'
+                      ? null
+                      : () => _checkOnlineStatus(),
+                  icon: const Icon(Icons.cloud_sync_outlined),
+                  label: Text(l10n.onlineCountCheckOnlineStatus),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _BodyText(l10n.onlineCountCheckOnlineStatusHelp),
+              const SizedBox(height: 12),
               _textField(
                 controller: _baseUrlController,
                 label: l10n.onlineCountBackendUrl,
@@ -1448,9 +1544,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       children: OnlineAwardType.values.map(
         (OnlineAwardType type) {
           final OnlineAward? award = _awardForType(type);
-          final bool canEdit = award != null &&
-              award.status == OnlineRoundStatus.draft &&
-              _session != null;
+          final bool canEdit = _canEditCandidatesForAward(award);
+          final bool canSave = canEdit && _hasCandidateLines(type);
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Column(
@@ -1474,7 +1569,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                 _fullWidthButton(
                   child: OutlinedButton.icon(
                     onPressed:
-                        canEdit && _busyAction != 'saveCandidates-${type.value}'
+                        canSave && _busyAction != 'saveCandidates-${type.value}'
                             ? () => _saveCandidates(type)
                             : null,
                     icon: const Icon(Icons.check_outlined),

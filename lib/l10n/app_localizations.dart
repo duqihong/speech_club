@@ -1136,6 +1136,12 @@ abstract class AppLocalizations {
   /// **'Check Online Status'**
   String get onlineCountCheckOnlineStatus;
 
+  /// No description provided for @onlineCountCheckOnlineStatusHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this only if the screen looks out of sync with online voting.'**
+  String get onlineCountCheckOnlineStatusHelp;
+
   /// No description provided for @onlineCountDeleteOnlineClub.
   ///
   /// In en, this message translates to:
@@ -1433,7 +1439,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountAddAllCandidatesBeforeOpening.
   ///
   /// In en, this message translates to:
-  /// **'Add candidates for all awards before opening the meeting.'**
+  /// **'Save candidates for all awards before opening the meeting.'**
   String get onlineCountAddAllCandidatesBeforeOpening;
 
   /// No description provided for @onlineCountDeleteCurrentMeeting.
@@ -1736,6 +1742,12 @@ abstract class AppLocalizations {
   /// **'Saved'**
   String get onlineCountSaved;
 
+  /// No description provided for @onlineCountCandidatesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates saved.'**
+  String get onlineCountCandidatesSaved;
+
   /// No description provided for @onlineCountCopied.
   ///
   /// In en, this message translates to:
@@ -1753,6 +1765,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not share QR code.'**
   String get onlineCountCouldNotShareQr;
+
+  /// No description provided for @onlineCountOnlineStatusUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Online status updated.'**
+  String get onlineCountOnlineStatusUpdated;
+
+  /// No description provided for @onlineCountNoCurrentMeetingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No current meeting found.'**
+  String get onlineCountNoCurrentMeetingFound;
 
   /// No description provided for @onlineCountCouldNotCheckStatus.
   ///
