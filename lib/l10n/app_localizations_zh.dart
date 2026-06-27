@@ -956,28 +956,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountStartedFresh => '本机在线计票已重新开始。';
 
   @override
-  String get onlineCountTypeDeleteToContinue => '输入 DELETE 继续';
-
-  @override
-  String get onlineCountTypeResetToContinue => '输入 RESET 继续';
-
-  @override
-  String get onlineCountTypeFreshToContinue => '输入 FRESH 继续';
+  String get onlineCountDeleteCurrentMeetingTitle => '删除当前会议？';
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
-      '要删除当前在线会议吗？\n这会删除本次会议的候选人、投票和结果。\n删除本次会议前，请先发送或复制结果。\n删除本次会议不会改变二维码。';
+      '这会删除本次会议的候选人、投票和结果。\n删除本次会议前，请先发送或复制结果。\n删除本次会议不会改变二维码。\n本机手动计票资料不会被删除。';
+
+  @override
+  String get onlineCountDeleteOnlineClubTitle => '删除在线俱乐部？';
 
   @override
   String get onlineCountDeleteOnlineClubWarning =>
-      '要删除在线俱乐部吗？\n这会删除云端俱乐部、当前会议、候选人、投票和结果。\n旧二维码将不能继续使用。\n此操作无法撤销。\n本机手动计票资料不会被删除。';
+      '这会删除云端在线俱乐部，以及当前会议、候选人、投票和结果。\n旧二维码将不能继续使用。\n本机手动计票资料不会被删除。';
 
   @override
   String get onlineCountResetDeviceSetupWarning =>
-      '这会清除本机保存的在线投票设置。\n不会删除云端记录。';
+      '这会清除本机保存的在线计票设置。\n云端资料不会被删除。\n本机手动计票资料不会被删除。';
 
   @override
-  String get onlineCountStartFreshTitle => '要重新开始吗？';
+  String get onlineCountStartFreshTitle => '本机重新开始？';
+
+  @override
+  String get onlineCountStartFreshConfirm => '重新开始';
 
   @override
   String get onlineCountStartFreshWarning =>

@@ -686,11 +686,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _showMessage(l10n.onlineCountCreateMeetingFirst);
       return;
     }
-    final bool confirmed = await _confirmTypedAction(
-      title: l10n.onlineCountDeleteCurrentMeeting,
+    final bool confirmed = await _confirmDestructiveAction(
+      title: l10n.onlineCountDeleteCurrentMeetingTitle,
       message: l10n.onlineCountDeleteCurrentMeetingWarning,
-      requiredText: 'DELETE',
-      confirmationLabel: l10n.onlineCountTypeDeleteToContinue,
+      actionLabel: l10n.onlineCountDeleteCurrentMeeting,
     );
     if (!confirmed) {
       return;
@@ -733,11 +732,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _showMessage(l10n.onlineCountPleaseCompleteSetup);
       return;
     }
-    final bool confirmed = await _confirmTypedAction(
-      title: l10n.onlineCountDeleteOnlineClub,
+    final bool confirmed = await _confirmDestructiveAction(
+      title: l10n.onlineCountDeleteOnlineClubTitle,
       message: l10n.onlineCountDeleteOnlineClubWarning,
-      requiredText: 'DELETE',
-      confirmationLabel: l10n.onlineCountTypeDeleteToContinue,
+      actionLabel: l10n.onlineCountDeleteOnlineClub,
     );
     if (!confirmed) {
       return;
@@ -756,11 +754,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   Future<void> _startFreshOnThisDevice() async {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final bool confirmed = await _confirmTypedAction(
+    final bool confirmed = await _confirmDestructiveAction(
       title: l10n.onlineCountStartFreshTitle,
       message: l10n.onlineCountStartFreshWarning,
-      requiredText: 'FRESH',
-      confirmationLabel: l10n.onlineCountTypeFreshToContinue,
+      actionLabel: l10n.onlineCountStartFreshConfirm,
     );
     if (!confirmed) {
       return;
@@ -1292,22 +1289,20 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         setup.adminPin.isNotEmpty;
   }
 
-  Future<bool> _confirmTypedAction({
+  Future<bool> _confirmDestructiveAction({
     required String title,
     required String message,
-    required String requiredText,
-    required String confirmationLabel,
+    required String actionLabel,
   }) async {
     if (!_canUseContext) {
       return false;
     }
     final bool? confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => _TypedConfirmationDialog(
+      builder: (BuildContext dialogContext) => _DestructiveConfirmationDialog(
         title: title,
         message: message,
-        requiredText: requiredText,
-        confirmationLabel: confirmationLabel,
+        actionLabel: actionLabel,
       ),
     );
     return _canUseContext && confirmed == true;
@@ -2120,65 +2115,34 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
 enum _QrLinkType { zh, en, auto }
 
-class _TypedConfirmationDialog extends StatefulWidget {
-  const _TypedConfirmationDialog({
+class _DestructiveConfirmationDialog extends StatelessWidget {
+  const _DestructiveConfirmationDialog({
     required this.title,
     required this.message,
-    required this.requiredText,
-    required this.confirmationLabel,
+    required this.actionLabel,
   });
 
   final String title;
   final String message;
-  final String requiredText;
-  final String confirmationLabel;
-
-  @override
-  State<_TypedConfirmationDialog> createState() =>
-      _TypedConfirmationDialogState();
-}
-
-class _TypedConfirmationDialogState extends State<_TypedConfirmationDialog> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String actionLabel;
 
   @override
   Widget build(BuildContext context) {
-    final bool canConfirm = _controller.text.trim() == widget.requiredText;
     final MaterialLocalizations materialLocalizations =
         MaterialLocalizations.of(context);
+    final Color destructiveColor = Theme.of(context).colorScheme.error;
     return AlertDialog(
-      title: Text(widget.title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(widget.message),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _controller,
-            autofocus: true,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: widget.confirmationLabel,
-              border: const OutlineInputBorder(),
-            ),
-          ),
-        ],
-      ),
+      title: Text(title),
+      content: Text(message),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(materialLocalizations.cancelButtonLabel),
         ),
-        FilledButton(
-          onPressed: canConfirm ? () => Navigator.of(context).pop(true) : null,
-          child: Text(materialLocalizations.okButtonLabel),
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: destructiveColor),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(actionLabel),
         ),
       ],
     );

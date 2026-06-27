@@ -1023,28 +1023,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Online Count started fresh on this device.';
 
   @override
-  String get onlineCountTypeDeleteToContinue => 'Type DELETE to continue';
-
-  @override
-  String get onlineCountTypeResetToContinue => 'Type RESET to continue';
-
-  @override
-  String get onlineCountTypeFreshToContinue => 'Type FRESH to continue';
+  String get onlineCountDeleteCurrentMeetingTitle => 'Delete current meeting?';
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
-      'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.';
+      'This will delete this meeting’s candidates, votes, and results.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.\nManual Count data will not be deleted.';
+
+  @override
+  String get onlineCountDeleteOnlineClubTitle => 'Delete online club?';
 
   @override
   String get onlineCountDeleteOnlineClubWarning =>
-      'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThe old QR code will no longer be usable.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.';
+      'This will delete the online club, current meeting, candidates, votes, and results from the cloud.\nThe old QR code will no longer be usable.\nManual Count data will not be deleted.';
 
   @override
   String get onlineCountResetDeviceSetupWarning =>
-      'This clears online voting setup saved on this phone.\nIt does not delete cloud records.';
+      'This will clear local Online Count setup on this phone.\nCloud data will not be deleted.\nManual Count data will not be deleted.';
 
   @override
-  String get onlineCountStartFreshTitle => 'Start fresh?';
+  String get onlineCountStartFreshTitle => 'Start fresh on this device?';
+
+  @override
+  String get onlineCountStartFreshConfirm => 'Start Fresh';
 
   @override
   String get onlineCountStartFreshWarning =>

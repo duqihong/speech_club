@@ -882,20 +882,33 @@ void main() {
       tester,
       debugInitialAwards: debugAwardsForSession(),
     );
+    final SharedPreferences beforePrefs = await SharedPreferences.getInstance();
+    expect(
+      beforePrefs.getString('speech_club_online_owner_token_v1'),
+      'owner-token',
+    );
     await openDangerZone(tester, actionLabel: 'Start Fresh on This Device');
     await tester.tap(find.text('Start Fresh on This Device'));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      textFieldWithLabel('Type FRESH to continue'),
-      'FRESH',
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      findsNothing,
     );
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'OK'));
+    await tester.tap(find.widgetWithText(TextButton, 'Start Fresh'));
     await tester.pumpAndSettle();
     await tester.pump(const Duration(seconds: 6));
 
     expect(tester.takeException(), isNull);
     expect(find.text('Online Club Setup'), findsOneWidget);
+    final SharedPreferences afterPrefs = await SharedPreferences.getInstance();
+    final String? newOwnerToken =
+        afterPrefs.getString('speech_club_online_owner_token_v1');
+    expect(newOwnerToken, isNotNull);
+    expect(newOwnerToken, isNot('owner-token'));
+    expect(afterPrefs.getString('speech_club_online_club_name_v1'), isNull);
   });
 
   testWidgets('closed current meeting shows result actions only',
@@ -958,7 +971,7 @@ void main() {
     expect(copyButton.onPressed, isNull);
   });
 
-  testWidgets('delete current meeting confirmation requires DELETE',
+  testWidgets('delete current meeting confirmation has no typed field',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
 
@@ -967,7 +980,14 @@ void main() {
     await tester.tap(find.text('Delete Current Meeting'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Type DELETE to continue'), findsOneWidget);
+    expect(find.text('Delete current meeting?'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      findsNothing,
+    );
     expect(
       find.textContaining(
         'Please send or copy results before deleting this meeting.',
@@ -978,22 +998,56 @@ void main() {
       find.textContaining('Deleting this meeting will not change the QR code.'),
       findsOneWidget,
     );
-    FilledButton okButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'OK'),
+    expect(
+      find.textContaining('Manual Count data will not be deleted.'),
+      findsOneWidget,
     );
-    expect(okButton.onPressed, isNull);
+    final TextButton deleteButton = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Delete Current Meeting'),
+    );
+    expect(deleteButton.onPressed, isNotNull);
 
-    await tester.enterText(
-        textFieldWithLabel('Type DELETE to continue'), 'DELETE');
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
     await tester.pumpAndSettle();
-
-    okButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'OK'),
-    );
-    expect(okButton.onPressed, isNotNull);
+    expect(find.text('Delete current meeting?'), findsNothing);
   });
 
-  testWidgets('start fresh confirmation requires FRESH',
+  testWidgets('delete online club confirmation has no typed field',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs());
+
+    await pumpOnlineCountScreen(tester);
+    await openDangerZone(tester, actionLabel: 'Delete Online Club');
+    await tester.tap(find.text('Delete Online Club'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete online club?'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.textContaining('The old QR code will no longer be usable.'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Manual Count data will not be deleted.'),
+      findsOneWidget,
+    );
+    final TextButton deleteButton = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Delete Online Club'),
+    );
+    expect(deleteButton.onPressed, isNotNull);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete online club?'), findsNothing);
+  });
+
+  testWidgets('start fresh confirmation has no typed field',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(savedClubPrefs());
 
@@ -1002,25 +1056,30 @@ void main() {
     await tester.tap(find.text('Start Fresh on This Device'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Start fresh?'), findsOneWidget);
+    expect(find.text('Start fresh on this device?'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      findsNothing,
+    );
     expect(
       find.textContaining('The old QR code should no longer be used.'),
       findsOneWidget,
     );
-    expect(find.text('Type FRESH to continue'), findsOneWidget);
-    FilledButton okButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'OK'),
+    expect(
+      find.textContaining('Manual Count data will not be deleted.'),
+      findsOneWidget,
     );
-    expect(okButton.onPressed, isNull);
+    final TextButton startFreshButton = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Start Fresh'),
+    );
+    expect(startFreshButton.onPressed, isNotNull);
 
-    await tester.enterText(
-        textFieldWithLabel('Type FRESH to continue'), 'FRESH');
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
     await tester.pumpAndSettle();
-
-    okButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'OK'),
-    );
-    expect(okButton.onPressed, isNotNull);
+    expect(find.text('Start fresh on this device?'), findsNothing);
   });
 
   testWidgets('permanent QR card keeps technical copy out of main flow',

@@ -1958,47 +1958,47 @@ abstract class AppLocalizations {
   /// **'Online Count started fresh on this device.'**
   String get onlineCountStartedFresh;
 
-  /// No description provided for @onlineCountTypeDeleteToContinue.
+  /// No description provided for @onlineCountDeleteCurrentMeetingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Type DELETE to continue'**
-  String get onlineCountTypeDeleteToContinue;
-
-  /// No description provided for @onlineCountTypeResetToContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Type RESET to continue'**
-  String get onlineCountTypeResetToContinue;
-
-  /// No description provided for @onlineCountTypeFreshToContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Type FRESH to continue'**
-  String get onlineCountTypeFreshToContinue;
+  /// **'Delete current meeting?'**
+  String get onlineCountDeleteCurrentMeetingTitle;
 
   /// No description provided for @onlineCountDeleteCurrentMeetingWarning.
   ///
   /// In en, this message translates to:
-  /// **'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.'**
+  /// **'This will delete this meeting’s candidates, votes, and results.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.\nManual Count data will not be deleted.'**
   String get onlineCountDeleteCurrentMeetingWarning;
+
+  /// No description provided for @onlineCountDeleteOnlineClubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete online club?'**
+  String get onlineCountDeleteOnlineClubTitle;
 
   /// No description provided for @onlineCountDeleteOnlineClubWarning.
   ///
   /// In en, this message translates to:
-  /// **'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThe old QR code will no longer be usable.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.'**
+  /// **'This will delete the online club, current meeting, candidates, votes, and results from the cloud.\nThe old QR code will no longer be usable.\nManual Count data will not be deleted.'**
   String get onlineCountDeleteOnlineClubWarning;
 
   /// No description provided for @onlineCountResetDeviceSetupWarning.
   ///
   /// In en, this message translates to:
-  /// **'This clears online voting setup saved on this phone.\nIt does not delete cloud records.'**
+  /// **'This will clear local Online Count setup on this phone.\nCloud data will not be deleted.\nManual Count data will not be deleted.'**
   String get onlineCountResetDeviceSetupWarning;
 
   /// No description provided for @onlineCountStartFreshTitle.
   ///
   /// In en, this message translates to:
-  /// **'Start fresh?'**
+  /// **'Start fresh on this device?'**
   String get onlineCountStartFreshTitle;
+
+  /// No description provided for @onlineCountStartFreshConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Fresh'**
+  String get onlineCountStartFreshConfirm;
 
   /// No description provided for @onlineCountStartFreshWarning.
   ///
