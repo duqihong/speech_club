@@ -1280,6 +1280,12 @@ abstract class AppLocalizations {
   /// **'Next step'**
   String get onlineCountNextStep;
 
+  /// No description provided for @onlineCountNextStepAddCandidatesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates'**
+  String get onlineCountNextStepAddCandidatesShort;
+
   /// No description provided for @onlineCountCurrentVote.
   ///
   /// In en, this message translates to:
@@ -1484,6 +1490,24 @@ abstract class AppLocalizations {
   /// **'Save Evaluator Candidates'**
   String get onlineCountSaveEvaluatorCandidates;
 
+  /// No description provided for @onlineCountBestSpeakerCandidatesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Speaker Candidates Saved'**
+  String get onlineCountBestSpeakerCandidatesSaved;
+
+  /// No description provided for @onlineCountTableTopicsCandidatesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Table Topics Candidates Saved'**
+  String get onlineCountTableTopicsCandidatesSaved;
+
+  /// No description provided for @onlineCountEvaluatorCandidatesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluator Candidates Saved'**
+  String get onlineCountEvaluatorCandidatesSaved;
+
   /// No description provided for @onlineCountVotingRound.
   ///
   /// In en, this message translates to:
@@ -1559,19 +1583,19 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountPermanentVotingQrHelp.
   ///
   /// In en, this message translates to:
-  /// **'This QR code belongs to this online club.'**
+  /// **'Reusable for every meeting.'**
   String get onlineCountPermanentVotingQrHelp;
 
   /// No description provided for @onlineCountQrScheduleShareHelp.
   ///
   /// In en, this message translates to:
-  /// **'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.'**
+  /// **'The voting page follows each voter’s phone language.'**
   String get onlineCountQrScheduleShareHelp;
 
   /// No description provided for @onlineCountQrLifecycleReminder.
   ///
   /// In en, this message translates to:
-  /// **'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes the old QR unusable.'**
+  /// **'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes it unusable.'**
   String get onlineCountQrLifecycleReminder;
 
   /// No description provided for @onlineCountChineseVotingPage.
@@ -1613,7 +1637,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCopyQrLink.
   ///
   /// In en, this message translates to:
-  /// **'Copy Link'**
+  /// **'Copy Voting Link'**
   String get onlineCountCopyQrLink;
 
   /// No description provided for @onlineCountShareQrCode.
@@ -1687,6 +1711,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Draft'**
   String get onlineCountDraft;
+
+  /// No description provided for @onlineCountPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing'**
+  String get onlineCountPreparing;
 
   /// No description provided for @onlineCountOpen.
   ///
@@ -1955,8 +1985,32 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCandidateHint.
   ///
   /// In en, this message translates to:
-  /// **'One candidate per line'**
+  /// **'Candidates'**
   String get onlineCountCandidateHint;
+
+  /// No description provided for @onlineCountCandidateSetupHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter one candidate per line for each award.'**
+  String get onlineCountCandidateSetupHelp;
+
+  /// No description provided for @onlineCountBestSpeakerCandidateExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Alice\nBob\nCharlie'**
+  String get onlineCountBestSpeakerCandidateExamples;
+
+  /// No description provided for @onlineCountTableTopicsCandidateExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'David\nEva\nFrank'**
+  String get onlineCountTableTopicsCandidateExamples;
+
+  /// No description provided for @onlineCountEvaluatorCandidateExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Grace\nHelen\nIvan'**
+  String get onlineCountEvaluatorCandidateExamples;
 
   /// No description provided for @onlineCountNoResultsYet.
   ///

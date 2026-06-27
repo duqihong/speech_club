@@ -225,13 +225,12 @@ void main() {
 
     await pumpOnlineCountScreen(tester);
 
-    expect(find.text('Current Status'), findsOneWidget);
+    expect(find.text('Current Status'), findsNothing);
     expect(find.text('Online Club Ready'), findsOneWidget);
-    expect(find.text('Current Meeting: Not created'), findsOneWidget);
     expect(find.text('Next step: Create Current Meeting'), findsOneWidget);
     expect(find.text('Club: Demo Club'), findsOneWidget);
-    expect(find.text('Club code: demo-club'), findsOneWidget);
-    expect(find.text('Voting QR is ready below.'), findsOneWidget);
+    expect(find.text('Club code: demo-club'), findsNothing);
+    expect(find.text('Voting QR is ready below.'), findsNothing);
     expect(
       find.text(
         'Voting Link: https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
@@ -239,7 +238,7 @@ void main() {
       findsNothing,
     );
     expect(find.text('Check Online Status'), findsNothing);
-    expect(find.text('Delete Online Club'), findsOneWidget);
+    expect(find.text('Delete Online Club'), findsNothing);
     expect(textFieldWithLabel('Club Name'), findsNothing);
     expect(textFieldWithLabel('Club Code'), findsNothing);
     expect(textFieldWithLabel('Admin PIN'), findsNothing);
@@ -249,6 +248,7 @@ void main() {
     expect(find.text('Start Fresh on This Device'), findsNothing);
 
     await openDangerZone(tester, actionLabel: 'Start Fresh on This Device');
+    expect(find.text('Delete Online Club'), findsOneWidget);
     expect(find.text('Reset Online Count on This Device'), findsOneWidget);
     expect(find.text('Start Fresh on This Device'), findsOneWidget);
     expect(find.text('Technical Settings'), findsOneWidget);
@@ -265,6 +265,8 @@ void main() {
     await openTechnicalSettings(tester);
 
     expect(find.text('Check Online Status'), findsOneWidget);
+    expect(find.text('Copy Voting Link'), findsOneWidget);
+    expect(find.text('Club code: demo-club'), findsOneWidget);
     expect(
       find.text(
         'Use this only if the screen looks out of sync with online voting.',
@@ -292,7 +294,7 @@ void main() {
 
     expect(find.text('No current meeting'), findsOneWidget);
     expect(
-      find.text('Create a meeting before adding candidates or opening voting.'),
+      find.text('Next step: Create Current Meeting'),
       findsOneWidget,
     );
     expect(find.text('Create Current Meeting'), findsOneWidget);
@@ -313,13 +315,17 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Meeting status: Draft'), findsOneWidget);
-    expect(find.text('Add candidates, then open the meeting.'), findsOneWidget);
-    expect(find.text('Delete Current Meeting'), findsOneWidget);
+    expect(find.text('Status: Preparing'), findsOneWidget);
+    expect(find.text('Next step: Add candidates'), findsOneWidget);
+    expect(find.text('Meeting is prepared, but voting is not open yet.'),
+        findsNothing);
+    expect(find.text('Delete Current Meeting'), findsNothing);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsOneWidget);
+    expect(find.text('Enter one candidate per line for each award.'),
+        findsOneWidget);
     final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
-      textFieldWithLabel('One candidate per line'),
+      textFieldWithLabel('Candidates'),
     );
     expect(candidateFields.length, 3);
     expect(
@@ -369,7 +375,7 @@ void main() {
     expect(find.text('Cara'), findsOneWidget);
     expect(find.text('Eva'), findsOneWidget);
     final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
-      textFieldWithLabel('One candidate per line'),
+      textFieldWithLabel('Candidates'),
     );
     expect(
       candidateFields.every((TextField field) => field.enabled == true),
@@ -394,7 +400,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').first,
+      textFieldWithLabel('Candidates').first,
       'Alice',
     );
     await tester.pumpAndSettle();
@@ -426,6 +432,17 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Best Speaker Candidates Saved'), findsOneWidget);
+    expect(find.text('Table Topics Candidates Saved'), findsOneWidget);
+    expect(find.text('Evaluator Candidates Saved'), findsOneWidget);
+
     await tester.scrollUntilVisible(
       find.text('Ready to start voting?'),
       700,
@@ -472,7 +489,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').first,
+      textFieldWithLabel('Candidates').first,
       'Alice\nBen',
     );
     await tester.pumpAndSettle();
@@ -509,7 +526,7 @@ void main() {
 
     expect(find.text('Meeting Open', skipOffstage: false), findsOneWidget);
     expect(find.text('Current vote: Best Speaker'), findsOneWidget);
-    expect(find.text('Next step: Close voting when ready'), findsOneWidget);
+    expect(find.text('Next step: Close voting when ready'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('Current Meeting'),
@@ -518,7 +535,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Meeting status: Open'), findsOneWidget);
+    expect(find.text('Status: Open'), findsWidgets);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Voting Round'), findsOneWidget);
@@ -722,7 +739,7 @@ void main() {
     expect(find.text('Results are final'), findsOneWidget);
     expect(
       find.text('Next step: Send results or delete meeting'),
-      findsOneWidget,
+      findsWidgets,
     );
 
     await tester.scrollUntilVisible(
@@ -732,7 +749,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Meeting status: Closed'), findsOneWidget);
+    expect(find.text('Status: Closed'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Voting Round'), findsNothing);
@@ -748,6 +765,9 @@ void main() {
     expect(find.text('Refresh Vote Count'), findsNothing);
     expect(find.text('Copy Results'), findsOneWidget);
     expect(find.text('Send Results to President'), findsOneWidget);
+    expect(find.text('Delete Current Meeting'), findsNothing);
+
+    await openDangerZone(tester, actionLabel: 'Delete Current Meeting');
     expect(find.text('Delete Current Meeting'), findsOneWidget);
   });
 
@@ -756,12 +776,7 @@ void main() {
     SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Delete Current Meeting'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await openDangerZone(tester, actionLabel: 'Delete Current Meeting');
     await tester.tap(find.text('Delete Current Meeting'));
     await tester.pumpAndSettle();
 
@@ -853,33 +868,34 @@ void main() {
     expect(find.text('Auto'), findsNothing);
     expect(
       find.text(
-        'This QR code belongs to this online club.',
+        'Reusable for every meeting.',
       ),
       findsOneWidget,
     );
     expect(
       find.text(
-        'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.',
+        'The voting page follows each voter’s phone language.',
       ),
       findsOneWidget,
     );
     expect(
       find.text(
-        'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes the old QR unusable.',
+        'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes it unusable.',
       ),
       findsOneWidget,
     );
-    expect(find.text('Copy Link'), findsOneWidget);
+    expect(find.text('Copy Voting Link'), findsNothing);
     expect(find.text('Share QR Code'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Share QR Code'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'Copy Link'), findsOneWidget);
+    expect(
+        find.widgetWithText(OutlinedButton, 'Copy Voting Link'), findsNothing);
     expect(find.text('Copy Print Text'), findsNothing);
     expect(find.text('Voting Link'), findsNothing);
     expect(
       find.text(
         'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
       ),
-      findsOneWidget,
+      findsNothing,
     );
   });
 

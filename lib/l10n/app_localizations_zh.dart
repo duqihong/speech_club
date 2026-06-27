@@ -612,6 +612,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountNextStep => '下一步';
 
   @override
+  String get onlineCountNextStepAddCandidatesShort => '添加候选人';
+
+  @override
   String get onlineCountCurrentVote => '当前投票';
 
   @override
@@ -715,6 +718,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSaveEvaluatorCandidates => '保存点评候选人';
 
   @override
+  String get onlineCountBestSpeakerCandidatesSaved => '最佳演讲者候选人已保存';
+
+  @override
+  String get onlineCountTableTopicsCandidatesSaved => '即席演讲候选人已保存';
+
+  @override
+  String get onlineCountEvaluatorCandidatesSaved => '点评候选人已保存';
+
+  @override
   String get onlineCountVotingRound => '投票轮次';
 
   @override
@@ -751,10 +763,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountPermanentVotingQr => '永久投票二维码';
 
   @override
-  String get onlineCountPermanentVotingQrHelp => '此二维码属于本在线俱乐部。';
+  String get onlineCountPermanentVotingQrHelp => '每次会议都可以重复使用。';
 
   @override
-  String get onlineCountQrScheduleShareHelp => '每次会议都可以重复使用。\n投票页面会跟随投票者手机的语言。';
+  String get onlineCountQrScheduleShareHelp => '投票页面会跟随投票者手机的语言。';
 
   @override
   String get onlineCountQrLifecycleReminder =>
@@ -779,7 +791,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountQrAuto => 'Auto';
 
   @override
-  String get onlineCountCopyQrLink => '复制链接';
+  String get onlineCountCopyQrLink => '复制投票链接';
 
   @override
   String get onlineCountShareQrCode => '分享二维码';
@@ -816,6 +828,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountDraft => '草稿';
+
+  @override
+  String get onlineCountPreparing => '准备中';
 
   @override
   String get onlineCountOpen => '开放';
@@ -955,7 +970,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountTechnicalDetails => '技术信息';
 
   @override
-  String get onlineCountCandidateHint => '每行一位候选人';
+  String get onlineCountCandidateHint => '候选人';
+
+  @override
+  String get onlineCountCandidateSetupHelp => '每行输入一位候选人。';
+
+  @override
+  String get onlineCountBestSpeakerCandidateExamples => '张三\n李四\n王五';
+
+  @override
+  String get onlineCountTableTopicsCandidateExamples => '张三\n李四\n王五';
+
+  @override
+  String get onlineCountEvaluatorCandidateExamples => '张三\n李四\n王五';
 
   @override
   String get onlineCountNoResultsYet => '还没有加载结果。';

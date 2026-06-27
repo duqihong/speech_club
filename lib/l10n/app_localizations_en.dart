@@ -640,6 +640,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountNextStep => 'Next step';
 
   @override
+  String get onlineCountNextStepAddCandidatesShort => 'Add candidates';
+
+  @override
   String get onlineCountCurrentVote => 'Current vote';
 
   @override
@@ -755,6 +758,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountSaveEvaluatorCandidates => 'Save Evaluator Candidates';
 
   @override
+  String get onlineCountBestSpeakerCandidatesSaved =>
+      'Best Speaker Candidates Saved';
+
+  @override
+  String get onlineCountTableTopicsCandidatesSaved =>
+      'Table Topics Candidates Saved';
+
+  @override
+  String get onlineCountEvaluatorCandidatesSaved =>
+      'Evaluator Candidates Saved';
+
+  @override
   String get onlineCountVotingRound => 'Voting Round';
 
   @override
@@ -793,16 +808,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountPermanentVotingQr => 'Permanent Voting QR';
 
   @override
-  String get onlineCountPermanentVotingQrHelp =>
-      'This QR code belongs to this online club.';
+  String get onlineCountPermanentVotingQrHelp => 'Reusable for every meeting.';
 
   @override
   String get onlineCountQrScheduleShareHelp =>
-      'It can be reused for every meeting.\nThe voting page will follow the voter’s phone language.';
+      'The voting page follows each voter’s phone language.';
 
   @override
   String get onlineCountQrLifecycleReminder =>
-      'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes the old QR unusable.';
+      'Deleting a meeting keeps this QR. Deleting the club or starting fresh makes it unusable.';
 
   @override
   String get onlineCountChineseVotingPage => 'Chinese voting page';
@@ -823,7 +837,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountQrAuto => 'Auto';
 
   @override
-  String get onlineCountCopyQrLink => 'Copy Link';
+  String get onlineCountCopyQrLink => 'Copy Voting Link';
 
   @override
   String get onlineCountShareQrCode => 'Share QR Code';
@@ -862,6 +876,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountDraft => 'Draft';
+
+  @override
+  String get onlineCountPreparing => 'Preparing';
 
   @override
   String get onlineCountOpen => 'Open';
@@ -1014,7 +1031,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountTechnicalDetails => 'Technical Details';
 
   @override
-  String get onlineCountCandidateHint => 'One candidate per line';
+  String get onlineCountCandidateHint => 'Candidates';
+
+  @override
+  String get onlineCountCandidateSetupHelp =>
+      'Enter one candidate per line for each award.';
+
+  @override
+  String get onlineCountBestSpeakerCandidateExamples => 'Alice\nBob\nCharlie';
+
+  @override
+  String get onlineCountTableTopicsCandidateExamples => 'David\nEva\nFrank';
+
+  @override
+  String get onlineCountEvaluatorCandidateExamples => 'Grace\nHelen\nIvan';
 
   @override
   String get onlineCountNoResultsYet => 'No results loaded yet.';
