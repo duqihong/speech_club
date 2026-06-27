@@ -75,7 +75,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get proPriceLine =>
-      'First 3 months free. Then S\$14.98 per year. Cancel anytime.';
+      'First 3 months free. Then yearly subscription. Cancel anytime.';
+
+  @override
+  String proPriceLineWithPrice(String price) {
+    return 'First 3 months free. Then $price per year. Cancel anytime.';
+  }
+
+  @override
+  String get proLoadingSubscription => 'Loading subscription information...';
+
+  @override
+  String get proSubscriptionUnavailable =>
+      'Subscription information is temporarily unavailable. You can still use Manual Count for free.';
 
   @override
   String get proStartTrialButton => 'Start 3-Month Free Trial';

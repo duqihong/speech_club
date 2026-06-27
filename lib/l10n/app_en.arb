@@ -21,7 +21,17 @@
   "proFeatureLiveVoteCounter": "Live vote counter",
   "proFeatureSendResultsByWhatsApp": "Send results by WhatsApp",
   "proFeatureFutureOnlineTools": "Future online meeting tools",
-  "proPriceLine": "First 3 months free. Then S$14.98 per year. Cancel anytime.",
+  "proPriceLine": "First 3 months free. Then yearly subscription. Cancel anytime.",
+  "proPriceLineWithPrice": "First 3 months free. Then {price} per year. Cancel anytime.",
+  "@proPriceLineWithPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "proLoadingSubscription": "Loading subscription information...",
+  "proSubscriptionUnavailable": "Subscription information is temporarily unavailable. You can still use Manual Count for free.",
   "proStartTrialButton": "Start 3-Month Free Trial",
   "proUseManualCountButton": "Use Manual Count for Free",
   "proManualCountFreeNote": "Manual Count and all offline tools remain free.",

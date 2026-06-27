@@ -227,8 +227,26 @@ abstract class AppLocalizations {
   /// No description provided for @proPriceLine.
   ///
   /// In en, this message translates to:
-  /// **'First 3 months free. Then S\$14.98 per year. Cancel anytime.'**
+  /// **'First 3 months free. Then yearly subscription. Cancel anytime.'**
   String get proPriceLine;
+
+  /// No description provided for @proPriceLineWithPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'First 3 months free. Then {price} per year. Cancel anytime.'**
+  String proPriceLineWithPrice(String price);
+
+  /// No description provided for @proLoadingSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading subscription information...'**
+  String get proLoadingSubscription;
+
+  /// No description provided for @proSubscriptionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription information is temporarily unavailable. You can still use Manual Count for free.'**
+  String get proSubscriptionUnavailable;
 
   /// No description provided for @proStartTrialButton.
   ///

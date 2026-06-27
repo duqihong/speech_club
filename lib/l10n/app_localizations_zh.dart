@@ -73,7 +73,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proFeatureFutureOnlineTools => '未来的在线会议工具';
 
   @override
-  String get proPriceLine => '前 3 个月免费。之后每年 S\$14.98。可随时取消。';
+  String get proPriceLine => '前 3 个月免费。之后按年订阅。可随时取消。';
+
+  @override
+  String proPriceLineWithPrice(String price) {
+    return '前 3 个月免费。之后每年 $price。可随时取消。';
+  }
+
+  @override
+  String get proLoadingSubscription => '正在加载订阅信息……';
+
+  @override
+  String get proSubscriptionUnavailable => '订阅信息暂时不可用。您仍然可以免费使用手动计票。';
 
   @override
   String get proStartTrialButton => '开始 3 个月免费试用';

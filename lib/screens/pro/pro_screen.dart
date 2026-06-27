@@ -1,9 +1,45 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../services/pro_entitlement_service.dart';
 
-class ProScreen extends StatelessWidget {
-  const ProScreen({super.key});
+class ProScreen extends StatefulWidget {
+  const ProScreen({
+    super.key,
+    this.proEntitlementService,
+  });
+
+  final ProEntitlementService? proEntitlementService;
+
+  @override
+  State<ProScreen> createState() => _ProScreenState();
+}
+
+class _ProScreenState extends State<ProScreen> {
+  late final ProEntitlementService _proEntitlementService;
+  late final bool _ownsService;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownsService = widget.proEntitlementService == null;
+    _proEntitlementService =
+        widget.proEntitlementService ?? ProEntitlementService();
+    _loadProductDetails();
+  }
+
+  @override
+  void dispose() {
+    if (_ownsService) {
+      _proEntitlementService.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _loadProductDetails() async {
+    await _proEntitlementService.initialize();
+    await _proEntitlementService.loadProducts();
+  }
 
   void _showPurchasePlaceholder(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
@@ -17,6 +53,45 @@ class ProScreen extends StatelessWidget {
     if (navigator.canPop()) {
       navigator.pop();
     }
+  }
+
+  String _priceLine(AppLocalizations l10n) {
+    final String? price = _proEntitlementService.proProductPriceText;
+    if (price == null || price.isEmpty) {
+      return l10n.proPriceLine;
+    }
+
+    return l10n.proPriceLineWithPrice(price);
+  }
+
+  Widget _buildSubscriptionStatus(AppLocalizations l10n) {
+    if (_proEntitlementService.isLoadingProduct) {
+      return _SubscriptionStatus(
+        icon: SizedBox.square(
+          dimension: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            color: Colors.blue.shade700,
+          ),
+        ),
+        message: l10n.proLoadingSubscription,
+      );
+    }
+
+    if (_proEntitlementService.productLoadState ==
+            ProProductLoadState.unavailable ||
+        _proEntitlementService.productLoadState == ProProductLoadState.error) {
+      return _SubscriptionStatus(
+        icon: const Icon(
+          Icons.info_outline,
+          size: 20,
+          color: Color(0xFF355E86),
+        ),
+        message: l10n.proSubscriptionUnavailable,
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildFeatureTile(String label) {
@@ -129,18 +204,36 @@ class ProScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Text(
-                  l10n.proPriceLine,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    height: 1.35,
+            AnimatedBuilder(
+              animation: _proEntitlementService,
+              builder: (BuildContext context, Widget? child) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Text(
+                      _priceLine(l10n),
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
+            ),
+            AnimatedBuilder(
+              animation: _proEntitlementService,
+              builder: (BuildContext context, Widget? child) {
+                final Widget status = _buildSubscriptionStatus(l10n);
+                if (status is SizedBox) {
+                  return status;
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: status,
+                );
+              },
             ),
             const SizedBox(height: 16),
             FilledButton(
@@ -160,6 +253,45 @@ class ProScreen extends StatelessWidget {
                 fontSize: 14,
                 color: Colors.black54,
                 height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SubscriptionStatus extends StatelessWidget {
+  const _SubscriptionStatus({
+    required this.icon,
+    required this.message,
+  });
+
+  final Widget icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 1),
+              child: icon,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black54,
+                  height: 1.35,
+                ),
               ),
             ),
           ],

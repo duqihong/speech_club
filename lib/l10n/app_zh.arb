@@ -21,7 +21,17 @@
   "proFeatureLiveVoteCounter": "实时票数显示",
   "proFeatureSendResultsByWhatsApp": "通过 WhatsApp 发送结果",
   "proFeatureFutureOnlineTools": "未来的在线会议工具",
-  "proPriceLine": "前 3 个月免费。之后每年 S$14.98。可随时取消。",
+  "proPriceLine": "前 3 个月免费。之后按年订阅。可随时取消。",
+  "proPriceLineWithPrice": "前 3 个月免费。之后每年 {price}。可随时取消。",
+  "@proPriceLineWithPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "proLoadingSubscription": "正在加载订阅信息……",
+  "proSubscriptionUnavailable": "订阅信息暂时不可用。您仍然可以免费使用手动计票。",
   "proStartTrialButton": "开始 3 个月免费试用",
   "proUseManualCountButton": "免费使用手动计票",
   "proManualCountFreeNote": "手动计票和所有离线工具永久免费。",
