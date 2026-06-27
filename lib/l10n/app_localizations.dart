@@ -152,6 +152,108 @@ abstract class AppLocalizations {
   /// **'Vote Bests'**
   String get navVoteBests;
 
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsProSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Online voting subscription'**
+  String get settingsProSubtitle;
+
+  /// No description provided for @proTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech Club Pro'**
+  String get proTitle;
+
+  /// No description provided for @proSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Run live online voting with one permanent club QR.'**
+  String get proSubtitle;
+
+  /// No description provided for @proBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech Club Pro helps your club collect votes from members’ phones, show a live vote count, and send final results to the meeting officer.'**
+  String get proBody;
+
+  /// No description provided for @proIncludedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get proIncludedTitle;
+
+  /// No description provided for @proFeatureOnlineCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Count'**
+  String get proFeatureOnlineCount;
+
+  /// No description provided for @proFeaturePermanentClubQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent club QR'**
+  String get proFeaturePermanentClubQr;
+
+  /// No description provided for @proFeatureQrSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'QR sharing'**
+  String get proFeatureQrSharing;
+
+  /// No description provided for @proFeatureLiveVoteCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Live vote counter'**
+  String get proFeatureLiveVoteCounter;
+
+  /// No description provided for @proFeatureSendResultsByWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send results by WhatsApp'**
+  String get proFeatureSendResultsByWhatsApp;
+
+  /// No description provided for @proFeatureFutureOnlineTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Future online meeting tools'**
+  String get proFeatureFutureOnlineTools;
+
+  /// No description provided for @proPriceLine.
+  ///
+  /// In en, this message translates to:
+  /// **'First 3 months free. Then S\$14.98 per year. Cancel anytime.'**
+  String get proPriceLine;
+
+  /// No description provided for @proStartTrialButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 3-Month Free Trial'**
+  String get proStartTrialButton;
+
+  /// No description provided for @proUseManualCountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Manual Count for Free'**
+  String get proUseManualCountButton;
+
+  /// No description provided for @proManualCountFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Count and all offline tools remain free.'**
+  String get proManualCountFreeNote;
+
+  /// No description provided for @proPurchaseComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase will be enabled in a later test phase.'**
+  String get proPurchaseComingSoon;
+
   /// No description provided for @buttonStart.
   ///
   /// In en, this message translates to:

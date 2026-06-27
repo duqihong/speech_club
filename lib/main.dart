@@ -11,6 +11,8 @@ import 'l10n/app_localizations.dart';
 import 'localization/app_locale_controller.dart';
 import 'role_assistant/ui/role_assistant_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/pro/pro_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'screens/timer/timer_screen.dart';
 
 Future<void> main() async {
@@ -62,6 +64,8 @@ class SpeechClubApp extends StatelessWidget {
             AppRoutes.committees: (_) => const CommitteesScreen(),
             AppRoutes.pathways: (_) => const PathwaysScreen(),
             AppRoutes.voteBests: (_) => const VoteBestsModeScreen(),
+            AppRoutes.settings: (_) => const SettingsScreen(),
+            AppRoutes.pro: (_) => const ProScreen(),
           },
         );
       },

@@ -36,6 +36,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navVoteBests => '最佳投票';
 
   @override
+  String get settingsTitle => '设置';
+
+  @override
+  String get settingsProSubtitle => '在线投票订阅';
+
+  @override
+  String get proTitle => 'Speech Club Pro';
+
+  @override
+  String get proSubtitle => '使用一个永久俱乐部二维码，进行现场在线投票。';
+
+  @override
+  String get proBody =>
+      'Speech Club Pro 可帮助俱乐部通过会员手机收集投票，显示实时票数，并将最终结果发送给会议负责人。';
+
+  @override
+  String get proIncludedTitle => '包含功能';
+
+  @override
+  String get proFeatureOnlineCount => '在线计票';
+
+  @override
+  String get proFeaturePermanentClubQr => '永久俱乐部二维码';
+
+  @override
+  String get proFeatureQrSharing => '二维码分享';
+
+  @override
+  String get proFeatureLiveVoteCounter => '实时票数显示';
+
+  @override
+  String get proFeatureSendResultsByWhatsApp => '通过 WhatsApp 发送结果';
+
+  @override
+  String get proFeatureFutureOnlineTools => '未来的在线会议工具';
+
+  @override
+  String get proPriceLine => '前 3 个月免费。之后每年 S\$14.98。可随时取消。';
+
+  @override
+  String get proStartTrialButton => '开始 3 个月免费试用';
+
+  @override
+  String get proUseManualCountButton => '免费使用手动计票';
+
+  @override
+  String get proManualCountFreeNote => '手动计票和所有离线工具永久免费。';
+
+  @override
+  String get proPurchaseComingSoon => '购买功能将在后续测试阶段启用。';
+
+  @override
   String get buttonStart => '开始';
 
   @override

@@ -36,6 +36,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navVoteBests => 'Vote Bests';
 
   @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsProSubtitle => 'Online voting subscription';
+
+  @override
+  String get proTitle => 'Speech Club Pro';
+
+  @override
+  String get proSubtitle =>
+      'Run live online voting with one permanent club QR.';
+
+  @override
+  String get proBody =>
+      'Speech Club Pro helps your club collect votes from members’ phones, show a live vote count, and send final results to the meeting officer.';
+
+  @override
+  String get proIncludedTitle => 'Included';
+
+  @override
+  String get proFeatureOnlineCount => 'Online Count';
+
+  @override
+  String get proFeaturePermanentClubQr => 'Permanent club QR';
+
+  @override
+  String get proFeatureQrSharing => 'QR sharing';
+
+  @override
+  String get proFeatureLiveVoteCounter => 'Live vote counter';
+
+  @override
+  String get proFeatureSendResultsByWhatsApp => 'Send results by WhatsApp';
+
+  @override
+  String get proFeatureFutureOnlineTools => 'Future online meeting tools';
+
+  @override
+  String get proPriceLine =>
+      'First 3 months free. Then S\$14.98 per year. Cancel anytime.';
+
+  @override
+  String get proStartTrialButton => 'Start 3-Month Free Trial';
+
+  @override
+  String get proUseManualCountButton => 'Use Manual Count for Free';
+
+  @override
+  String get proManualCountFreeNote =>
+      'Manual Count and all offline tools remain free.';
+
+  @override
+  String get proPurchaseComingSoon =>
+      'Purchase will be enabled in a later test phase.';
+
+  @override
   String get buttonStart => 'Start';
 
   @override

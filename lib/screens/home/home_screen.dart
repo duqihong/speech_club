@@ -91,6 +91,13 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+          IconButton(
+            tooltip: l10n.settingsTitle,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).pushNamed(
+              AppRoutes.settings,
+            ),
+          ),
         ],
       ),
       body: SafeArea(

@@ -7,4 +7,6 @@ class AppRoutes {
   static const String committees = '/committees';
   static const String pathways = '/pathways';
   static const String voteBests = '/vote-bests';
+  static const String settings = '/settings';
+  static const String pro = '/pro';
 }
