@@ -11,7 +11,7 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
 
-  testWidgets('Timer and Speaker open from home without overflow',
+  testWidgets('Timer and Flashcards open from home without overflow',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(414, 896);
     tester.view.devicePixelRatio = 1;
@@ -34,12 +34,14 @@ void main() {
 
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Speaker'));
+    await tester.tap(find.text('Flashcards'));
     await tester.pumpAndSettle();
 
-    expect(find.text('My Speech'), findsOneWidget);
-    expect(find.text('Edit Cards'), findsOneWidget);
-    expect(find.text('Start Presentation'), findsOneWidget);
+    expect(find.text('Speech Flashcards'), findsOneWidget);
+    expect(find.text('Create simple cards to guide your prepared speech.'),
+        findsOneWidget);
+    expect(find.text('Edit Flashcards'), findsOneWidget);
+    expect(find.text('Start Practice'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
@@ -49,9 +51,9 @@ void main() {
     await tester.tap(find.text('演讲卡片'));
     await tester.pumpAndSettle();
 
-    expect(find.text('我的演讲'), findsOneWidget);
+    expect(find.text('演讲卡片'), findsWidgets);
     expect(find.text('编辑卡片'), findsOneWidget);
-    expect(find.text('开始展示'), findsOneWidget);
+    expect(find.text('开始练习'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

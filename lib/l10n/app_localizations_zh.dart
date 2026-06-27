@@ -212,10 +212,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tableTopicsCategoryClassicalPoetryLines => '诗句';
 
   @override
-  String get flashcardsMySpeech => '我的演讲';
+  String get flashcardsMySpeech => '演讲卡片';
 
   @override
-  String get flashcardsMySpeeches => '我的演讲';
+  String get flashcardsMySpeeches => '演讲卡片';
 
   @override
   String get flashcardsAddCard => '添加卡片';
@@ -227,16 +227,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get flashcardsPasteMultipleCards => '粘贴多张卡片';
 
   @override
-  String get flashcardsEditMySpeech => '编辑我的演讲';
+  String get flashcardsEditMySpeech => '编辑演讲卡片';
 
   @override
   String get flashcardsEditCards => '编辑卡片';
 
   @override
-  String get flashcardsStartPresentation => '开始展示';
+  String get flashcardsStartPresentation => '开始练习';
 
   @override
-  String get flashcardsNoCardsYet => '还没有卡片，请先添加卡片。';
+  String get flashcardsIntro => '创建简短卡片，帮助你准备演讲。';
+
+  @override
+  String get flashcardsNoCardsYet => '还没有卡片。点击“编辑卡片”添加第一张卡片。';
 
   @override
   String get flashcardsEmptyState => '还没有卡片。\n点击“添加卡片”创建第一张。';
@@ -370,8 +373,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pathwaysIntro => '学习路径帮助你一步一步提升演讲、自信、领导力和沟通能力。';
 
   @override
-  String get pathwaysBaseCampNote =>
-      '这是俱乐部内使用的简明参考。正式项目要求请以 Toastmasters Base Camp 为准。';
+  String get pathwaysBaseCampNote => '';
 
   @override
   String get pathwaysWhatThisPathBuilds => '这条路径训练什么';
@@ -735,7 +737,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountSaveTableTopicsCandidates => '保存即席演讲候选人';
 
   @override
-  String get onlineCountSaveEvaluatorCandidates => '保存点评候选人';
+  String get onlineCountSaveEvaluatorCandidates => '保存评论员候选人';
 
   @override
   String get onlineCountBestSpeakerCandidatesSaved => '最佳演讲者候选人已保存';
@@ -744,7 +746,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountTableTopicsCandidatesSaved => '即席演讲候选人已保存';
 
   @override
-  String get onlineCountEvaluatorCandidatesSaved => '点评候选人已保存';
+  String get onlineCountEvaluatorCandidatesSaved => '评论员候选人已保存';
 
   @override
   String get onlineCountVotingRound => '投票轮次';

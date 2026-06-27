@@ -39,7 +39,8 @@ void main() {
     expect(summary, contains('状态：尚未最终确认'));
     expect(summary, contains('最佳演讲者\n获奖者：Alice'));
     expect(summary, contains('最佳即席演讲者\n并列：David, Eva'));
-    expect(summary, contains('最佳点评者\n尚未计票。'));
+    expect(summary, contains('最佳评论员\n尚未计票。'));
+    expect(summary, isNot(contains('最佳点评者')));
     expect(summary, contains('票数：\n- Alice：3'));
     expect(summary, contains('没有候选人。'));
   });

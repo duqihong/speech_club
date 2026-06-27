@@ -67,7 +67,7 @@ void main() {
           OnlineAwardType.bestEvaluator,
           const Locale('zh'),
         ),
-        '最佳点评者',
+        '最佳评论员',
       );
     });
 

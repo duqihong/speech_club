@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTimer => 'Timer';
 
   @override
-  String get navSpeaker => 'Speaker';
+  String get navSpeaker => 'Flashcards';
 
   @override
   String get navTopicSelection => 'Topic Selection';
@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTableTopics => 'Table Topics';
 
   @override
-  String get navRoleAssistant => 'Role Assistant';
+  String get navRoleAssistant => 'Role Assistants';
 
   @override
   String get navCommittees => 'Committees';
@@ -217,10 +217,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Classical Poetry Lines';
 
   @override
-  String get flashcardsMySpeech => 'My Speech';
+  String get flashcardsMySpeech => 'Speech Flashcards';
 
   @override
-  String get flashcardsMySpeeches => 'My Speeches';
+  String get flashcardsMySpeeches => 'Speech Flashcards';
 
   @override
   String get flashcardsAddCard => 'Add Card';
@@ -232,20 +232,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsPasteMultipleCards => 'Paste Multiple Cards';
 
   @override
-  String get flashcardsEditMySpeech => 'Edit My Speech';
+  String get flashcardsEditMySpeech => 'Edit Speech Flashcards';
 
   @override
-  String get flashcardsEditCards => 'Edit Cards';
+  String get flashcardsEditCards => 'Edit Flashcards';
 
   @override
-  String get flashcardsStartPresentation => 'Start Presentation';
+  String get flashcardsStartPresentation => 'Start Practice';
 
   @override
-  String get flashcardsNoCardsYet => 'No cards yet. Please add cards first.';
+  String get flashcardsIntro =>
+      'Create simple cards to guide your prepared speech.';
+
+  @override
+  String get flashcardsNoCardsYet =>
+      'No flashcards yet. Tap Edit Flashcards to add your first card.';
 
   @override
   String get flashcardsEmptyState =>
-      'No cards yet.\nTap \"Add Card\" to create your first one.';
+      'No flashcards yet.\nTap \"Add Card\" to create your first one.';
 
   @override
   String get flashcardsMoveUp => 'Move up';

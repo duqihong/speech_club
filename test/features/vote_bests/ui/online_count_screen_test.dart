@@ -474,6 +474,25 @@ void main() {
     expect(find.text('Results'), findsNothing);
   });
 
+  testWidgets('Chinese draft Online Count uses evaluator wording',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+
+    await pumpOnlineCountScreen(tester, locale: const Locale('zh'));
+
+    await tester.scrollUntilVisible(
+      find.text('候选人设置'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('最佳评论员'), findsOneWidget);
+    expect(find.text('保存评论员候选人'), findsOneWidget);
+    expect(find.text('最佳点评者'), findsNothing);
+    expect(find.text('保存点评候选人'), findsNothing);
+  });
+
   testWidgets(
       'draft candidates restore from local draft storage and stay editable',
       (WidgetTester tester) async {

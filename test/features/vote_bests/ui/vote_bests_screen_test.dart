@@ -126,7 +126,8 @@ void main() {
     expect(find.text('手动计票'), findsOneWidget);
     expect(find.text('最佳演讲者'), findsOneWidget);
     expect(find.text('最佳即席演讲者'), findsOneWidget);
-    expect(find.text('最佳点评者'), findsOneWidget);
+    expect(find.text('最佳评论员'), findsOneWidget);
+    expect(find.text('最佳点评者'), findsNothing);
   });
 
   testWidgets('tapping Best Speaker opens detail page',

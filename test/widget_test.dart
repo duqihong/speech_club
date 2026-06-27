@@ -27,11 +27,13 @@ void main() {
 
     expect(find.text('Speech Club'), findsWidgets);
     expect(find.text('Timer'), findsOneWidget);
-    expect(find.text('Speaker'), findsOneWidget);
+    expect(find.text('Flashcards'), findsOneWidget);
+    expect(find.text('Speaker'), findsNothing);
     expect(find.text('Expressions'), findsNothing);
     expect(find.text('Topic Selection'), findsOneWidget);
     expect(find.text('Table Topics'), findsOneWidget);
-    expect(find.text('Role Assistant'), findsOneWidget);
+    expect(find.text('Role Assistants'), findsOneWidget);
+    expect(find.text('Role Assistant'), findsNothing);
     expect(find.text('Committees'), findsOneWidget);
     expect(find.text('Pathways'), findsOneWidget);
     expect(find.text('Vote Bests'), findsOneWidget);
@@ -51,7 +53,7 @@ void main() {
 
     for (final String title in <String>[
       'Timer',
-      'Speaker',
+      'Flashcards',
       'Committees',
       'Pathways',
     ]) {
@@ -59,7 +61,7 @@ void main() {
           reason: '$title should stay on one line');
     }
     expect(renderedLineCount('Topic Selection'), 2);
-    expect(renderedLineCount('Role Assistant'), 2);
+    expect(renderedLineCount('Role Assistants'), 2);
     expect(tester.takeException(), isNull);
   });
 

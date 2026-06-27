@@ -363,7 +363,7 @@ String onlineAwardLabel(OnlineAwardType type, Locale locale) {
     OnlineAwardType.bestSpeaker => isChinese ? '最佳演讲者' : 'Best Speaker',
     OnlineAwardType.bestTableTopics =>
       isChinese ? '最佳即席演讲者' : 'Best Table Topics Speaker',
-    OnlineAwardType.bestEvaluator => isChinese ? '最佳点评者' : 'Best Evaluator',
+    OnlineAwardType.bestEvaluator => isChinese ? '最佳评论员' : 'Best Evaluator',
   };
 }
 

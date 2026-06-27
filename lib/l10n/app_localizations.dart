@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @navSpeaker.
   ///
   /// In en, this message translates to:
-  /// **'Speaker'**
+  /// **'Flashcards'**
   String get navSpeaker;
 
   /// No description provided for @navTopicSelection.
@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @navRoleAssistant.
   ///
   /// In en, this message translates to:
-  /// **'Role Assistant'**
+  /// **'Role Assistants'**
   String get navRoleAssistant;
 
   /// No description provided for @navCommittees.
@@ -503,13 +503,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsMySpeech.
   ///
   /// In en, this message translates to:
-  /// **'My Speech'**
+  /// **'Speech Flashcards'**
   String get flashcardsMySpeech;
 
   /// No description provided for @flashcardsMySpeeches.
   ///
   /// In en, this message translates to:
-  /// **'My Speeches'**
+  /// **'Speech Flashcards'**
   String get flashcardsMySpeeches;
 
   /// No description provided for @flashcardsAddCard.
@@ -533,31 +533,37 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsEditMySpeech.
   ///
   /// In en, this message translates to:
-  /// **'Edit My Speech'**
+  /// **'Edit Speech Flashcards'**
   String get flashcardsEditMySpeech;
 
   /// No description provided for @flashcardsEditCards.
   ///
   /// In en, this message translates to:
-  /// **'Edit Cards'**
+  /// **'Edit Flashcards'**
   String get flashcardsEditCards;
 
   /// No description provided for @flashcardsStartPresentation.
   ///
   /// In en, this message translates to:
-  /// **'Start Presentation'**
+  /// **'Start Practice'**
   String get flashcardsStartPresentation;
+
+  /// No description provided for @flashcardsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Create simple cards to guide your prepared speech.'**
+  String get flashcardsIntro;
 
   /// No description provided for @flashcardsNoCardsYet.
   ///
   /// In en, this message translates to:
-  /// **'No cards yet. Please add cards first.'**
+  /// **'No flashcards yet. Tap Edit Flashcards to add your first card.'**
   String get flashcardsNoCardsYet;
 
   /// No description provided for @flashcardsEmptyState.
   ///
   /// In en, this message translates to:
-  /// **'No cards yet.\nTap \"Add Card\" to create your first one.'**
+  /// **'No flashcards yet.\nTap \"Add Card\" to create your first one.'**
   String get flashcardsEmptyState;
 
   /// No description provided for @flashcardsMoveUp.

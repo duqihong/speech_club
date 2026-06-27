@@ -91,7 +91,12 @@ void main() {
     expect(find.text('说服影响力'), findsOneWidget);
     expect(find.text('演讲精进'), findsOneWidget);
     expect(find.text('愿景沟通'), findsOneWidget);
-    expect(find.textContaining('这是俱乐部内使用的简明参考'), findsOneWidget);
+    expect(
+      find.text('学习路径帮助你一步一步提升演讲、自信、领导力和沟通能力。'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Toastmasters Base Camp'), findsNothing);
+    expect(find.textContaining('这是俱乐部内使用的简明参考'), findsNothing);
   });
 
   testWidgets('English Presentation Mastery detail shows guide sections',

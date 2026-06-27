@@ -99,15 +99,17 @@ class PathwaysScreen extends StatelessWidget {
                       l10n.pathwaysIntro,
                       style: const TextStyle(fontSize: 18, height: 1.35),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      l10n.pathwaysBaseCampNote,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                        height: 1.3,
+                    if (l10n.pathwaysBaseCampNote.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.pathwaysBaseCampNote,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          height: 1.3,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

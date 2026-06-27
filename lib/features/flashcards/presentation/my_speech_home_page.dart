@@ -50,6 +50,16 @@ class _MySpeechHomePageState extends State<MySpeechHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(
+              l10n.flashcardsIntro,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black54,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               height: 64,

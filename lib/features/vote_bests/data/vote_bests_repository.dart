@@ -33,7 +33,7 @@ class VoteBestsRepository {
       id: 'best_evaluator',
       icon: '📝',
       titleEn: 'Best Evaluator',
-      titleZh: '最佳点评者',
+      titleZh: '最佳评论员',
       candidates: <VoteCandidate>[],
     ),
   ];
