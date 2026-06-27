@@ -1163,13 +1163,13 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountDangerZone.
   ///
   /// In en, this message translates to:
-  /// **'Danger Zone'**
+  /// **'Manage & Reset'**
   String get onlineCountDangerZone;
 
   /// No description provided for @onlineCountDangerZoneHelp.
   ///
   /// In en, this message translates to:
-  /// **'Use only if setup is wrong or you want to stop using this online club.'**
+  /// **'Use these options only if setup is wrong or you need to reset online voting.'**
   String get onlineCountDangerZoneHelp;
 
   /// No description provided for @onlineCountSlugHelp.
@@ -1417,6 +1417,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Meeting Title'**
   String get onlineCountMeetingTitle;
+
+  /// No description provided for @onlineCountDefaultMeetingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular Meeting'**
+  String get onlineCountDefaultMeetingTitle;
 
   /// No description provided for @onlineCountMeetingDate.
   ///

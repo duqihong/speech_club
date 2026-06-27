@@ -12,9 +12,11 @@ void main() {
   Future<void> pumpOnlineCountScreen(
     WidgetTester tester, {
     List<OnlineAward> debugInitialAwards = const <OnlineAward>[],
+    Locale? locale,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: OnlineCountScreen(debugInitialAwards: debugInitialAwards),
@@ -35,12 +37,12 @@ void main() {
     String? actionLabel,
   }) async {
     await tester.scrollUntilVisible(
-      find.text('Danger Zone'),
+      find.text('Manage & Reset'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Danger Zone'));
+    await tester.tap(find.text('Manage & Reset'));
     await tester.pumpAndSettle();
     if (actionLabel != null) {
       await tester.scrollUntilVisible(
@@ -78,6 +80,8 @@ void main() {
   Map<String, Object> savedClubPrefs({
     bool withSession = false,
     String sessionStatus = 'draft',
+    String sessionTitle = 'Regular Meeting',
+    String? formMeetingTitle,
   }) {
     return <String, Object>{
       'speech_club_online_owner_token_v1': 'owner-token',
@@ -86,9 +90,11 @@ void main() {
       'speech_club_online_club_name_v1': 'Demo Club',
       'speech_club_online_club_slug_v1': 'demo-club',
       'speech_club_online_admin_pin_v1': '123456',
+      if (formMeetingTitle != null)
+        'speech_club_online_current_session_title_v1': formMeetingTitle,
       if (withSession) ...<String, Object>{
         'speech_club_online_current_session_id_v1': 'session-1',
-        'speech_club_online_current_session_title_v1': 'Regular Meeting',
+        'speech_club_online_current_session_title_v1': sessionTitle,
         'speech_club_online_current_session_date_v1': '2026-06-26',
         'speech_club_online_current_session_status_v1': sessionStatus,
       },
@@ -191,6 +197,7 @@ void main() {
     expect(find.text('Share QR Code'), findsNothing);
     expect(find.text('Results'), findsNothing);
     expect(find.text('Danger Zone'), findsNothing);
+    expect(find.text('Manage & Reset'), findsNothing);
     expect(find.text('Advanced Settings'), findsOneWidget);
     expect(find.text('Backend URL'), findsNothing);
     expect(find.text('Start Fresh on This Device'), findsNothing);
@@ -268,9 +275,18 @@ void main() {
     expect(find.text('Reset Online Count on This Device'), findsNothing);
     expect(find.text('Start Fresh on This Device'), findsNothing);
     expect(find.text('Advanced Settings'), findsNothing);
+    expect(find.text('Danger Zone'), findsNothing);
+    expect(find.text('Manage & Reset'), findsNothing);
 
     await openDangerZone(tester, actionLabel: 'Start Fresh on This Device');
-    expect(find.text('Danger Zone'), findsOneWidget);
+    expect(find.text('Manage & Reset'), findsOneWidget);
+    expect(find.text('Danger Zone'), findsNothing);
+    expect(
+      find.text(
+        'Use these options only if setup is wrong or you need to reset online voting.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Delete Online Club'), findsOneWidget);
     expect(find.text('Reset Online Count on This Device'), findsNothing);
     expect(find.text('Start Fresh on This Device'), findsOneWidget);
@@ -329,6 +345,63 @@ void main() {
     expect(find.text('Create Current Meeting'), findsOneWidget);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Results'), findsNothing);
+  });
+
+  testWidgets('English no-session meeting form defaults to Regular Meeting',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs());
+
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Current Meeting'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final TextField titleField = tester.widget<TextField>(
+      textFieldWithLabel('Meeting Title'),
+    );
+    expect(titleField.controller!.text, 'Regular Meeting');
+  });
+
+  testWidgets('Chinese no-session meeting form defaults to localized title',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(savedClubPrefs());
+
+    await pumpOnlineCountScreen(tester, locale: const Locale('zh'));
+    await tester.scrollUntilVisible(
+      find.text('当前会议'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final TextField titleField = tester.widget<TextField>(
+      textFieldWithLabel('会议名称'),
+    );
+    expect(titleField.controller!.text, '例会');
+    expect(find.text('Regular Meeting'), findsNothing);
+  });
+
+  testWidgets('Chinese no-session form keeps user-edited meeting title',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(
+      savedClubPrefs(formMeetingTitle: 'Regular Meeting of Minister'),
+    );
+
+    await pumpOnlineCountScreen(tester, locale: const Locale('zh'));
+    await tester.scrollUntilVisible(
+      find.text('当前会议'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final TextField titleField = tester.widget<TextField>(
+      textFieldWithLabel('会议名称'),
+    );
+    expect(titleField.controller!.text, 'Regular Meeting of Minister');
   });
 
   testWidgets('draft current meeting blocks create and hides results',

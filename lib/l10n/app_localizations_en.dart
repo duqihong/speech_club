@@ -573,11 +573,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountStartFreshDevice => 'Start Fresh on This Device';
 
   @override
-  String get onlineCountDangerZone => 'Danger Zone';
+  String get onlineCountDangerZone => 'Manage & Reset';
 
   @override
   String get onlineCountDangerZoneHelp =>
-      'Use only if setup is wrong or you want to stop using this online club.';
+      'Use these options only if setup is wrong or you need to reset online voting.';
 
   @override
   String get onlineCountSlugHelp =>
@@ -718,6 +718,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountMeetingTitle => 'Meeting Title';
+
+  @override
+  String get onlineCountDefaultMeetingTitle => 'Regular Meeting';
 
   @override
   String get onlineCountMeetingDate => 'Meeting Date';

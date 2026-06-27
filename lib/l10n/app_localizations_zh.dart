@@ -551,10 +551,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountStartFreshDevice => '本机重新开始';
 
   @override
-  String get onlineCountDangerZone => '危险操作';
+  String get onlineCountDangerZone => '管理与重置';
 
   @override
-  String get onlineCountDangerZoneHelp => '仅在设置错误或不再使用此在线俱乐部时使用。';
+  String get onlineCountDangerZoneHelp => '仅在设置错误或需要重置在线投票时使用。';
 
   @override
   String get onlineCountSlugHelp => '用于永久投票链接。请使用小写字母、数字和连字符。';
@@ -681,6 +681,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountMeetingTitle => '会议名称';
+
+  @override
+  String get onlineCountDefaultMeetingTitle => '例会';
 
   @override
   String get onlineCountMeetingDate => '会议日期';

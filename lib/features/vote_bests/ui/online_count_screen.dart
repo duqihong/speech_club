@@ -63,6 +63,9 @@ class OnlineCountScreen extends StatefulWidget {
 }
 
 class _OnlineCountScreenState extends State<OnlineCountScreen> {
+  static const String _englishDefaultMeetingTitle = 'Regular Meeting';
+  static const String _chineseDefaultMeetingTitle = '例会';
+
   final OnlineCountStorage _storage = OnlineCountStorage();
   final TextEditingController _baseUrlController = TextEditingController(
     text: OnlineCountApi.defaultBaseUrl,
@@ -70,9 +73,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   final TextEditingController _clubNameController = TextEditingController();
   final TextEditingController _clubSlugController = TextEditingController();
   final TextEditingController _adminPinController = TextEditingController();
-  final TextEditingController _meetingTitleController = TextEditingController(
-    text: 'Regular Meeting',
-  );
+  final TextEditingController _meetingTitleController = TextEditingController();
   final TextEditingController _meetingDateController = TextEditingController();
   final Map<OnlineAwardType, TextEditingController> _candidateControllers =
       <OnlineAwardType, TextEditingController>{
@@ -101,6 +102,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   late Future<VoteResultsRecipient?> _recipientFuture;
   bool _elementActive = true;
   bool _restoringCandidateDrafts = false;
+  bool _meetingTitleEditedByUser = false;
 
   bool get _canUseContext => mounted && _elementActive;
   bool get _canUpdateState => mounted && _elementActive;
@@ -157,6 +159,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     _syncVoteCountPolling();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _applyLocalizedDefaultMeetingTitleIfUntouched();
+  }
+
   Future<void> _loadSetup() async {
     final OnlineCountSetup setup = await _storage.load();
     final List<OnlineAward> storedAwards = setup.currentSessionId.isEmpty
@@ -171,9 +179,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _clubNameController.text = setup.clubName;
       _clubSlugController.text = setup.clubSlug;
       _adminPinController.text = setup.adminPin;
-      _meetingTitleController.text = setup.currentSessionTitle.isEmpty
-          ? 'Regular Meeting'
-          : setup.currentSessionTitle;
+      _meetingTitleController.text = _meetingTitleForSetup(setup);
+      _meetingTitleEditedByUser = setup.currentSessionId.isEmpty &&
+          setup.currentSessionTitle.isNotEmpty &&
+          !_isDefaultMeetingTitle(setup.currentSessionTitle);
       _meetingDateController.text = setup.currentSessionDate.isEmpty
           ? _todayText()
           : setup.currentSessionDate;
@@ -648,9 +657,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _awards = <OnlineAward>[];
         _results = null;
         _clearVoteCountState();
-        _meetingTitleController.text = _meetingTitleController.text.isEmpty
-            ? 'Regular Meeting'
-            : _meetingTitleController.text;
+        _applyLocalizedDefaultMeetingTitleIfUntouched();
         _meetingDateController.text = _meetingDateController.text.isEmpty
             ? _todayText()
             : _meetingDateController.text;
@@ -712,7 +719,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _legacyMultipleSessions = false;
         _savedCandidateFingerprints.clear();
         _clearVoteCountState();
-        _meetingTitleController.text = 'Regular Meeting';
+        _meetingTitleEditedByUser = false;
+        _meetingTitleController.text = _localizedDefaultMeetingTitle();
         _meetingDateController.text = _todayText();
         for (final TextEditingController controller
             in _candidateControllers.values) {
@@ -798,7 +806,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _clubNameController.clear();
       _clubSlugController.clear();
       _adminPinController.clear();
-      _meetingTitleController.text = 'Regular Meeting';
+      _meetingTitleEditedByUser = false;
+      _meetingTitleController.text = _localizedDefaultMeetingTitle();
       _meetingDateController.text = _todayText();
       _clubCreated = false;
       _session = null;
@@ -1098,6 +1107,51 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   void _onClubNameChanged(String value) {
     setState(() {});
+  }
+
+  void _onMeetingTitleChanged(String value) {
+    _meetingTitleEditedByUser = true;
+    setState(() {});
+  }
+
+  String _meetingTitleForSetup(OnlineCountSetup setup) {
+    if (setup.currentSessionId.isNotEmpty) {
+      return setup.currentSessionTitle.isEmpty
+          ? _localizedDefaultMeetingTitle()
+          : setup.currentSessionTitle;
+    }
+    if (setup.currentSessionTitle.isEmpty ||
+        _isDefaultMeetingTitle(setup.currentSessionTitle)) {
+      return _localizedDefaultMeetingTitle();
+    }
+    return setup.currentSessionTitle;
+  }
+
+  void _applyLocalizedDefaultMeetingTitleIfUntouched() {
+    if (_session != null || _meetingTitleEditedByUser) {
+      return;
+    }
+    final String currentTitle = _meetingTitleController.text;
+    if (currentTitle.isEmpty || _isDefaultMeetingTitle(currentTitle)) {
+      final String localizedTitle = _localizedDefaultMeetingTitle();
+      if (currentTitle != localizedTitle) {
+        _meetingTitleController.text = localizedTitle;
+      }
+    }
+  }
+
+  String _localizedDefaultMeetingTitle() {
+    if (!_canUseContext) {
+      return _englishDefaultMeetingTitle;
+    }
+    return AppLocalizations.of(context)?.onlineCountDefaultMeetingTitle ??
+        _englishDefaultMeetingTitle;
+  }
+
+  bool _isDefaultMeetingTitle(String value) {
+    final String trimmed = value.trim();
+    return trimmed == _englishDefaultMeetingTitle ||
+        trimmed == _chineseDefaultMeetingTitle;
   }
 
   bool _hasCloudSetup() {
@@ -1588,6 +1642,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _textField(
             controller: _meetingTitleController,
             label: l10n.onlineCountMeetingTitle,
+            onChanged: _onMeetingTitleChanged,
           ),
           _textField(
             controller: _meetingDateController,
