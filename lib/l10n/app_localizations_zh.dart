@@ -90,6 +90,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proStartTrialButton => '开始 3 个月免费试用';
 
   @override
+  String get proRestorePurchasesButton => '恢复购买';
+
+  @override
   String get proUseManualCountButton => '免费使用手动计票';
 
   @override
@@ -97,6 +100,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get proPurchaseComingSoon => '购买功能将在后续测试阶段启用。';
+
+  @override
+  String get proPurchasing => '正在购买……';
+
+  @override
+  String get proPurchasePending => '购买处理中……';
+
+  @override
+  String get proPurchaseFailed => '购买未能完成。';
+
+  @override
+  String get proPurchaseCancelled => '购买已取消。';
+
+  @override
+  String get proRestoringPurchases => '正在恢复购买……';
+
+  @override
+  String get proRestoreRequestSent => '如果您已有有效订阅，Apple 确认后将会恢复。';
+
+  @override
+  String get proActive => 'Speech Club Pro 已启用。';
+
+  @override
+  String get proSubscriptionInfoUnavailable => '订阅信息暂时不可用。';
 
   @override
   String get buttonStart => '开始';

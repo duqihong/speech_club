@@ -41,11 +41,12 @@ class _ProScreenState extends State<ProScreen> {
     await _proEntitlementService.loadProducts();
   }
 
-  void _showPurchasePlaceholder(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.proPurchaseComingSoon)),
-    );
+  Future<void> _purchasePro() async {
+    await _proEntitlementService.purchasePro();
+  }
+
+  Future<void> _restorePurchases() async {
+    await _proEntitlementService.restorePurchases();
   }
 
   void _returnToPreviousScreen(BuildContext context) {
@@ -65,6 +66,90 @@ class _ProScreenState extends State<ProScreen> {
   }
 
   Widget _buildSubscriptionStatus(AppLocalizations l10n) {
+    if (_proEntitlementService.isProActive) {
+      return _SubscriptionStatus(
+        icon: const Icon(
+          Icons.check_circle_outline,
+          size: 20,
+          color: Color(0xFF355E86),
+        ),
+        message: l10n.proActive,
+      );
+    }
+
+    switch (_proEntitlementService.purchaseFlowState) {
+      case ProPurchaseFlowState.purchasing:
+        return _SubscriptionStatus(
+          icon: SizedBox.square(
+            dimension: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: Colors.blue.shade700,
+            ),
+          ),
+          message: l10n.proPurchasing,
+        );
+      case ProPurchaseFlowState.pending:
+        return _SubscriptionStatus(
+          icon: const Icon(
+            Icons.hourglass_empty,
+            size: 20,
+            color: Color(0xFF355E86),
+          ),
+          message: l10n.proPurchasePending,
+        );
+      case ProPurchaseFlowState.restoring:
+        return _SubscriptionStatus(
+          icon: SizedBox.square(
+            dimension: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: Colors.blue.shade700,
+            ),
+          ),
+          message: l10n.proRestoringPurchases,
+        );
+      case ProPurchaseFlowState.restoreRequested:
+        return _SubscriptionStatus(
+          icon: const Icon(
+            Icons.info_outline,
+            size: 20,
+            color: Color(0xFF355E86),
+          ),
+          message: l10n.proRestoreRequestSent,
+        );
+      case ProPurchaseFlowState.unavailable:
+        return _SubscriptionStatus(
+          icon: const Icon(
+            Icons.info_outline,
+            size: 20,
+            color: Color(0xFF355E86),
+          ),
+          message: l10n.proSubscriptionInfoUnavailable,
+        );
+      case ProPurchaseFlowState.canceled:
+        return _SubscriptionStatus(
+          icon: const Icon(
+            Icons.info_outline,
+            size: 20,
+            color: Color(0xFF355E86),
+          ),
+          message: l10n.proPurchaseCancelled,
+        );
+      case ProPurchaseFlowState.error:
+        return _SubscriptionStatus(
+          icon: const Icon(
+            Icons.error_outline,
+            size: 20,
+            color: Color(0xFFB3261E),
+          ),
+          message: l10n.proPurchaseFailed,
+        );
+      case ProPurchaseFlowState.idle:
+      case ProPurchaseFlowState.active:
+        break;
+    }
+
     if (_proEntitlementService.isLoadingProduct) {
       return _SubscriptionStatus(
         icon: SizedBox.square(
@@ -115,6 +200,20 @@ class _ProScreenState extends State<ProScreen> {
         ],
       ),
     );
+  }
+
+  String _primaryButtonText(AppLocalizations l10n) {
+    if (_proEntitlementService.purchaseFlowState ==
+        ProPurchaseFlowState.purchasing) {
+      return l10n.proPurchasing;
+    }
+
+    if (_proEntitlementService.purchaseFlowState ==
+        ProPurchaseFlowState.pending) {
+      return l10n.proPurchasePending;
+    }
+
+    return l10n.proStartTrialButton;
   }
 
   @override
@@ -236,9 +335,31 @@ class _ProScreenState extends State<ProScreen> {
               },
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => _showPurchasePlaceholder(context),
-              child: Text(l10n.proStartTrialButton),
+            AnimatedBuilder(
+              animation: _proEntitlementService,
+              builder: (BuildContext context, Widget? child) {
+                final bool purchaseDisabled =
+                    _proEntitlementService.isProActive ||
+                        _proEntitlementService.isBusy;
+                return FilledButton(
+                  onPressed: purchaseDisabled ? null : _purchasePro,
+                  child: Text(_primaryButtonText(l10n)),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            AnimatedBuilder(
+              animation: _proEntitlementService,
+              builder: (BuildContext context, Widget? child) {
+                final bool restoreDisabled =
+                    _proEntitlementService.isProActive ||
+                        _proEntitlementService.isPurchasing ||
+                        _proEntitlementService.isRestoring;
+                return TextButton(
+                  onPressed: restoreDisabled ? null : _restorePurchases,
+                  child: Text(l10n.proRestorePurchasesButton),
+                );
+              },
             ),
             const SizedBox(height: 10),
             OutlinedButton(

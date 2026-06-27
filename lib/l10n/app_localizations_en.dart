@@ -93,6 +93,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proStartTrialButton => 'Start 3-Month Free Trial';
 
   @override
+  String get proRestorePurchasesButton => 'Restore Purchases';
+
+  @override
   String get proUseManualCountButton => 'Use Manual Count for Free';
 
   @override
@@ -102,6 +105,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get proPurchaseComingSoon =>
       'Purchase will be enabled in a later test phase.';
+
+  @override
+  String get proPurchasing => 'Purchasing...';
+
+  @override
+  String get proPurchasePending => 'Purchase pending...';
+
+  @override
+  String get proPurchaseFailed => 'Purchase could not be completed.';
+
+  @override
+  String get proPurchaseCancelled => 'Purchase cancelled.';
+
+  @override
+  String get proRestoringPurchases => 'Restoring purchases...';
+
+  @override
+  String get proRestoreRequestSent =>
+      'If you have an active subscription, it will be restored after Apple confirms it.';
+
+  @override
+  String get proActive => 'Speech Club Pro is active.';
+
+  @override
+  String get proSubscriptionInfoUnavailable =>
+      'Subscription information is unavailable.';
 
   @override
   String get buttonStart => 'Start';

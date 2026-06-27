@@ -254,6 +254,12 @@ abstract class AppLocalizations {
   /// **'Start 3-Month Free Trial'**
   String get proStartTrialButton;
 
+  /// No description provided for @proRestorePurchasesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get proRestorePurchasesButton;
+
   /// No description provided for @proUseManualCountButton.
   ///
   /// In en, this message translates to:
@@ -271,6 +277,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Purchase will be enabled in a later test phase.'**
   String get proPurchaseComingSoon;
+
+  /// No description provided for @proPurchasing.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchasing...'**
+  String get proPurchasing;
+
+  /// No description provided for @proPurchasePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase pending...'**
+  String get proPurchasePending;
+
+  /// No description provided for @proPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase could not be completed.'**
+  String get proPurchaseFailed;
+
+  /// No description provided for @proPurchaseCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase cancelled.'**
+  String get proPurchaseCancelled;
+
+  /// No description provided for @proRestoringPurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring purchases...'**
+  String get proRestoringPurchases;
+
+  /// No description provided for @proRestoreRequestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have an active subscription, it will be restored after Apple confirms it.'**
+  String get proRestoreRequestSent;
+
+  /// No description provided for @proActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech Club Pro is active.'**
+  String get proActive;
+
+  /// No description provided for @proSubscriptionInfoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription information is unavailable.'**
+  String get proSubscriptionInfoUnavailable;
 
   /// No description provided for @buttonStart.
   ///
