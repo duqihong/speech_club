@@ -381,20 +381,23 @@ void main() {
       expect(find.text(sampleName), findsNothing);
     }
     await tester.scrollUntilVisible(
-      find.text('Ready to start voting?'),
+      find.text('Ready for award voting?'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    expect(find.text('Ready to start voting?'), findsOneWidget);
+    expect(find.text('Ready for award voting?'), findsOneWidget);
     expect(
-      find.text('Save candidates for all awards before opening the meeting.'),
+      find.text(
+        'Save candidates for all awards before opening the voting session.',
+      ),
       findsOneWidget,
     );
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Meeting'),
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
     );
     expect(openMeetingButton.onPressed, isNull);
+    expect(find.text('Open Meeting'), findsNothing);
     expect(find.text('Results'), findsNothing);
   });
 
@@ -470,7 +473,8 @@ void main() {
     expect(saveSpeakerButton.onPressed, isNotNull);
   });
 
-  testWidgets('saved candidate groups keep Open Meeting enabled after rebuild',
+  testWidgets(
+      'saved candidate groups keep Open Voting Session enabled after rebuild',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(withSession: true),
@@ -492,14 +496,14 @@ void main() {
     expect(find.text('Evaluator Candidates Saved'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Ready to start voting?'),
+      find.text('Ready for award voting?'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
     FilledButton openMeetingButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Meeting'),
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
     );
     expect(openMeetingButton.onPressed, isNotNull);
 
@@ -507,19 +511,19 @@ void main() {
     await tester.pumpAndSettle();
     await pumpOnlineCountScreen(tester);
     await tester.scrollUntilVisible(
-      find.text('Ready to start voting?'),
+      find.text('Ready for award voting?'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
     openMeetingButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Meeting'),
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
     );
     expect(openMeetingButton.onPressed, isNotNull);
   });
 
-  testWidgets('editing a saved candidate group disables Open Meeting',
+  testWidgets('editing a saved candidate group disables Open Voting Session',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(withSession: true),
@@ -542,18 +546,20 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
-      find.text('Ready to start voting?'),
+      find.text('Ready for award voting?'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Meeting'),
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
     );
     expect(openMeetingButton.onPressed, isNull);
     expect(
-      find.text('Save candidates for all awards before opening the meeting.'),
+      find.text(
+        'Save candidates for all awards before opening the voting session.',
+      ),
       findsOneWidget,
     );
   });
@@ -576,6 +582,8 @@ void main() {
     expect(find.text('Meeting Open', skipOffstage: false), findsNothing);
     expect(find.text('Current vote: Best Speaker'), findsNothing);
     expect(find.text('Next step: Close voting when ready'), findsWidgets);
+    expect(find.text('Open Meeting', skipOffstage: false), findsNothing);
+    expect(find.text('Close Meeting', skipOffstage: false), findsNothing);
 
     await tester.scrollUntilVisible(
       find.text('Current Meeting'),
@@ -584,7 +592,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Status: Open'), findsWidgets);
+    expect(find.text('Status: Voting Session Open'), findsWidgets);
+    expect(find.text('Close Voting Session'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Voting Round'), findsOneWidget);
@@ -593,16 +602,20 @@ void main() {
       find.text('Vote counts auto-refresh every 5 seconds.'),
       findsOneWidget,
     );
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNotNull);
 
     await tester.scrollUntilVisible(
-      find.text('Open · Votes received: 0'),
+      find.text('Votes received: 0').first,
       500,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Open · Votes received: 0'), findsOneWidget);
-    expect(find.text('Status: Open'), findsOneWidget);
+    expect(find.text('Open · Votes received: 0'), findsNothing);
+    expect(find.text('Status: Open'), findsNothing);
     expect(find.text('Votes received: 0'), findsWidgets);
     expect(find.text('Final votes: 0'), findsOneWidget);
     expect(find.text('Results'), findsNothing);
@@ -627,8 +640,24 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Status: Open'), findsOneWidget);
+    expect(find.text('Status: Voting Session Open'), findsOneWidget);
     expect(find.text('Next step: Open the next voting round'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Voting Round'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Open a voting round to start receiving votes.'),
+      findsOneWidget,
+    );
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNull);
   });
 
   testWidgets('restored open meeting enables Open Voting for draft awards',
@@ -649,6 +678,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(
+      find.text('Open a voting round to start receiving votes.'),
+      findsOneWidget,
+    );
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNull);
     final Iterable<FilledButton> openVotingButtons =
         tester.widgetList<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
@@ -704,6 +741,14 @@ void main() {
       find.widgetWithText(FilledButton, 'Close Voting', skipOffstage: false),
     );
     expect(closeVotingButton.onPressed, isNotNull);
+    expect(
+      find.text('Vote counts auto-refresh every 5 seconds.'),
+      findsOneWidget,
+    );
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNotNull);
     final Iterable<FilledButton> openVotingButtons =
         tester.widgetList<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
@@ -736,6 +781,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Final votes: 0', skipOffstage: false), findsOneWidget);
+    expect(find.text('Status: Closed', skipOffstage: false), findsNothing);
+    expect(
+      find.text('Open a voting round to start receiving votes.'),
+      findsOneWidget,
+    );
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNull);
     final Iterable<FilledButton> openVotingButtons =
         tester.widgetList<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
@@ -772,7 +826,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('All voting rounds are closed.'), findsOneWidget);
-    expect(find.text('Next step: Close Meeting'), findsOneWidget);
+    expect(find.text('Next step: Close Voting Session'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('Voting Round'),
@@ -783,10 +837,17 @@ void main() {
 
     expect(
       find.text(
-        'All voting rounds are closed. Close the meeting to finalize results.',
+        'All voting rounds are closed. Close the voting session to finalize results.',
       ),
       findsOneWidget,
     );
+    expect(
+        find.text('Vote counting is complete for all rounds.'), findsOneWidget);
+    expect(find.text('Status: Closed', skipOffstage: false), findsNothing);
+    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+    );
+    expect(refreshVoteCountButton.onPressed, isNull);
   });
 
   testWidgets('disposing while vote polling is active does not throw',
@@ -859,8 +920,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Status: Closed'), findsOneWidget);
+    expect(find.text('Status: Voting Session Closed'), findsOneWidget);
     expect(find.text('Next step: Refresh and send results'), findsOneWidget);
+    expect(find.text('Open Meeting', skipOffstage: false), findsNothing);
+    expect(find.text('Close Meeting', skipOffstage: false), findsNothing);
     expect(find.text('Create Current Meeting'), findsNothing);
     expect(find.text('Candidate Setup'), findsNothing);
     expect(find.text('Voting Round'), findsNothing);

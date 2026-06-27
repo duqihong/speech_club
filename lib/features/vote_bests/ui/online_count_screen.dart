@@ -1216,8 +1216,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   String _voteCountLabel(OnlineAward award, AppLocalizations l10n) {
     final int voteCount = _voteCountForAward(award);
     return switch (award.status) {
-      OnlineRoundStatus.open =>
-        '${l10n.onlineCountOpen} · ${l10n.onlineCountVotesReceived}: $voteCount',
+      OnlineRoundStatus.open => '${l10n.onlineCountVotesReceived}: $voteCount',
       OnlineRoundStatus.closed => '${l10n.onlineCountFinalVotes}: $voteCount',
       OnlineRoundStatus.draft => '${l10n.onlineCountVotesReceived}: $voteCount',
     };
@@ -1711,6 +1710,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     final Locale locale = Localizations.localeOf(context);
     final List<OnlineAward> awards = _awardsForVoteCountDisplay();
     final bool hasOpenAward = _hasOpenAward;
+    final bool canRefreshVoteCount =
+        _session?.status == OnlineRoundStatus.open && hasOpenAward;
     return _SectionCard(
       title: l10n.onlineCountVotingRound,
       icon: Icons.how_to_vote_outlined,
@@ -1718,9 +1719,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _buttonWrap(
           <Widget>[
             OutlinedButton.icon(
-              onPressed: _busyAction == 'refreshVoteCount'
-                  ? null
-                  : () => _refreshVoteCounts(showError: true),
+              onPressed:
+                  !canRefreshVoteCount || _busyAction == 'refreshVoteCount'
+                      ? null
+                      : () => _refreshVoteCounts(showError: true),
               icon: const Icon(Icons.refresh_outlined),
               label: Text(l10n.onlineCountRefreshVoteCount),
             ),
@@ -1728,9 +1730,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          _lastVoteCountRefreshAt == null
-              ? l10n.onlineCountVoteCountsAutoRefresh
-              : l10n.onlineCountVoteCountsLastUpdated,
+          _voteCountHelperText(l10n),
           style: const TextStyle(fontSize: 14, color: Colors.black54),
         ),
         if (_voteCountRefreshFailed) ...<Widget>[
@@ -1788,15 +1788,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                             status: award.status,
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${l10n.onlineCountAwardStatusLabel}: '
-                        '${onlineStatusLabel(award.status, locale)}',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -1907,7 +1898,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       title: l10n.onlineCountResults,
       icon: Icons.emoji_events_outlined,
       children: <Widget>[
-        _BodyText(l10n.onlineCountRefreshResultsThenCheckFinal),
+        _BodyText(
+          hasResults
+              ? l10n.onlineCountFinalResultsReady
+              : l10n.onlineCountRefreshResultsThenCheckFinal,
+        ),
         const SizedBox(height: 8),
         _fullWidthButton(
           child: FilledButton.icon(
@@ -2085,9 +2080,22 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     final bool isChinese = locale.languageCode == 'zh';
     return switch (status) {
       OnlineRoundStatus.draft => l10n.onlineCountPreparing,
-      OnlineRoundStatus.open => isChinese ? '开放中' : l10n.onlineCountOpen,
+      OnlineRoundStatus.open =>
+        isChinese ? '投票流程已开始' : l10n.onlineCountSessionOpen,
       OnlineRoundStatus.closed => l10n.onlineCountClosed,
     };
+  }
+
+  String _voteCountHelperText(AppLocalizations l10n) {
+    if (_hasOpenAward) {
+      return _lastVoteCountRefreshAt == null
+          ? l10n.onlineCountVoteCountsAutoRefresh
+          : l10n.onlineCountVoteCountsLastUpdated;
+    }
+    if (_allAwardRoundsClosed) {
+      return l10n.onlineCountVoteCountingComplete;
+    }
+    return l10n.onlineCountOpenVotingRoundToReceiveVotes;
   }
 
   String _qrUrl(_QrLinkType type) {

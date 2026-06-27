@@ -649,7 +649,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountAllVotingRoundsClosedFinalize =>
-      '所有奖项投票已结束。请关闭会议以确认结果。';
+      '所有奖项投票已结束。请结束投票流程以确认结果。';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -662,7 +662,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountMeetingStep1Body => '准备今天的投票场次。';
 
   @override
-  String get onlineCountMeetingStep2Title => '步骤二：开放会议';
+  String get onlineCountMeetingStep2Title => '步骤二：开始投票流程';
 
   @override
   String get onlineCountMeetingStep2Body => '允许开始各奖项投票。';
@@ -674,7 +674,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountMeetingStep3Body => '会员使用同一个链接投票。';
 
   @override
-  String get onlineCountMeetingStep4Title => '步骤四：结束会议';
+  String get onlineCountMeetingStep4Title => '步骤四：结束投票流程';
 
   @override
   String get onlineCountMeetingStep4Body => '停止投票并确认最终结果。';
@@ -701,25 +701,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountDraftMeetingHelper => '请添加候选人，然后开放会议。';
 
   @override
-  String get onlineCountOpenMeetingHelper => '请一次只开放一个奖项投票。全部投票结束后，再结束会议。';
+  String get onlineCountOpenMeetingHelper => '请一次只开放一个奖项投票。全部投票结束后，再结束投票流程。';
 
   @override
   String get onlineCountClosedMeetingHelper => '结果已最终确认。请先发送或复制结果，再删除会议。';
 
   @override
-  String get onlineCountReadyToStartVoting => '准备开始投票了吗？';
+  String get onlineCountReadyToStartVoting => '准备开始奖项投票了吗？';
 
   @override
-  String get onlineCountAddAllCandidatesBeforeOpening => '请先保存所有奖项的候选人，再开放会议。';
+  String get onlineCountAddAllCandidatesBeforeOpening =>
+      '请先保存所有奖项的候选人，再开始投票流程。';
 
   @override
   String get onlineCountDeleteCurrentMeeting => '删除当前会议';
 
   @override
-  String get onlineCountOpenMeeting => '开放会议';
+  String get onlineCountOpenMeeting => '开始投票流程';
 
   @override
-  String get onlineCountCloseMeeting => '结束会议';
+  String get onlineCountCloseMeeting => '结束投票流程';
 
   @override
   String get onlineCountCandidateSetup => '候选人设置';
@@ -768,6 +769,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountVoteCountsLastUpdated => '最后更新：刚刚';
+
+  @override
+  String get onlineCountOpenVotingRoundToReceiveVotes => '请开放一个奖项投票后开始收票。';
+
+  @override
+  String get onlineCountVoteCountingComplete => '所有奖项票数统计已完成。';
 
   @override
   String get onlineCountCouldNotRefreshVoteCount => '无法刷新票数。';
@@ -855,10 +862,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountOpen => '开放';
 
   @override
-  String get onlineCountClosed => '已关闭';
+  String get onlineCountClosed => '投票流程已结束';
 
   @override
-  String get onlineCountSessionOpen => '开放中';
+  String get onlineCountSessionOpen => '投票流程已开始';
 
   @override
   String get onlineCountDraftHelp => '会议已创建，但投票尚未开放。';
@@ -867,10 +874,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountOpenHelp => '会议已开放。准备好后，请开放一个奖项投票。';
 
   @override
-  String get onlineCountClosedHelp => '会议已结束，结果已最终确认。';
+  String get onlineCountClosedHelp => '投票流程已结束，结果已最终确认。';
 
   @override
   String get onlineCountFinalResults => '最终结果';
+
+  @override
+  String get onlineCountFinalResultsReady => '最终结果已准备好。';
 
   @override
   String get onlineCountResultsNotFinal => '结果尚未最终确认';
@@ -912,7 +922,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountCreateMeetingFirst => '请先创建会议。';
 
   @override
-  String get onlineCountOpenMeetingFirst => '请先开放会议。';
+  String get onlineCountOpenMeetingFirst => '请先开始投票流程。';
 
   @override
   String get onlineCountAddCandidatesFirst => '请先添加候选人，再开放此项投票。';

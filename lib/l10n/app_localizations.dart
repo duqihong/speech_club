@@ -1355,7 +1355,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountAllVotingRoundsClosedFinalize.
   ///
   /// In en, this message translates to:
-  /// **'All voting rounds are closed. Close the meeting to finalize results.'**
+  /// **'All voting rounds are closed. Close the voting session to finalize results.'**
   String get onlineCountAllVotingRoundsClosedFinalize;
 
   /// No description provided for @onlineCountMeetingExplanation.
@@ -1379,7 +1379,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountMeetingStep2Title.
   ///
   /// In en, this message translates to:
-  /// **'Step 2: Open Meeting'**
+  /// **'Step 2: Open Voting Session'**
   String get onlineCountMeetingStep2Title;
 
   /// No description provided for @onlineCountMeetingStep2Body.
@@ -1403,7 +1403,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountMeetingStep4Title.
   ///
   /// In en, this message translates to:
-  /// **'Step 4: Close Meeting'**
+  /// **'Step 4: Close Voting Session'**
   String get onlineCountMeetingStep4Title;
 
   /// No description provided for @onlineCountMeetingStep4Body.
@@ -1457,7 +1457,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountOpenMeetingHelper.
   ///
   /// In en, this message translates to:
-  /// **'Open one award voting round at a time. Close the meeting when all voting is finished.'**
+  /// **'Open one award voting round at a time. Close the voting session when all voting is finished.'**
   String get onlineCountOpenMeetingHelper;
 
   /// No description provided for @onlineCountClosedMeetingHelper.
@@ -1469,13 +1469,13 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountReadyToStartVoting.
   ///
   /// In en, this message translates to:
-  /// **'Ready to start voting?'**
+  /// **'Ready for award voting?'**
   String get onlineCountReadyToStartVoting;
 
   /// No description provided for @onlineCountAddAllCandidatesBeforeOpening.
   ///
   /// In en, this message translates to:
-  /// **'Save candidates for all awards before opening the meeting.'**
+  /// **'Save candidates for all awards before opening the voting session.'**
   String get onlineCountAddAllCandidatesBeforeOpening;
 
   /// No description provided for @onlineCountDeleteCurrentMeeting.
@@ -1487,13 +1487,13 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountOpenMeeting.
   ///
   /// In en, this message translates to:
-  /// **'Open Meeting'**
+  /// **'Open Voting Session'**
   String get onlineCountOpenMeeting;
 
   /// No description provided for @onlineCountCloseMeeting.
   ///
   /// In en, this message translates to:
-  /// **'Close Meeting'**
+  /// **'Close Voting Session'**
   String get onlineCountCloseMeeting;
 
   /// No description provided for @onlineCountCandidateSetup.
@@ -1591,6 +1591,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last updated: just now'**
   String get onlineCountVoteCountsLastUpdated;
+
+  /// No description provided for @onlineCountOpenVotingRoundToReceiveVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a voting round to start receiving votes.'**
+  String get onlineCountOpenVotingRoundToReceiveVotes;
+
+  /// No description provided for @onlineCountVoteCountingComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote counting is complete for all rounds.'**
+  String get onlineCountVoteCountingComplete;
 
   /// No description provided for @onlineCountCouldNotRefreshVoteCount.
   ///
@@ -1763,13 +1775,13 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountClosed.
   ///
   /// In en, this message translates to:
-  /// **'Closed'**
+  /// **'Voting Session Closed'**
   String get onlineCountClosed;
 
   /// No description provided for @onlineCountSessionOpen.
   ///
   /// In en, this message translates to:
-  /// **'Open'**
+  /// **'Voting Session Open'**
   String get onlineCountSessionOpen;
 
   /// No description provided for @onlineCountDraftHelp.
@@ -1787,7 +1799,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountClosedHelp.
   ///
   /// In en, this message translates to:
-  /// **'Meeting is closed. Results are final.'**
+  /// **'Voting session is closed. Results are final.'**
   String get onlineCountClosedHelp;
 
   /// No description provided for @onlineCountFinalResults.
@@ -1795,6 +1807,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Final Results'**
   String get onlineCountFinalResults;
+
+  /// No description provided for @onlineCountFinalResultsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Final results are ready.'**
+  String get onlineCountFinalResultsReady;
 
   /// No description provided for @onlineCountResultsNotFinal.
   ///
@@ -1877,7 +1895,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountOpenMeetingFirst.
   ///
   /// In en, this message translates to:
-  /// **'Please open the meeting first.'**
+  /// **'Please open the voting session first.'**
   String get onlineCountOpenMeetingFirst;
 
   /// No description provided for @onlineCountAddCandidatesFirst.

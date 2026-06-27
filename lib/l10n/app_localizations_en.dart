@@ -683,7 +683,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountAllVotingRoundsClosedFinalize =>
-      'All voting rounds are closed. Close the meeting to finalize results.';
+      'All voting rounds are closed. Close the voting session to finalize results.';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -696,7 +696,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountMeetingStep1Body => 'Prepare today’s voting session.';
 
   @override
-  String get onlineCountMeetingStep2Title => 'Step 2: Open Meeting';
+  String get onlineCountMeetingStep2Title => 'Step 2: Open Voting Session';
 
   @override
   String get onlineCountMeetingStep2Body =>
@@ -710,7 +710,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountMeetingStep3Body => 'Members vote using the same link.';
 
   @override
-  String get onlineCountMeetingStep4Title => 'Step 4: Close Meeting';
+  String get onlineCountMeetingStep4Title => 'Step 4: Close Voting Session';
 
   @override
   String get onlineCountMeetingStep4Body =>
@@ -741,27 +741,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountOpenMeetingHelper =>
-      'Open one award voting round at a time. Close the meeting when all voting is finished.';
+      'Open one award voting round at a time. Close the voting session when all voting is finished.';
 
   @override
   String get onlineCountClosedMeetingHelper =>
       'Results are final. Send or copy results before deleting the meeting.';
 
   @override
-  String get onlineCountReadyToStartVoting => 'Ready to start voting?';
+  String get onlineCountReadyToStartVoting => 'Ready for award voting?';
 
   @override
   String get onlineCountAddAllCandidatesBeforeOpening =>
-      'Save candidates for all awards before opening the meeting.';
+      'Save candidates for all awards before opening the voting session.';
 
   @override
   String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
 
   @override
-  String get onlineCountOpenMeeting => 'Open Meeting';
+  String get onlineCountOpenMeeting => 'Open Voting Session';
 
   @override
-  String get onlineCountCloseMeeting => 'Close Meeting';
+  String get onlineCountCloseMeeting => 'Close Voting Session';
 
   @override
   String get onlineCountCandidateSetup => 'Candidate Setup';
@@ -816,6 +816,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountVoteCountsLastUpdated => 'Last updated: just now';
+
+  @override
+  String get onlineCountOpenVotingRoundToReceiveVotes =>
+      'Open a voting round to start receiving votes.';
+
+  @override
+  String get onlineCountVoteCountingComplete =>
+      'Vote counting is complete for all rounds.';
 
   @override
   String get onlineCountCouldNotRefreshVoteCount =>
@@ -908,10 +916,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountOpen => 'Open';
 
   @override
-  String get onlineCountClosed => 'Closed';
+  String get onlineCountClosed => 'Voting Session Closed';
 
   @override
-  String get onlineCountSessionOpen => 'Open';
+  String get onlineCountSessionOpen => 'Voting Session Open';
 
   @override
   String get onlineCountDraftHelp =>
@@ -922,10 +930,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Meeting is open. Open one award voting round when ready.';
 
   @override
-  String get onlineCountClosedHelp => 'Meeting is closed. Results are final.';
+  String get onlineCountClosedHelp =>
+      'Voting session is closed. Results are final.';
 
   @override
   String get onlineCountFinalResults => 'Final Results';
+
+  @override
+  String get onlineCountFinalResultsReady => 'Final results are ready.';
 
   @override
   String get onlineCountResultsNotFinal => 'Results are not final yet';
@@ -969,7 +981,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountCreateMeetingFirst => 'Please create a meeting first.';
 
   @override
-  String get onlineCountOpenMeetingFirst => 'Please open the meeting first.';
+  String get onlineCountOpenMeetingFirst =>
+      'Please open the voting session first.';
 
   @override
   String get onlineCountAddCandidatesFirst =>
