@@ -605,6 +605,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountAdvancedSettings => 'Advanced Settings';
 
   @override
+  String get onlineCountAdvancedSettingsHelp =>
+      'Use this only if online setup is stuck or this device already has an old online club.';
+
+  @override
   String get onlineCountBackendUrlHelp =>
       'Normal club officers should not need to edit the Backend URL. It is mainly for testing or future backend changes.';
 
@@ -662,8 +666,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountNextStepCloseVoting => 'Close voting when ready';
 
   @override
+  String get onlineCountNextStepOpenNextVotingRound =>
+      'Open the next voting round';
+
+  @override
+  String get onlineCountNextStepRefreshAndSendResults =>
+      'Refresh and send results';
+
+  @override
   String get onlineCountNextStepSendOrDelete =>
       'Send results or delete meeting';
+
+  @override
+  String get onlineCountAllVotingRoundsClosed =>
+      'All voting rounds are closed.';
+
+  @override
+  String get onlineCountAllVotingRoundsClosedFinalize =>
+      'All voting rounds are closed. Close the meeting to finalize results.';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -872,6 +892,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountRefreshResultsFirst => 'Please refresh results first.';
 
   @override
+  String get onlineCountRefreshResultsThenCheckFinal =>
+      'Tap Refresh Results first, then check the final results.';
+
+  @override
   String get onlineCountCopyResults => 'Copy Results';
 
   @override
@@ -901,7 +925,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountClosedHelp => 'Meeting is closed. Results are final.';
 
   @override
-  String get onlineCountFinalResults => 'Final results';
+  String get onlineCountFinalResults => 'Final Results';
 
   @override
   String get onlineCountResultsNotFinal => 'Results are not final yet';
@@ -996,11 +1020,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
-      'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease copy or send results before deleting.';
+      'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.';
 
   @override
   String get onlineCountDeleteOnlineClubWarning =>
-      'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.';
+      'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThe old QR code will no longer be usable.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.';
 
   @override
   String get onlineCountResetDeviceSetupWarning =>
@@ -1031,7 +1055,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountTechnicalDetails => 'Technical Details';
 
   @override
-  String get onlineCountCandidateHint => 'Candidates';
+  String get onlineCountCandidateHint => 'One candidate per line';
 
   @override
   String get onlineCountCandidateSetupHelp =>
@@ -1059,6 +1083,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onlineCountTechnicalSettingsHelp =>
       'Only change this if you know which online voting backend to use.';
+
+  @override
+  String get onlineCountSetPresidentContact => 'Set President Contact';
 
   @override
   String onlineCountWinner(String name) {

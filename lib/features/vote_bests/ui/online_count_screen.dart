@@ -754,22 +754,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     });
   }
 
-  Future<void> _resetOnlineCountOnThisDevice() async {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final bool confirmed = await _confirmTypedAction(
-      title: l10n.onlineCountResetDeviceSetup,
-      message: l10n.onlineCountResetDeviceSetupWarning,
-      requiredText: 'RESET',
-      confirmationLabel: l10n.onlineCountTypeResetToContinue,
-    );
-    if (!confirmed) {
-      return;
-    }
-    _stopVoteCountPolling();
-    await _resetLocalOnlineCount(showMessage: false);
-    _showMessage(l10n.onlineCountDeviceSetupReset);
-  }
-
   Future<void> _startFreshOnThisDevice() async {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final bool confirmed = await _confirmTypedAction(
@@ -1211,6 +1195,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   bool get _hasOpenAward => _openAwardForDisplay() != null;
 
+  bool get _allAwardRoundsClosed =>
+      _awards.isNotEmpty &&
+      _awards.every((OnlineAward award) {
+        return award.status == OnlineRoundStatus.closed;
+      });
+
   OnlineAward? _openAwardForDisplay() {
     if (_activeAward != null) {
       return _activeAward;
@@ -1233,53 +1223,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     };
   }
 
-  String _statusSummaryTitle(AppLocalizations l10n) {
-    return switch (_uiState) {
-      OnlineCountUiState.noOnlineClub => l10n.onlineCountCloudSetup,
-      OnlineCountUiState.clubReadyNoMeeting => l10n.onlineCountCurrentStatus,
-      OnlineCountUiState.meetingDraft => l10n.onlineCountCurrentStatus,
-      OnlineCountUiState.meetingOpen => l10n.onlineCountMeetingOpenTitle,
-      OnlineCountUiState.meetingClosed => l10n.onlineCountMeetingClosedTitle,
-    };
-  }
-
-  List<String> _statusSummaryLines(AppLocalizations l10n) {
-    final Locale locale = Localizations.localeOf(context);
-    return switch (_uiState) {
-      OnlineCountUiState.noOnlineClub => <String>[],
-      OnlineCountUiState.clubReadyNoMeeting => <String>[
-          '${l10n.onlineCountCurrentMeeting}: ${l10n.onlineCountNotCreated}',
-          '${l10n.onlineCountNextStep}: ${l10n.onlineCountCreateCurrentMeeting}',
-        ],
-      OnlineCountUiState.meetingDraft => <String>[
-          '${l10n.onlineCountCurrentMeeting}: ${_session?.meetingTitle ?? ''}',
-          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepAddCandidates}',
-        ],
-      OnlineCountUiState.meetingOpen => <String>[
-          '${l10n.onlineCountCurrentVote}: ${_currentVoteSummary(locale, l10n)}',
-          '${l10n.onlineCountVotesReceived}: ${_currentVoteCount()}',
-          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepCloseVoting}',
-        ],
-      OnlineCountUiState.meetingClosed => <String>[
-          l10n.onlineCountResultsAreFinal,
-          '${l10n.onlineCountNextStep}: ${l10n.onlineCountNextStepSendOrDelete}',
-        ],
-    };
-  }
-
-  String _currentVoteSummary(Locale locale, AppLocalizations l10n) {
-    final OnlineAward? award = _openAwardForDisplay();
-    if (award == null) {
-      return l10n.onlineCountNotOpened;
-    }
-    return onlineAwardLabel(award.type, locale);
-  }
-
-  int _currentVoteCount() {
-    final OnlineAward? award = _openAwardForDisplay();
-    return award == null ? 0 : _voteCountForAward(award);
-  }
-
   String _onlineClubNextStep(AppLocalizations l10n) {
     return switch (_uiState) {
       OnlineCountUiState.noOnlineClub => l10n.onlineCountCreateClub,
@@ -1287,8 +1230,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         l10n.onlineCountCreateCurrentMeeting,
       OnlineCountUiState.meetingDraft =>
         l10n.onlineCountNextStepAddCandidatesShort,
-      OnlineCountUiState.meetingOpen => l10n.onlineCountNextStepCloseVoting,
-      OnlineCountUiState.meetingClosed => l10n.onlineCountNextStepSendOrDelete,
+      OnlineCountUiState.meetingOpen =>
+        _meetingNextStep(OnlineRoundStatus.open, l10n),
+      OnlineCountUiState.meetingClosed =>
+        _meetingNextStep(OnlineRoundStatus.closed, l10n),
     };
   }
 
@@ -1298,8 +1243,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   ) {
     return switch (status) {
       OnlineRoundStatus.draft => l10n.onlineCountNextStepAddCandidatesShort,
-      OnlineRoundStatus.open => l10n.onlineCountNextStepCloseVoting,
-      OnlineRoundStatus.closed => l10n.onlineCountNextStepSendOrDelete,
+      OnlineRoundStatus.open => _hasOpenAward
+          ? l10n.onlineCountNextStepCloseVoting
+          : _allAwardRoundsClosed
+              ? l10n.onlineCountCloseMeeting
+              : l10n.onlineCountNextStepOpenNextVotingRound,
+      OnlineRoundStatus.closed => l10n.onlineCountNextStepRefreshAndSendResults,
     };
   }
 
@@ -1402,7 +1351,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return switch (_uiState) {
       OnlineCountUiState.noOnlineClub => <Widget>[
           _buildCloudSetupCard(l10n),
-          _buildDangerZoneCard(l10n),
+          _buildAdvancedSettingsCard(l10n),
         ],
       OnlineCountUiState.clubReadyNoMeeting => <Widget>[
           _buildLockedClubCard(l10n),
@@ -1411,7 +1360,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingDraft => <Widget>[
-          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
@@ -1420,7 +1368,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingOpen => <Widget>[
-          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
@@ -1428,7 +1375,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingClosed => <Widget>[
-          _buildStatusSummaryCard(l10n),
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
@@ -1436,16 +1382,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildDangerZoneCard(l10n),
         ],
     };
-  }
-
-  Widget _buildStatusSummaryCard(AppLocalizations l10n) {
-    return _SectionCard(
-      title: _statusSummaryTitle(l10n),
-      icon: Icons.flag_circle_outlined,
-      children: <Widget>[
-        _InfoBlock(lines: _statusSummaryLines(l10n)),
-      ],
-    );
   }
 
   Widget _buildCloudSetupCard(AppLocalizations l10n) {
@@ -1470,6 +1406,37 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAdvancedSettingsCard(AppLocalizations l10n) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        leading: const Icon(Icons.tune_outlined),
+        title: Text(
+          l10n.onlineCountAdvancedSettings,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        children: <Widget>[
+          _BodyText(l10n.onlineCountAdvancedSettingsHelp),
+          const SizedBox(height: 12),
+          _textField(
+            controller: _baseUrlController,
+            label: l10n.onlineCountBackendUrl,
+            keyboardType: TextInputType.url,
+          ),
+          _fullWidthButton(
+            child: OutlinedButton.icon(
+              onPressed: _startFreshOnThisDevice,
+              icon: const Icon(Icons.refresh_outlined),
+              label: Text(l10n.onlineCountStartFreshDevice),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1539,14 +1506,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           ],
           _fullWidthButton(
             child: OutlinedButton.icon(
-              onPressed: _resetOnlineCountOnThisDevice,
-              icon: const Icon(Icons.restart_alt_outlined),
-              label: Text(l10n.onlineCountResetDeviceSetup),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _fullWidthButton(
-            child: OutlinedButton.icon(
               onPressed: _startFreshOnThisDevice,
               icon: const Icon(Icons.refresh_outlined),
               label: Text(l10n.onlineCountStartFreshDevice),
@@ -1562,6 +1521,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             ),
             children: <Widget>[
               _BodyText(l10n.onlineCountTechnicalSettingsHelp),
+              const SizedBox(height: 8),
+              _BodyText(l10n.onlineCountQrScheduleShareHelp),
               const SizedBox(height: 8),
               _fullWidthButton(
                 child: OutlinedButton.icon(
@@ -1603,29 +1564,29 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   Widget _buildMeetingCard(AppLocalizations l10n) {
     final Locale locale = Localizations.localeOf(context);
+    final List<String> meetingLines = _session == null
+        ? <String>[
+            l10n.onlineCountNoCurrentMeeting,
+            '${l10n.onlineCountNextStep}: '
+                '${l10n.onlineCountCreateCurrentMeeting}',
+          ]
+        : <String>[
+            _session!.meetingTitle,
+            _session!.meetingDate,
+            '${l10n.onlineCountAwardStatusLabel}: '
+                '${_sessionStatusLabel(_session!.status, locale, l10n)}',
+            if (_session!.status == OnlineRoundStatus.open &&
+                _allAwardRoundsClosed)
+              l10n.onlineCountAllVotingRoundsClosed,
+            '${l10n.onlineCountNextStep}: '
+                '${_meetingNextStep(_session!.status, l10n)}',
+          ];
     return _SectionCard(
       title: l10n.onlineCountCurrentMeeting,
       icon: Icons.event_note_outlined,
       children: <Widget>[
-        if (_session == null)
-          _InfoBlock(
-            lines: <String>[
-              l10n.onlineCountNoCurrentMeeting,
-              '${l10n.onlineCountNextStep}: '
-                  '${l10n.onlineCountCreateCurrentMeeting}',
-            ],
-          )
-        else ...<Widget>[
-          _InfoBlock(
-            lines: <String>[
-              _session!.meetingTitle,
-              _session!.meetingDate,
-              '${l10n.onlineCountAwardStatusLabel}: '
-                  '${_sessionStatusLabel(_session!.status, locale, l10n)}',
-              '${l10n.onlineCountNextStep}: '
-                  '${_meetingNextStep(_session!.status, l10n)}',
-            ],
-          ),
+        _InfoBlock(lines: meetingLines),
+        if (_session != null) ...<Widget>[
           const SizedBox(height: 10),
         ],
         if (_session == null) ...<Widget>[
@@ -1700,7 +1661,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                     minLines: 3,
                     maxLines: 6,
                     enabled: canEdit,
-                    hintText: _candidateHintText(type, l10n),
                   ),
                   _fullWidthButton(
                     child: OutlinedButton.icon(
@@ -1781,6 +1741,11 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           ),
         ],
         const SizedBox(height: 12),
+        if (_session?.status == OnlineRoundStatus.open &&
+            _allAwardRoundsClosed) ...<Widget>[
+          _BodyText(l10n.onlineCountAllVotingRoundsClosedFinalize),
+          const SizedBox(height: 12),
+        ],
         if (awards.isEmpty)
           Text(
             l10n.onlineCountNoSessionYet,
@@ -1889,7 +1854,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       icon: Icons.qr_code_2_outlined,
       children: <Widget>[
         _BodyText(l10n.onlineCountPermanentVotingQrHelp),
-        _BodyText(l10n.onlineCountQrScheduleShareHelp),
         const SizedBox(height: 12),
         if (baseUrl.isEmpty)
           Text(
@@ -1931,7 +1895,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          _BodyText(l10n.onlineCountQrLifecycleReminder),
         ],
       ],
     );
@@ -1939,11 +1902,12 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
 
   Widget _buildResultsCard(AppLocalizations l10n) {
     final Locale locale = Localizations.localeOf(context);
+    final bool hasResults = _results != null;
     return _SectionCard(
       title: l10n.onlineCountResults,
       icon: Icons.emoji_events_outlined,
       children: <Widget>[
-        _BodyText(l10n.onlineCountClosedMeetingHelper),
+        _BodyText(l10n.onlineCountRefreshResultsThenCheckFinal),
         const SizedBox(height: 8),
         _fullWidthButton(
           child: FilledButton.icon(
@@ -1954,38 +1918,18 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             label: Text(l10n.onlineCountRefreshResults),
           ),
         ),
-        const SizedBox(height: 10),
-        _fullWidthButton(
-          child: OutlinedButton.icon(
-            onPressed: _sendResultsToPresident,
-            icon: const Icon(Icons.send_outlined),
-            label: Text(l10n.voteBestsSendResultsToPresident),
-          ),
+        const SizedBox(height: 14),
+        Text(
+          l10n.onlineCountFinalResults,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 10),
-        _fullWidthButton(
-          child: OutlinedButton.icon(
-            onPressed: _copyResults,
-            icon: const Icon(Icons.copy_outlined),
-            label: Text(l10n.onlineCountCopyResults),
-          ),
-        ),
-        const SizedBox(height: 10),
-        _buildPresidentContactCard(l10n),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         if (_results == null)
           Text(
             l10n.onlineCountNoResultsYet,
             style: const TextStyle(fontSize: 15, color: Colors.black54),
           )
-        else ...<Widget>[
-          Text(
-            _results!.isFinal
-                ? l10n.onlineCountFinalResults
-                : l10n.onlineCountResultsNotFinal,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 12),
+        else
           for (final OnlineAwardResult award in _results!.awards)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
@@ -1995,7 +1939,33 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                 l10n: l10n,
               ),
             ),
-        ],
+        const SizedBox(height: 10),
+        _buildPresidentContactCard(l10n),
+        const SizedBox(height: 10),
+        _fullWidthButton(
+          child: OutlinedButton.icon(
+            onPressed: hasResults ? _sendResultsToPresident : null,
+            icon: const Icon(Icons.send_outlined),
+            label: Text(l10n.voteBestsSendResultsToPresident),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _fullWidthButton(
+          child: OutlinedButton.icon(
+            onPressed: hasResults ? _copyResults : null,
+            icon: const Icon(Icons.copy_outlined),
+            label: Text(l10n.onlineCountCopyResults),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _fullWidthButton(
+          child: OutlinedButton.icon(
+            onPressed:
+                _busyAction == 'deleteMeeting' ? null : _deleteCurrentMeeting,
+            icon: const Icon(Icons.delete_outline),
+            label: Text(l10n.onlineCountDeleteCurrentMeeting),
+          ),
+        ),
       ],
     );
   }
@@ -2014,7 +1984,9 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             minVerticalPadding: 14,
             leading: const Icon(Icons.contact_phone_outlined),
             title: Text(
-              l10n.voteBestsPresidentContact,
+              snapshot.data == null
+                  ? l10n.onlineCountSetPresidentContact
+                  : l10n.voteBestsPresidentContact,
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             subtitle: Text(
@@ -2094,17 +2066,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       OnlineAwardType.bestTableTopics =>
         l10n.onlineCountTableTopicsCandidatesSaved,
       OnlineAwardType.bestEvaluator => l10n.onlineCountEvaluatorCandidatesSaved,
-    };
-  }
-
-  String _candidateHintText(OnlineAwardType type, AppLocalizations l10n) {
-    return switch (type) {
-      OnlineAwardType.bestSpeaker =>
-        l10n.onlineCountBestSpeakerCandidateExamples,
-      OnlineAwardType.bestTableTopics =>
-        l10n.onlineCountTableTopicsCandidateExamples,
-      OnlineAwardType.bestEvaluator =>
-        l10n.onlineCountEvaluatorCandidateExamples,
     };
   }
 

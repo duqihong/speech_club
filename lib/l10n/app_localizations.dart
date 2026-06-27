@@ -1214,6 +1214,12 @@ abstract class AppLocalizations {
   /// **'Advanced Settings'**
   String get onlineCountAdvancedSettings;
 
+  /// No description provided for @onlineCountAdvancedSettingsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this only if online setup is stuck or this device already has an old online club.'**
+  String get onlineCountAdvancedSettingsHelp;
+
   /// No description provided for @onlineCountBackendUrlHelp.
   ///
   /// In en, this message translates to:
@@ -1322,11 +1328,35 @@ abstract class AppLocalizations {
   /// **'Close voting when ready'**
   String get onlineCountNextStepCloseVoting;
 
+  /// No description provided for @onlineCountNextStepOpenNextVotingRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the next voting round'**
+  String get onlineCountNextStepOpenNextVotingRound;
+
+  /// No description provided for @onlineCountNextStepRefreshAndSendResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh and send results'**
+  String get onlineCountNextStepRefreshAndSendResults;
+
   /// No description provided for @onlineCountNextStepSendOrDelete.
   ///
   /// In en, this message translates to:
   /// **'Send results or delete meeting'**
   String get onlineCountNextStepSendOrDelete;
+
+  /// No description provided for @onlineCountAllVotingRoundsClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'All voting rounds are closed.'**
+  String get onlineCountAllVotingRoundsClosed;
+
+  /// No description provided for @onlineCountAllVotingRoundsClosedFinalize.
+  ///
+  /// In en, this message translates to:
+  /// **'All voting rounds are closed. Close the meeting to finalize results.'**
+  String get onlineCountAllVotingRoundsClosedFinalize;
 
   /// No description provided for @onlineCountMeetingExplanation.
   ///
@@ -1700,6 +1730,12 @@ abstract class AppLocalizations {
   /// **'Please refresh results first.'**
   String get onlineCountRefreshResultsFirst;
 
+  /// No description provided for @onlineCountRefreshResultsThenCheckFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Refresh Results first, then check the final results.'**
+  String get onlineCountRefreshResultsThenCheckFinal;
+
   /// No description provided for @onlineCountCopyResults.
   ///
   /// In en, this message translates to:
@@ -1757,7 +1793,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountFinalResults.
   ///
   /// In en, this message translates to:
-  /// **'Final results'**
+  /// **'Final Results'**
   String get onlineCountFinalResults;
 
   /// No description provided for @onlineCountResultsNotFinal.
@@ -1925,13 +1961,13 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountDeleteCurrentMeetingWarning.
   ///
   /// In en, this message translates to:
-  /// **'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease copy or send results before deleting.'**
+  /// **'Delete current online meeting?\nThis will delete candidates, votes, and results for this meeting.\nPlease send or copy results before deleting this meeting.\nDeleting this meeting will not change the QR code.'**
   String get onlineCountDeleteCurrentMeetingWarning;
 
   /// No description provided for @onlineCountDeleteOnlineClubWarning.
   ///
   /// In en, this message translates to:
-  /// **'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.'**
+  /// **'Delete online club?\nThis will delete the online club, current meeting, candidates, votes, and results.\nThe old QR code will no longer be usable.\nThis cannot be undone.\nManual Count data on this phone will not be deleted.'**
   String get onlineCountDeleteOnlineClubWarning;
 
   /// No description provided for @onlineCountResetDeviceSetupWarning.
@@ -1985,7 +2021,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountCandidateHint.
   ///
   /// In en, this message translates to:
-  /// **'Candidates'**
+  /// **'One candidate per line'**
   String get onlineCountCandidateHint;
 
   /// No description provided for @onlineCountCandidateSetupHelp.
@@ -2035,6 +2071,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only change this if you know which online voting backend to use.'**
   String get onlineCountTechnicalSettingsHelp;
+
+  /// No description provided for @onlineCountSetPresidentContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Set President Contact'**
+  String get onlineCountSetPresidentContact;
 
   /// No description provided for @onlineCountWinner.
   ///

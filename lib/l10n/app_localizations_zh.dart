@@ -579,6 +579,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountAdvancedSettings => '高级设置';
 
   @override
+  String get onlineCountAdvancedSettingsHelp => '仅在在线设置卡住，或本机已有旧在线俱乐部时使用。';
+
+  @override
   String get onlineCountBackendUrlHelp => '普通俱乐部执委通常不需要修改后台网址。它主要用于测试或未来更换后台。';
 
   @override
@@ -633,7 +636,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountNextStepCloseVoting => '准备好后结束投票';
 
   @override
+  String get onlineCountNextStepOpenNextVotingRound => '开放下一个奖项投票';
+
+  @override
+  String get onlineCountNextStepRefreshAndSendResults => '刷新并发送结果';
+
+  @override
   String get onlineCountNextStepSendOrDelete => '发送结果或删除会议';
+
+  @override
+  String get onlineCountAllVotingRoundsClosed => '所有奖项投票已结束。';
+
+  @override
+  String get onlineCountAllVotingRoundsClosedFinalize =>
+      '所有奖项投票已结束。请关闭会议以确认结果。';
 
   @override
   String get onlineCountMeetingExplanation =>
@@ -824,6 +840,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountRefreshResultsFirst => '请先刷新结果。';
 
   @override
+  String get onlineCountRefreshResultsThenCheckFinal => '请先刷新结果，然后查看最终结果。';
+
+  @override
   String get onlineCountCopyResults => '复制结果';
 
   @override
@@ -836,7 +855,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountOpen => '开放';
 
   @override
-  String get onlineCountClosed => '已结束';
+  String get onlineCountClosed => '已关闭';
 
   @override
   String get onlineCountSessionOpen => '开放中';
@@ -937,11 +956,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountDeleteCurrentMeetingWarning =>
-      '要删除当前在线会议吗？\n这会删除本次会议的候选人、投票和结果。\n请先复制或发送结果。';
+      '要删除当前在线会议吗？\n这会删除本次会议的候选人、投票和结果。\n删除本次会议前，请先发送或复制结果。\n删除本次会议不会改变二维码。';
 
   @override
   String get onlineCountDeleteOnlineClubWarning =>
-      '要删除在线俱乐部吗？\n这会删除云端俱乐部、当前会议、候选人、投票和结果。\n此操作无法撤销。\n本机手动计票资料不会被删除。';
+      '要删除在线俱乐部吗？\n这会删除云端俱乐部、当前会议、候选人、投票和结果。\n旧二维码将不能继续使用。\n此操作无法撤销。\n本机手动计票资料不会被删除。';
 
   @override
   String get onlineCountResetDeviceSetupWarning =>
@@ -970,7 +989,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountTechnicalDetails => '技术信息';
 
   @override
-  String get onlineCountCandidateHint => '候选人';
+  String get onlineCountCandidateHint => '每行一位候选人';
 
   @override
   String get onlineCountCandidateSetupHelp => '每行输入一位候选人。';
@@ -995,6 +1014,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountTechnicalSettingsHelp => '只有在知道要使用哪个在线投票后台时才修改这里。';
+
+  @override
+  String get onlineCountSetPresidentContact => '设置会长联系资料';
 
   @override
   String onlineCountWinner(String name) {
