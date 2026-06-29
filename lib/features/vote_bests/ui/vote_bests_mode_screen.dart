@@ -1,11 +1,55 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../screens/pro/pro_screen.dart';
+import '../../../services/pro_entitlement_service.dart';
 import 'online_count_screen.dart';
 import 'vote_bests_screen.dart';
 
-class VoteBestsModeScreen extends StatelessWidget {
-  const VoteBestsModeScreen({super.key});
+class VoteBestsModeScreen extends StatefulWidget {
+  const VoteBestsModeScreen({
+    super.key,
+    this.proEntitlementService,
+  });
+
+  final ProEntitlementService? proEntitlementService;
+
+  @override
+  State<VoteBestsModeScreen> createState() => _VoteBestsModeScreenState();
+}
+
+class _VoteBestsModeScreenState extends State<VoteBestsModeScreen> {
+  late final ProEntitlementService _proEntitlementService;
+  late final bool _ownsProEntitlementService;
+  bool _hasLoadedProEntitlement = false;
+  bool _isCheckingOnlineCountAccess = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownsProEntitlementService = widget.proEntitlementService == null;
+    _proEntitlementService =
+        widget.proEntitlementService ?? ProEntitlementService();
+  }
+
+  @override
+  void dispose() {
+    if (_ownsProEntitlementService) {
+      _proEntitlementService.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _ensureProEntitlementLoaded() async {
+    if (_hasLoadedProEntitlement) {
+      return;
+    }
+
+    await _proEntitlementService.initialize();
+    _hasLoadedProEntitlement = true;
+  }
 
   void _openManualCount(BuildContext context) {
     Navigator.of(context).push(
@@ -13,7 +57,33 @@ class VoteBestsModeScreen extends StatelessWidget {
     );
   }
 
-  void _openOnlineCount(BuildContext context) {
+  Future<void> _openOnlineCount() async {
+    if (_isCheckingOnlineCountAccess) {
+      return;
+    }
+
+    setState(() {
+      _isCheckingOnlineCountAccess = true;
+    });
+    await _ensureProEntitlementLoaded();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _isCheckingOnlineCountAccess = false;
+    });
+
+    if (!_proEntitlementService.isProActive) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ProScreen(
+            proEntitlementService: _proEntitlementService,
+          ),
+        ),
+      );
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => OnlineCountScreen()),
     );
@@ -23,7 +93,7 @@ class VoteBestsModeScreen extends StatelessWidget {
     required String icon,
     required String title,
     required String subtitle,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return Material(
       color: Colors.grey.shade100,
@@ -113,7 +183,9 @@ class VoteBestsModeScreen extends StatelessWidget {
               icon: '☁️',
               title: l10n.voteBestsOnlineCount,
               subtitle: l10n.voteBestsOnlineCountSubtitle,
-              onTap: () => _openOnlineCount(context),
+              onTap: _isCheckingOnlineCountAccess
+                  ? null
+                  : () => unawaited(_openOnlineCount()),
             ),
           ],
         ),
