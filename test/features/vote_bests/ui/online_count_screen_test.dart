@@ -86,7 +86,7 @@ void main() {
     return <String, Object>{
       'speech_club_online_owner_token_v1': 'owner-token',
       'speech_club_online_base_url_v1':
-          'https://speech-club-vote-prototype.duduqihong.workers.dev',
+          'https://speech-club-vote.duduqihong.workers.dev',
       'speech_club_online_club_name_v1': 'Demo Club',
       'speech_club_online_club_slug_v1': 'demo-club',
       'speech_club_online_admin_pin_v1': '123456',
@@ -261,7 +261,7 @@ void main() {
     expect(find.text('Voting QR is ready below.'), findsNothing);
     expect(
       find.text(
-        'Voting Link: https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
+        'Voting Link: https://speech-club-vote.duduqihong.workers.dev/c/demo-club',
       ),
       findsNothing,
     );
@@ -1217,7 +1217,7 @@ void main() {
     expect(find.text('Voting Link'), findsNothing);
     expect(
       find.text(
-        'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club',
+        'https://speech-club-vote.duduqihong.workers.dev/c/demo-club',
       ),
       findsNothing,
     );

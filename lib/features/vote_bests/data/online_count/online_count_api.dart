@@ -28,7 +28,7 @@ class OnlineCountApi {
         _client = client ?? http.Client();
 
   static const String defaultBaseUrl =
-      'https://speech-club-vote-prototype.duduqihong.workers.dev';
+      'https://speech-club-vote.duduqihong.workers.dev';
   static const Duration _timeout = Duration(seconds: 15);
 
   final String baseUrl;

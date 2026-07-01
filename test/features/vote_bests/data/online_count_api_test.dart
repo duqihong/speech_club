@@ -6,6 +6,13 @@ import 'package:speech_club/features/vote_bests/data/online_count/online_count_m
 
 void main() {
   group('OnlineCountApi', () {
+    test('default backend base URL points to production Worker', () {
+      expect(
+        OnlineCountApi.defaultBaseUrl,
+        'https://speech-club-vote.duduqihong.workers.dev',
+      );
+    });
+
     test('votingLinkForClub builds base, Chinese, and English links', () {
       final OnlineCountApi api = OnlineCountApi(
         baseUrl: 'https://example.com/',

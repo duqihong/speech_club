@@ -17,7 +17,7 @@ void main() {
 
     final File file = await createVotingQrPngFile(
       url:
-          'https://speech-club-vote-prototype.duduqihong.workers.dev/c/demo-club?lang=en',
+          'https://speech-club-vote.duduqihong.workers.dev/c/demo-club?lang=en',
       clubCode: 'demo-club',
       languageCode: 'en',
       directory: tempDirectory,
