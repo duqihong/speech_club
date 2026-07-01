@@ -1,0 +1,12 @@
+name = "speech-club-vote"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+[triggers]
+crons = ["0 3 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "speech-club-vote-production"
+database_id = "e6d9db95-7f01-4d3f-bc75-55bf63d17f4f"
+migrations_dir = "migrations"
