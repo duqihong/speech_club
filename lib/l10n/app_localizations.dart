@@ -1469,7 +1469,7 @@ abstract class AppLocalizations {
   /// No description provided for @onlineCountNextStepAddCandidatesShort.
   ///
   /// In en, this message translates to:
-  /// **'Add candidates'**
+  /// **'Add candidates for an award'**
   String get onlineCountNextStepAddCandidatesShort;
 
   /// No description provided for @onlineCountCurrentVote.
@@ -1525,6 +1525,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send results or delete meeting'**
   String get onlineCountNextStepSendOrDelete;
+
+  /// No description provided for @onlineCountNextStepOpenAwardVoting.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {award} voting'**
+  String onlineCountNextStepOpenAwardVoting(String award);
+
+  /// No description provided for @onlineCountNextStepAddAwardCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates for {award}'**
+  String onlineCountNextStepAddAwardCandidates(String award);
+
+  /// No description provided for @onlineCountNextStepAwardVotingOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'{award} voting is currently open'**
+  String onlineCountNextStepAwardVotingOpen(String award);
 
   /// No description provided for @onlineCountAllVotingRoundsClosed.
   ///
@@ -1658,11 +1676,11 @@ abstract class AppLocalizations {
   /// **'Ready for award voting?'**
   String get onlineCountReadyToStartVoting;
 
-  /// No description provided for @onlineCountAddAllCandidatesBeforeOpening.
+  /// No description provided for @onlineCountAddCandidatesBeforeOpening.
   ///
   /// In en, this message translates to:
-  /// **'Save candidates for all awards before opening the voting session.'**
-  String get onlineCountAddAllCandidatesBeforeOpening;
+  /// **'Save candidates for at least one award before opening the voting session. You can add other awards later.'**
+  String get onlineCountAddCandidatesBeforeOpening;
 
   /// No description provided for @onlineCountDeleteCurrentMeeting.
   ///
@@ -1687,6 +1705,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Candidate Setup'**
   String get onlineCountCandidateSetup;
+
+  /// No description provided for @onlineCountCandidateStateAddCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Add candidates'**
+  String get onlineCountCandidateStateAddCandidates;
+
+  /// No description provided for @onlineCountCandidateStateCandidatesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates saved'**
+  String get onlineCountCandidateStateCandidatesSaved;
+
+  /// No description provided for @onlineCountCandidateStateVotingOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting open'**
+  String get onlineCountCandidateStateVotingOpen;
+
+  /// No description provided for @onlineCountCandidateStateVotingClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting closed'**
+  String get onlineCountCandidateStateVotingClosed;
 
   /// No description provided for @onlineCountSaveBestSpeakerCandidates.
   ///

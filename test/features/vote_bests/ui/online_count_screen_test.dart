@@ -406,7 +406,10 @@ void main() {
 
   testWidgets('draft current meeting blocks create and hides results',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      ...awardStatePrefs(),
+    });
 
     await pumpOnlineCountScreen(tester);
 
@@ -418,7 +421,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Status: Preparing'), findsOneWidget);
-    expect(find.text('Next step: Add candidates'), findsOneWidget);
+    expect(
+      find.text('Next step: Add candidates for an award'),
+      findsOneWidget,
+    );
     expect(find.text('Current Status'), findsNothing);
     expect(find.text('Meeting is prepared, but voting is not open yet.'),
         findsNothing);
@@ -462,7 +468,8 @@ void main() {
     expect(find.text('Ready for award voting?'), findsOneWidget);
     expect(
       find.text(
-        'Save candidates for all awards before opening the voting session.',
+        'Save candidates for at least one award before opening the voting '
+        'session. You can add other awards later.',
       ),
       findsOneWidget,
     );
@@ -476,7 +483,10 @@ void main() {
 
   testWidgets('Chinese draft Online Count uses evaluator wording',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      ...awardStatePrefs(),
+    });
 
     await pumpOnlineCountScreen(tester, locale: const Locale('zh'));
 
@@ -491,6 +501,20 @@ void main() {
     expect(find.text('保存评论员候选人'), findsOneWidget);
     expect(find.text('最佳点评者'), findsNothing);
     expect(find.text('保存点评候选人'), findsNothing);
+
+    await tester.scrollUntilVisible(
+      find.text('准备开始奖项投票了吗？'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        '请先为至少一个奖项保存候选人，再开启投票。其他奖项的候选人可以稍后添加。',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
@@ -503,6 +527,7 @@ void main() {
       'speech_club_online_candidate_draft_session-1_best_table_topics_v1':
           'Cara',
       'speech_club_online_candidate_draft_session-1_best_evaluator_v1': 'Eva',
+      ...awardStatePrefs(),
     });
 
     await pumpOnlineCountScreen(tester);
@@ -532,7 +557,10 @@ void main() {
 
   testWidgets('typing candidate text persists after rebuilding screen',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(savedClubPrefs(withSession: true));
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      ...awardStatePrefs(),
+    });
 
     await pumpOnlineCountScreen(tester);
     await tester.scrollUntilVisible(
@@ -566,12 +594,12 @@ void main() {
   });
 
   testWidgets(
-      'saved candidate groups keep Open Voting Session enabled after rebuild',
+      'only Best Speaker saved enables Open Voting Session after rebuild',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(withSession: true),
-      ...candidateDraftPrefs(),
-      ...candidateSavedPrefs(),
+      ...candidateDraftPrefs(bestTableTopics: '', bestEvaluator: ''),
+      ...candidateSavedPrefs(bestTableTopics: '', bestEvaluator: ''),
       ...awardStatePrefs(),
     });
 
@@ -584,8 +612,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Best Speaker Candidates Saved'), findsOneWidget);
-    expect(find.text('Table Topics Candidates Saved'), findsOneWidget);
-    expect(find.text('Evaluator Candidates Saved'), findsOneWidget);
+    expect(find.text('Table Topics Candidates Saved'), findsNothing);
+    expect(find.text('Evaluator Candidates Saved'), findsNothing);
 
     await tester.scrollUntilVisible(
       find.text('Ready for award voting?'),
@@ -615,7 +643,49 @@ void main() {
     expect(openMeetingButton.onPressed, isNotNull);
   });
 
-  testWidgets('editing a saved candidate group disables Open Voting Session',
+  testWidgets('editing the only ready award disables Open Voting Session',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      ...candidateDraftPrefs(bestTableTopics: '', bestEvaluator: ''),
+      ...candidateSavedPrefs(bestTableTopics: '', bestEvaluator: ''),
+      ...awardStatePrefs(),
+    });
+
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      textFieldWithLabel('One candidate per line').first,
+      'Alice\nBen',
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Ready for award voting?'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final FilledButton openMeetingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
+    );
+    expect(openMeetingButton.onPressed, isNull);
+    expect(
+      find.text(
+        'Save candidates for at least one award before opening the voting '
+        'session. You can add other awards later.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('one ready award still allows opening when another is edited',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(withSession: true),
@@ -647,23 +717,34 @@ void main() {
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting Session'),
     );
-    expect(openMeetingButton.onPressed, isNull);
+    expect(openMeetingButton.onPressed, isNotNull);
     expect(
       find.text(
-        'Save candidates for all awards before opening the voting session.',
+        'Save candidates for at least one award before opening the voting '
+        'session. You can add other awards later.',
       ),
-      findsOneWidget,
+      findsNothing,
     );
   });
 
-  testWidgets('open current meeting shows award controls and hides setup',
+  testWidgets('open current meeting keeps per-award candidate setup visible',
       (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues(
-      savedClubPrefs(
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(
         withSession: true,
         sessionStatus: OnlineRoundStatus.open.value,
       ),
-    );
+      ...candidateDraftPrefs(
+        bestSpeaker: 'Alice',
+        bestTableTopics: 'Cara',
+        bestEvaluator: 'Eva',
+      ),
+      ...candidateSavedPrefs(
+        bestSpeaker: 'Alice',
+        bestTableTopics: '',
+        bestEvaluator: 'Eva',
+      ),
+    });
 
     await pumpOnlineCountScreen(
       tester,
@@ -673,7 +754,10 @@ void main() {
     expect(find.text('Current Status', skipOffstage: false), findsNothing);
     expect(find.text('Meeting Open', skipOffstage: false), findsNothing);
     expect(find.text('Current vote: Best Speaker'), findsNothing);
-    expect(find.text('Next step: Close voting when ready'), findsWidgets);
+    expect(
+      find.text('Next step: Best Speaker voting is currently open'),
+      findsWidgets,
+    );
     expect(find.text('Open Meeting', skipOffstage: false), findsNothing);
     expect(find.text('Close Meeting', skipOffstage: false), findsNothing);
 
@@ -687,7 +771,37 @@ void main() {
     expect(find.text('Status: Voting Session Open'), findsWidgets);
     expect(find.text('Close Voting Session'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
-    expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Candidate Setup'), findsOneWidget);
+    expect(find.text('Voting open'), findsOneWidget);
+    expect(find.text('Add candidates'), findsOneWidget);
+    expect(find.text('Voting closed'), findsOneWidget);
+    final List<TextField> candidateFields = tester
+        .widgetList<TextField>(textFieldWithLabel('One candidate per line'))
+        .toList(growable: false);
+    expect(candidateFields, hasLength(3));
+    expect(candidateFields[0].enabled, isFalse);
+    expect(candidateFields[1].enabled, isTrue);
+    expect(candidateFields[2].enabled, isFalse);
+    final OutlinedButton speakerSaveButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Best Speaker Candidates Saved'),
+    );
+    final OutlinedButton tableTopicsSaveButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Save Table Topics Candidates'),
+    );
+    final OutlinedButton evaluatorSaveButton = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Evaluator Candidates Saved'),
+    );
+    expect(speakerSaveButton.onPressed, isNull);
+    expect(tableTopicsSaveButton.onPressed, isNotNull);
+    expect(evaluatorSaveButton.onPressed, isNull);
+
+    await tester.scrollUntilVisible(
+      find.text('Voting Round'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('Voting Round'), findsOneWidget);
     expect(find.text('Refresh Vote Count'), findsOneWidget);
     expect(
@@ -713,7 +827,7 @@ void main() {
     expect(find.text('Results'), findsNothing);
   });
 
-  testWidgets('open meeting with no open award points to next voting round',
+  testWidgets('open meeting with no ready award prompts for first candidates',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(
@@ -733,7 +847,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Status: Voting Session Open'), findsOneWidget);
-    expect(find.text('Next step: Open the next voting round'), findsOneWidget);
+    expect(
+      find.text('Next step: Add candidates for Best Speaker'),
+      findsOneWidget,
+    );
 
     await tester.scrollUntilVisible(
       find.text('Voting Round'),
@@ -750,19 +867,51 @@ void main() {
       find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
     );
     expect(refreshVoteCountButton.onPressed, isNull);
+    final Iterable<FilledButton> openVotingButtons =
+        tester.widgetList<FilledButton>(
+      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
+    );
+    expect(openVotingButtons, hasLength(3));
+    expect(
+      openVotingButtons
+          .every((FilledButton button) => button.onPressed == null),
+      isTrue,
+    );
   });
 
-  testWidgets('restored open meeting enables Open Voting for draft awards',
+  testWidgets('restored open meeting enables only its ready draft award',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(
         withSession: true,
         sessionStatus: OnlineRoundStatus.open.value,
       ),
+      ...candidateDraftPrefs(
+        bestSpeaker: '',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
+      ...candidateSavedPrefs(
+        bestSpeaker: '',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
       ...awardStatePrefs(),
     });
 
     await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Current Meeting'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Next step: Open Best Table Topics Speaker voting'),
+      findsOneWidget,
+    );
+
     await tester.scrollUntilVisible(
       find.text('Voting Round'),
       700,
@@ -783,12 +932,9 @@ void main() {
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
     );
     expect(openVotingButtons.length, 3);
-    expect(
-      openVotingButtons
-          .every((FilledButton button) => button.onPressed != null),
-      isTrue,
-    );
-
+    expect(openVotingButtons.elementAt(0).onPressed, isNull);
+    expect(openVotingButtons.elementAt(1).onPressed, isNotNull);
+    expect(openVotingButtons.elementAt(2).onPressed, isNull);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await pumpOnlineCountScreen(tester);
@@ -804,9 +950,77 @@ void main() {
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
     );
     expect(rebuiltOpenVotingButtons.length, 3);
+    expect(rebuiltOpenVotingButtons.elementAt(0).onPressed, isNull);
+    expect(rebuiltOpenVotingButtons.elementAt(1).onPressed, isNotNull);
+    expect(rebuiltOpenVotingButtons.elementAt(2).onPressed, isNull);
+  });
+
+  testWidgets('unsaved edits disable only that award Open Voting action',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.open.value,
+      ),
+      ...candidateDraftPrefs(
+        bestSpeaker: '',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
+      ...candidateSavedPrefs(
+        bestSpeaker: '',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
+      ...awardStatePrefs(),
+    });
+
+    await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      textFieldWithLabel('One candidate per line').at(1),
+      'Cara\nDana',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Table Topics Candidates Saved'), findsNothing);
     expect(
-      rebuiltOpenVotingButtons
-          .every((FilledButton button) => button.onPressed != null),
+      find.widgetWithText(OutlinedButton, 'Save Table Topics Candidates'),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Current Meeting'),
+      -500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Next step: Add candidates for Best Speaker'),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Voting Round'),
+      700,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final Iterable<FilledButton> openVotingButtons =
+        tester.widgetList<FilledButton>(
+      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
+    );
+    expect(openVotingButtons, hasLength(3));
+    expect(
+      openVotingButtons
+          .every((FilledButton button) => button.onPressed == null),
       isTrue,
     );
   });
@@ -854,17 +1068,43 @@ void main() {
   });
 
   testWidgets(
-      'restored closed award stays disabled while draft awards can open',
+      'closed Best Speaker is preserved while ready Table Topics can open',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       ...savedClubPrefs(
         withSession: true,
         sessionStatus: OnlineRoundStatus.open.value,
       ),
+      ...candidateDraftPrefs(
+        bestSpeaker: 'Alice',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
+      ...candidateSavedPrefs(
+        bestSpeaker: 'Alice',
+        bestTableTopics: 'Cara',
+        bestEvaluator: '',
+      ),
       ...awardStatePrefs(bestSpeakerStatus: OnlineRoundStatus.closed.value),
     });
 
     await pumpOnlineCountScreen(tester);
+    await tester.scrollUntilVisible(
+      find.text('Candidate Setup'),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alice'), findsOneWidget);
+    expect(find.text('Cara'), findsOneWidget);
+    final List<TextField> candidateFields = tester
+        .widgetList<TextField>(textFieldWithLabel('One candidate per line'))
+        .toList(growable: false);
+    expect(candidateFields[0].enabled, isFalse);
+    expect(candidateFields[1].enabled, isTrue);
+    expect(candidateFields[2].enabled, isTrue);
+
     await tester.scrollUntilVisible(
       find.text('Voting Round'),
       700,
@@ -887,11 +1127,8 @@ void main() {
       find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
     );
     expect(openVotingButtons.length, 2);
-    expect(
-      openVotingButtons
-          .every((FilledButton button) => button.onPressed != null),
-      isTrue,
-    );
+    expect(openVotingButtons.elementAt(0).onPressed, isNotNull);
+    expect(openVotingButtons.elementAt(1).onPressed, isNull);
   });
 
   testWidgets('open meeting with all awards closed points to close meeting',

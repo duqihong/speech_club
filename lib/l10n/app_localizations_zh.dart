@@ -707,7 +707,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountNextStep => '下一步';
 
   @override
-  String get onlineCountNextStepAddCandidatesShort => '添加候选人';
+  String get onlineCountNextStepAddCandidatesShort => '为一个奖项添加候选人';
 
   @override
   String get onlineCountCurrentVote => '当前投票';
@@ -735,6 +735,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountNextStepSendOrDelete => '发送结果或删除会议';
+
+  @override
+  String onlineCountNextStepOpenAwardVoting(String award) {
+    return '开放$award投票';
+  }
+
+  @override
+  String onlineCountNextStepAddAwardCandidates(String award) {
+    return '为$award添加候选人';
+  }
+
+  @override
+  String onlineCountNextStepAwardVotingOpen(String award) {
+    return '$award投票正在开放';
+  }
 
   @override
   String get onlineCountAllVotingRoundsClosed => '所有奖项投票已结束。';
@@ -805,8 +820,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountReadyToStartVoting => '准备开始奖项投票了吗？';
 
   @override
-  String get onlineCountAddAllCandidatesBeforeOpening =>
-      '请先保存所有奖项的候选人，再开始投票流程。';
+  String get onlineCountAddCandidatesBeforeOpening =>
+      '请先为至少一个奖项保存候选人，再开启投票。其他奖项的候选人可以稍后添加。';
 
   @override
   String get onlineCountDeleteCurrentMeeting => '删除当前会议';
@@ -819,6 +834,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountCandidateSetup => '候选人设置';
+
+  @override
+  String get onlineCountCandidateStateAddCandidates => '添加候选人';
+
+  @override
+  String get onlineCountCandidateStateCandidatesSaved => '候选人已保存';
+
+  @override
+  String get onlineCountCandidateStateVotingOpen => '投票开放中';
+
+  @override
+  String get onlineCountCandidateStateVotingClosed => '投票已结束';
 
   @override
   String get onlineCountSaveBestSpeakerCandidates => '保存最佳演讲候选人';

@@ -402,7 +402,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       return;
     }
     if (!_canOpenMeeting) {
-      _showMessage(l10n.onlineCountAddAllCandidatesBeforeOpening);
+      _showMessage(l10n.onlineCountAddCandidatesBeforeOpening);
       return;
     }
     await _runAction('openMeeting', () async {
@@ -480,8 +480,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _showMessage(l10n.onlineCountCreateMeetingFirst);
       return;
     }
-    if (session.status != OnlineRoundStatus.draft ||
-        (award != null && award.status != OnlineRoundStatus.draft)) {
+    if (!_canEditCandidatesForAward(award)) {
       _showMessage(l10n.onlineCountAddCandidatesFirst);
       return;
     }
@@ -526,6 +525,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       return;
     }
     if (award.status != OnlineRoundStatus.draft) {
+      _showMessage(l10n.onlineCountAddCandidatesFirst);
+      return;
+    }
+    if (!_isAwardReady(award.type)) {
       _showMessage(l10n.onlineCountAddCandidatesFirst);
       return;
     }
@@ -1174,7 +1177,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   bool get _canOpenMeeting =>
       _session != null &&
       _session!.status == OnlineRoundStatus.draft &&
-      _allAwardCandidatesSaved;
+      _hasReadyAward;
 
   bool get _canCloseMeeting =>
       _session != null && _session!.status == OnlineRoundStatus.open;
@@ -1195,23 +1198,26 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return null;
   }
 
-  bool get _allAwardCandidatesSaved {
-    return OnlineAwardType.values.every((OnlineAwardType type) {
-      final List<String> candidates = parseOnlineCandidateLines(
-        _candidateControllers[type]?.text ?? '',
-      );
-      return candidates.isNotEmpty &&
-          _savedCandidateFingerprints[type] ==
-              _candidateFingerprint(candidates);
-    });
+  bool get _hasReadyAward {
+    return OnlineAwardType.values.any(_isAwardReady);
+  }
+
+  bool _isAwardReady(OnlineAwardType type) {
+    final OnlineAward? award = _awardForType(type);
+    if (award == null || award.status != OnlineRoundStatus.draft) {
+      return false;
+    }
+    return _isCandidateTextSaved(type);
   }
 
   bool _canEditCandidatesForAward(OnlineAward? award) {
     final OnlineSession? session = _session;
-    if (session == null || session.status != OnlineRoundStatus.draft) {
+    if (session == null ||
+        (session.status != OnlineRoundStatus.draft &&
+            session.status != OnlineRoundStatus.open)) {
       return false;
     }
-    return award == null || award.status == OnlineRoundStatus.draft;
+    return award?.status == OnlineRoundStatus.draft;
   }
 
   bool _hasCandidateLines(OnlineAwardType type) {
@@ -1264,6 +1270,24 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return null;
   }
 
+  OnlineAward? _nextReadyAward() {
+    for (final OnlineAward award in _awards) {
+      if (_isAwardReady(award.type)) {
+        return award;
+      }
+    }
+    return null;
+  }
+
+  OnlineAward? _nextDraftAward() {
+    for (final OnlineAward award in _awards) {
+      if (award.status == OnlineRoundStatus.draft) {
+        return award;
+      }
+    }
+    return null;
+  }
+
   String _voteCountLabel(OnlineAward award, AppLocalizations l10n) {
     final int voteCount = _voteCountForAward(award);
     return switch (award.status) {
@@ -1279,7 +1303,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       OnlineCountUiState.clubReadyNoMeeting =>
         l10n.onlineCountCreateCurrentMeeting,
       OnlineCountUiState.meetingDraft =>
-        l10n.onlineCountNextStepAddCandidatesShort,
+        _meetingNextStep(OnlineRoundStatus.draft, l10n),
       OnlineCountUiState.meetingOpen =>
         _meetingNextStep(OnlineRoundStatus.open, l10n),
       OnlineCountUiState.meetingClosed =>
@@ -1291,15 +1315,40 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     OnlineRoundStatus status,
     AppLocalizations l10n,
   ) {
-    return switch (status) {
-      OnlineRoundStatus.draft => l10n.onlineCountNextStepAddCandidatesShort,
-      OnlineRoundStatus.open => _hasOpenAward
-          ? l10n.onlineCountNextStepCloseVoting
-          : _allAwardRoundsClosed
-              ? l10n.onlineCountCloseMeeting
-              : l10n.onlineCountNextStepOpenNextVotingRound,
-      OnlineRoundStatus.closed => l10n.onlineCountNextStepRefreshAndSendResults,
-    };
+    final Locale locale = Localizations.localeOf(context);
+    if (status == OnlineRoundStatus.draft) {
+      return _hasReadyAward
+          ? l10n.onlineCountOpenMeeting
+          : l10n.onlineCountNextStepAddCandidatesShort;
+    }
+    if (status == OnlineRoundStatus.closed) {
+      return l10n.onlineCountNextStepRefreshAndSendResults;
+    }
+
+    final OnlineAward? openAward = _openAwardForDisplay();
+    if (openAward != null) {
+      return l10n.onlineCountNextStepAwardVotingOpen(
+        onlineAwardLabel(openAward.type, locale),
+      );
+    }
+    if (_allAwardRoundsClosed) {
+      return l10n.onlineCountCloseMeeting;
+    }
+
+    final OnlineAward? readyAward = _nextReadyAward();
+    if (readyAward != null) {
+      return l10n.onlineCountNextStepOpenAwardVoting(
+        onlineAwardLabel(readyAward.type, locale),
+      );
+    }
+
+    final OnlineAward? draftAward = _nextDraftAward();
+    if (draftAward != null) {
+      return l10n.onlineCountNextStepAddAwardCandidates(
+        onlineAwardLabel(draftAward.type, locale),
+      );
+    }
+    return l10n.onlineCountNextStepAddCandidatesShort;
   }
 
   String _friendlyError(OnlineCountApiException error, AppLocalizations l10n) {
@@ -1419,6 +1468,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
           _buildLockedClubCard(l10n),
           _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
+          _buildCandidateSetupCard(l10n),
           _buildVotingRoundCard(l10n),
           _buildDangerZoneCard(l10n),
         ],
@@ -1696,12 +1746,30 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    onlineAwardLabel(type, Localizations.localeOf(context)),
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          onlineAwardLabel(
+                            type,
+                            Localizations.localeOf(context),
+                          ),
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (award != null)
+                        _StatusPill(
+                          label: _candidateSetupStatusLabel(
+                            award,
+                            isSaved,
+                            l10n,
+                          ),
+                          status: award.status,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   _textField(
@@ -1739,8 +1807,8 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       title: l10n.onlineCountReadyToStartVoting,
       icon: Icons.play_circle_outline,
       children: <Widget>[
-        if (!_allAwardCandidatesSaved) ...<Widget>[
-          _BodyText(l10n.onlineCountAddAllCandidatesBeforeOpening),
+        if (!_hasReadyAward) ...<Widget>[
+          _BodyText(l10n.onlineCountAddCandidatesBeforeOpening),
           const SizedBox(height: 8),
         ],
         _fullWidthButton(
@@ -1868,6 +1936,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
                             onPressed:
                                 _session?.status == OnlineRoundStatus.open &&
                                         !hasOpenAward &&
+                                        _isAwardReady(award.type) &&
                                         award.id.isNotEmpty &&
                                         _busyAction != 'openAward-${award.id}'
                                     ? () => _openAward(award)
@@ -2111,6 +2180,20 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       OnlineAwardType.bestTableTopics =>
         l10n.onlineCountTableTopicsCandidatesSaved,
       OnlineAwardType.bestEvaluator => l10n.onlineCountEvaluatorCandidatesSaved,
+    };
+  }
+
+  String _candidateSetupStatusLabel(
+    OnlineAward award,
+    bool isSaved,
+    AppLocalizations l10n,
+  ) {
+    return switch (award.status) {
+      OnlineRoundStatus.open => l10n.onlineCountCandidateStateVotingOpen,
+      OnlineRoundStatus.closed => l10n.onlineCountCandidateStateVotingClosed,
+      OnlineRoundStatus.draft => isSaved
+          ? l10n.onlineCountCandidateStateCandidatesSaved
+          : l10n.onlineCountCandidateStateAddCandidates,
     };
   }
 

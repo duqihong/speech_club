@@ -746,7 +746,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountNextStep => 'Next step';
 
   @override
-  String get onlineCountNextStepAddCandidatesShort => 'Add candidates';
+  String get onlineCountNextStepAddCandidatesShort =>
+      'Add candidates for an award';
 
   @override
   String get onlineCountCurrentVote => 'Current vote';
@@ -778,6 +779,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onlineCountNextStepSendOrDelete =>
       'Send results or delete meeting';
+
+  @override
+  String onlineCountNextStepOpenAwardVoting(String award) {
+    return 'Open $award voting';
+  }
+
+  @override
+  String onlineCountNextStepAddAwardCandidates(String award) {
+    return 'Add candidates for $award';
+  }
+
+  @override
+  String onlineCountNextStepAwardVotingOpen(String award) {
+    return '$award voting is currently open';
+  }
 
   @override
   String get onlineCountAllVotingRoundsClosed =>
@@ -856,8 +872,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountReadyToStartVoting => 'Ready for award voting?';
 
   @override
-  String get onlineCountAddAllCandidatesBeforeOpening =>
-      'Save candidates for all awards before opening the voting session.';
+  String get onlineCountAddCandidatesBeforeOpening =>
+      'Save candidates for at least one award before opening the voting session. You can add other awards later.';
 
   @override
   String get onlineCountDeleteCurrentMeeting => 'Delete Current Meeting';
@@ -870,6 +886,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountCandidateSetup => 'Candidate Setup';
+
+  @override
+  String get onlineCountCandidateStateAddCandidates => 'Add candidates';
+
+  @override
+  String get onlineCountCandidateStateCandidatesSaved => 'Candidates saved';
+
+  @override
+  String get onlineCountCandidateStateVotingOpen => 'Voting open';
+
+  @override
+  String get onlineCountCandidateStateVotingClosed => 'Voting closed';
 
   @override
   String get onlineCountSaveBestSpeakerCandidates =>

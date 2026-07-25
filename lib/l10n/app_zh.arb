@@ -273,7 +273,7 @@
   "onlineCountMeetingOpenTitle": "会议开放中",
   "onlineCountMeetingClosedTitle": "会议已结束",
   "onlineCountNextStep": "下一步",
-  "onlineCountNextStepAddCandidatesShort": "添加候选人",
+  "onlineCountNextStepAddCandidatesShort": "为一个奖项添加候选人",
   "onlineCountCurrentVote": "当前投票",
   "onlineCountNotCreated": "尚未创建",
   "onlineCountNotOpened": "尚未开放",
@@ -283,6 +283,30 @@
   "onlineCountNextStepOpenNextVotingRound": "开放下一个奖项投票",
   "onlineCountNextStepRefreshAndSendResults": "刷新并发送结果",
   "onlineCountNextStepSendOrDelete": "发送结果或删除会议",
+  "onlineCountNextStepOpenAwardVoting": "开放{award}投票",
+  "@onlineCountNextStepOpenAwardVoting": {
+    "placeholders": {
+      "award": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountNextStepAddAwardCandidates": "为{award}添加候选人",
+  "@onlineCountNextStepAddAwardCandidates": {
+    "placeholders": {
+      "award": {
+        "type": "String"
+      }
+    }
+  },
+  "onlineCountNextStepAwardVotingOpen": "{award}投票正在开放",
+  "@onlineCountNextStepAwardVotingOpen": {
+    "placeholders": {
+      "award": {
+        "type": "String"
+      }
+    }
+  },
   "onlineCountAllVotingRoundsClosed": "所有奖项投票已结束。",
   "onlineCountAllVotingRoundsClosedFinalize": "所有奖项投票已结束。请结束投票流程以确认结果。",
   "onlineCountMeetingExplanation": "每次会议都有独立的投票场次。先创建会议并开放会议，然后一次只开放一个奖项投票。",
@@ -305,11 +329,15 @@
   "onlineCountOpenMeetingHelper": "请一次只开放一个奖项投票。全部投票结束后，再结束投票流程。",
   "onlineCountClosedMeetingHelper": "结果已最终确认。请先发送或复制结果，再删除会议。",
   "onlineCountReadyToStartVoting": "准备开始奖项投票了吗？",
-  "onlineCountAddAllCandidatesBeforeOpening": "请先保存所有奖项的候选人，再开始投票流程。",
+  "onlineCountAddCandidatesBeforeOpening": "请先为至少一个奖项保存候选人，再开启投票。其他奖项的候选人可以稍后添加。",
   "onlineCountDeleteCurrentMeeting": "删除当前会议",
   "onlineCountOpenMeeting": "开始投票流程",
   "onlineCountCloseMeeting": "结束投票流程",
   "onlineCountCandidateSetup": "候选人设置",
+  "onlineCountCandidateStateAddCandidates": "添加候选人",
+  "onlineCountCandidateStateCandidatesSaved": "候选人已保存",
+  "onlineCountCandidateStateVotingOpen": "投票开放中",
+  "onlineCountCandidateStateVotingClosed": "投票已结束",
   "onlineCountSaveBestSpeakerCandidates": "保存最佳演讲候选人",
   "onlineCountSaveTableTopicsCandidates": "保存即席演讲候选人",
   "onlineCountSaveEvaluatorCandidates": "保存评论员候选人",
