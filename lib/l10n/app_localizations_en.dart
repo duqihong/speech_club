@@ -885,10 +885,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onlineCountCloseMeeting => 'Close Voting Session';
 
   @override
+  String get onlineCountAwardManagement => 'Award Management';
+
+  @override
   String get onlineCountCandidateSetup => 'Candidate Setup';
 
   @override
   String get onlineCountCandidateStateAddCandidates => 'Add candidates';
+
+  @override
+  String get onlineCountCandidateStateUnsavedChanges => 'Unsaved changes';
+
+  @override
+  String get onlineCountCandidateStateReady => 'Ready';
 
   @override
   String get onlineCountCandidateStateCandidatesSaved => 'Candidates saved';
@@ -924,6 +933,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlineCountVotingRound => 'Voting Round';
+
+  @override
+  String get onlineCountEditCandidates => 'Edit candidates';
+
+  @override
+  String get onlineCountSaveChanges => 'Save changes';
 
   @override
   String get onlineCountOpenVoting => 'Open Voting';

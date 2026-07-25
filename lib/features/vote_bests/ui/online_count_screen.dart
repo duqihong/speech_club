@@ -45,6 +45,7 @@ class OnlineCountScreen extends StatefulWidget {
     VoteResultsRecipientRepository? recipientRepository,
     OnlineCountResultsSummaryBuilder? summaryBuilder,
     LaunchPresidentWhatsApp? launchWhatsAppToPresident,
+    this.api,
     this.debugInitialAwards = const <OnlineAward>[],
   })  : recipientRepository =
             recipientRepository ?? VoteResultsRecipientRepository(),
@@ -56,6 +57,7 @@ class OnlineCountScreen extends StatefulWidget {
   final VoteResultsRecipientRepository recipientRepository;
   final OnlineCountResultsSummaryBuilder summaryBuilder;
   final LaunchPresidentWhatsApp launchWhatsAppToPresident;
+  final OnlineCountApi? api;
   final List<OnlineAward> debugInitialAwards;
 
   @override
@@ -90,6 +92,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   String? _busyAction;
   final Map<OnlineAwardType, String> _savedCandidateFingerprints =
       <OnlineAwardType, String>{};
+  final Set<OnlineAwardType> _editingCandidateAwards = <OnlineAwardType>{};
   bool _clubCreated = false;
   bool _loaded = false;
   bool _legacyMultipleSessions = false;
@@ -279,7 +282,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   OnlineCountApi _api() {
-    return OnlineCountApi(baseUrl: _baseUrlController.text);
+    return widget.api ?? OnlineCountApi(baseUrl: _baseUrlController.text);
   }
 
   Future<void> _runAction(
@@ -382,6 +385,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _activeAward = null;
         _legacyMultipleSessions = false;
         _savedCandidateFingerprints.clear();
+        _editingCandidateAwards.clear();
         _clearVoteCountState();
       });
       await _storage.saveAwardStates(
@@ -502,6 +506,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       if (_canUpdateState) {
         setState(() {
           _savedCandidateFingerprints[type] = _candidateFingerprint(candidates);
+          _editingCandidateAwards.remove(type);
         });
       }
       await _storage.saveCandidateSavedText(
@@ -540,7 +545,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         ownerToken: _ownerToken,
       );
       _replaceAward(updated);
-      setState(() => _activeAward = updated);
+      setState(() {
+        _activeAward = updated;
+        _editingCandidateAwards.remove(updated.type);
+      });
       await _storage.saveAwardState(
         sessionId: session.id,
         awardType: updated.type,
@@ -571,7 +579,10 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         ownerToken: _ownerToken,
       );
       _replaceAward(updated);
-      setState(() => _activeAward = null);
+      setState(() {
+        _activeAward = null;
+        _editingCandidateAwards.remove(updated.type);
+      });
       await _storage.saveAwardState(
         sessionId: session.id,
         awardType: updated.type,
@@ -659,12 +670,16 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _session = null;
         _awards = <OnlineAward>[];
         _results = null;
+        _editingCandidateAwards.clear();
         _clearVoteCountState();
         _applyLocalizedDefaultMeetingTitleIfUntouched();
         _meetingDateController.text = _meetingDateController.text.isEmpty
             ? _todayText()
             : _meetingDateController.text;
       } else {
+        if (status.currentSession!.id != previousSessionId) {
+          _editingCandidateAwards.clear();
+        }
         _session = status.currentSession;
         _awards = refreshedAwards;
         _meetingTitleController.text = status.currentSession!.meetingTitle;
@@ -721,6 +736,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         _activeAward = null;
         _legacyMultipleSessions = false;
         _savedCandidateFingerprints.clear();
+        _editingCandidateAwards.clear();
         _clearVoteCountState();
         _meetingTitleEditedByUser = false;
         _meetingTitleController.text = _localizedDefaultMeetingTitle();
@@ -819,6 +835,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
       _activeAward = null;
       _legacyMultipleSessions = false;
       _savedCandidateFingerprints.clear();
+      _editingCandidateAwards.clear();
       _clearVoteCountState();
       for (final TextEditingController controller
           in _candidateControllers.values) {
@@ -880,6 +897,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         return;
       }
       setState(() {
+        _results = results;
         _voteTotalsByAwardType = buildAwardVoteTotals(results);
         _lastVoteCountRefreshAt = DateTime.now();
         _voteCountRefreshFailed = false;
@@ -1452,30 +1470,29 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
         ],
       OnlineCountUiState.clubReadyNoMeeting => <Widget>[
           _buildLockedClubCard(l10n),
-          _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
+          _buildPermanentQrCard(l10n),
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingDraft => <Widget>[
           _buildLockedClubCard(l10n),
-          _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
-          _buildCandidateSetupCard(l10n),
           _buildOpenMeetingCard(l10n),
+          _buildAwardManagementSection(l10n),
+          _buildPermanentQrCard(l10n),
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingOpen => <Widget>[
           _buildLockedClubCard(l10n),
-          _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
-          _buildCandidateSetupCard(l10n),
-          _buildVotingRoundCard(l10n),
+          _buildAwardManagementSection(l10n),
+          _buildPermanentQrCard(l10n),
           _buildDangerZoneCard(l10n),
         ],
       OnlineCountUiState.meetingClosed => <Widget>[
           _buildLockedClubCard(l10n),
-          _buildPermanentQrCard(l10n),
           _buildMeetingCard(l10n),
+          _buildPermanentQrCard(l10n),
           _buildResultsCard(l10n),
           _buildDangerZoneCard(l10n),
         ],
@@ -1728,76 +1745,286 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     );
   }
 
-  Widget _buildCandidateSetupCard(AppLocalizations l10n) {
-    return _SectionCard(
-      title: l10n.onlineCountCandidateSetup,
-      icon: Icons.groups_outlined,
+  Widget _buildAwardManagementSection(AppLocalizations l10n) {
+    final List<OnlineAward> awards = _awardsForVoteCountDisplay();
+    return Column(
+      key: const ValueKey<String>('onlineAwardManagement'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _BodyText(l10n.onlineCountCandidateSetupHelp),
-        const SizedBox(height: 12),
-        ...OnlineAwardType.values.map(
-          (OnlineAwardType type) {
-            final OnlineAward? award = _awardForType(type);
-            final bool canEdit = _canEditCandidatesForAward(award);
-            final bool canSave = canEdit && _hasCandidateLines(type);
-            final bool isSaved = _isCandidateTextSaved(type);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          onlineAwardLabel(
-                            type,
-                            Localizations.localeOf(context),
-                          ),
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      if (award != null)
-                        _StatusPill(
-                          label: _candidateSetupStatusLabel(
-                            award,
-                            isSaved,
-                            l10n,
-                          ),
-                          status: award.status,
-                        ),
-                    ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+          child: Row(
+            children: <Widget>[
+              const Icon(Icons.how_to_vote_outlined),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.onlineCountAwardManagement,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
                   ),
-                  const SizedBox(height: 8),
-                  _textField(
-                    controller: _candidateControllers[type]!,
-                    label: l10n.onlineCountCandidateHint,
-                    minLines: 3,
-                    maxLines: 6,
-                    enabled: canEdit,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_session?.status == OnlineRoundStatus.open && _allAwardRoundsClosed)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+            child: _BodyText(l10n.onlineCountAllVotingRoundsClosedFinalize),
+          ),
+        if (awards.isEmpty)
+          Card(
+            margin: const EdgeInsets.only(bottom: 14),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                l10n.onlineCountNoSessionYet,
+                style: const TextStyle(fontSize: 15, color: Colors.black54),
+              ),
+            ),
+          )
+        else
+          for (final OnlineAward award in awards)
+            _buildIntegratedAwardCard(award, l10n),
+      ],
+    );
+  }
+
+  Widget _buildIntegratedAwardCard(
+    OnlineAward award,
+    AppLocalizations l10n,
+  ) {
+    final Locale locale = Localizations.localeOf(context);
+    final OnlineAwardType type = award.type;
+    final bool isSaved = _isCandidateTextSaved(type);
+    final bool canEdit = _canEditCandidatesForAward(award);
+    final bool isEditing = _editingCandidateAwards.contains(type);
+    final bool showEditor = canEdit && (!isSaved || isEditing);
+    final bool canSave = canEdit && _hasCandidateLines(type);
+    final bool canOpen = _session?.status == OnlineRoundStatus.open &&
+        !_hasOpenAward &&
+        _isAwardReady(type) &&
+        award.id.isNotEmpty;
+    final String suffix = _awardKeySuffix(type);
+    final String expansionState = <Object>[
+      award.status.value,
+      isSaved,
+      showEditor,
+      _hasOpenAward,
+    ].join('-');
+
+    return Card(
+      key: ValueKey<String>('onlineAwardCard_$suffix'),
+      clipBehavior: Clip.antiAlias,
+      color:
+          award.status == OnlineRoundStatus.open ? Colors.green.shade50 : null,
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ExpansionTile(
+        key: ValueKey<String>('onlineAwardExpansion_${suffix}_$expansionState'),
+        initiallyExpanded: _shouldAutoExpandAward(award),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        title: Text(
+          onlineAwardLabel(type, locale),
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
+            children: <Widget>[
+              _StatusPill(
+                label: _awardManagementStatusLabel(award, l10n),
+                status: award.status,
+              ),
+              if (award.status == OnlineRoundStatus.closed)
+                Text(
+                  _voteCountLabel(award, l10n),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
                   ),
-                  _fullWidthButton(
-                    child: OutlinedButton.icon(
-                      onPressed: canSave &&
-                              _busyAction != 'saveCandidates-${type.value}'
-                          ? () => _saveCandidates(type)
-                          : null,
-                      icon: const Icon(Icons.check_outlined),
-                      label: Text(
-                        isSaved
-                            ? _candidatesSavedLabel(type, l10n)
-                            : _saveCandidatesLabel(type, l10n),
-                      ),
-                    ),
+                ),
+            ],
+          ),
+        ),
+        children: <Widget>[
+          if (showEditor) ...<Widget>[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: _BodyText(l10n.onlineCountCandidateSetupHelp),
+            ),
+            const SizedBox(height: 10),
+            _textField(
+              key: ValueKey<String>('onlineAwardCandidates_$suffix'),
+              controller: _candidateControllers[type]!,
+              label: l10n.onlineCountCandidateHint,
+              minLines: 2,
+              maxLines: 5,
+              enabled: canEdit,
+            ),
+            _fullWidthButton(
+              child: OutlinedButton.icon(
+                key: ValueKey<String>('onlineAwardSave_$suffix'),
+                onPressed:
+                    canSave && _busyAction != 'saveCandidates-${type.value}'
+                        ? () => _saveCandidates(type)
+                        : null,
+                icon: const Icon(Icons.check_outlined),
+                label: Text(l10n.onlineCountSaveChanges),
+              ),
+            ),
+          ] else ...<Widget>[
+            _buildCompactCandidateSummary(type, l10n),
+            if (award.status == OnlineRoundStatus.draft) ...<Widget>[
+              const SizedBox(height: 12),
+              _buttonWrap(
+                <Widget>[
+                  OutlinedButton.icon(
+                    key: ValueKey<String>('onlineAwardEdit_$suffix'),
+                    onPressed: canEdit
+                        ? () => setState(
+                              () => _editingCandidateAwards.add(type),
+                            )
+                        : null,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(l10n.onlineCountEditCandidates),
+                  ),
+                  FilledButton.icon(
+                    key: ValueKey<String>('onlineAwardOpen_$suffix'),
+                    onPressed: canOpen && _busyAction != 'openAward-${award.id}'
+                        ? () => _openAward(award)
+                        : null,
+                    icon: const Icon(Icons.play_arrow_outlined),
+                    label: Text(l10n.onlineCountOpenVoting),
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ],
+          if (award.status == OnlineRoundStatus.open) ...<Widget>[
+            const SizedBox(height: 12),
+            Text(
+              _voteCountLabel(award, l10n),
+              key: ValueKey<String>('onlineAwardVoteCount_$suffix'),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _voteCountHelperText(l10n),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            if (_voteCountRefreshFailed) ...<Widget>[
+              const SizedBox(height: 6),
+              Text(
+                l10n.onlineCountCouldNotRefreshVoteCount,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.redAccent,
+                ),
+              ),
+            ],
+            const SizedBox(height: 8),
+            _buttonWrap(
+              <Widget>[
+                OutlinedButton.icon(
+                  key: ValueKey<String>('onlineAwardRefresh_$suffix'),
+                  onPressed: _busyAction == 'refreshVoteCount'
+                      ? null
+                      : () => _refreshVoteCounts(showError: true),
+                  icon: const Icon(Icons.refresh_outlined),
+                  label: Text(l10n.onlineCountRefreshVoteCount),
+                ),
+                FilledButton.icon(
+                  key: ValueKey<String>('onlineAwardClose_$suffix'),
+                  onPressed: award.id.isNotEmpty &&
+                          _busyAction != 'closeAward-${award.id}'
+                      ? () => _closeAward(award)
+                      : null,
+                  icon: const Icon(Icons.stop_circle_outlined),
+                  label: Text(l10n.onlineCountCloseVoting),
+                ),
+              ],
+            ),
+          ],
+          if (award.status == OnlineRoundStatus.closed) ...<Widget>[
+            const SizedBox(height: 12),
+            _buildClosedAwardResults(award, l10n),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactCandidateSummary(
+    OnlineAwardType type,
+    AppLocalizations l10n,
+  ) {
+    final List<String> candidates = _candidateNamesForAward(type);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade50,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Icon(Icons.groups_outlined, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                candidates.isEmpty
+                    ? l10n.voteBestsNoCandidatesYet
+                    : candidates.join(' · '),
+                style: const TextStyle(fontSize: 15, height: 1.35),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildClosedAwardResults(
+    OnlineAward award,
+    AppLocalizations l10n,
+  ) {
+    final OnlineAwardResult? result = _resultForAward(award.type);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          _voteCountLabel(award, l10n),
+          key: ValueKey<String>(
+            'onlineAwardVoteCount_${_awardKeySuffix(award.type)}',
+          ),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (result != null && result.candidates.isNotEmpty) ...<Widget>[
+          const SizedBox(height: 8),
+          for (final OnlineCandidateResult candidate in result.candidates)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '${candidate.name}: '
+                '${l10n.onlineCountVotes(candidate.voteCount)}',
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -1820,136 +2047,6 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
             label: Text(l10n.onlineCountOpenMeeting),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildVotingRoundCard(AppLocalizations l10n) {
-    final Locale locale = Localizations.localeOf(context);
-    final List<OnlineAward> awards = _awardsForVoteCountDisplay();
-    final bool hasOpenAward = _hasOpenAward;
-    final bool canRefreshVoteCount =
-        _session?.status == OnlineRoundStatus.open && hasOpenAward;
-    return _SectionCard(
-      title: l10n.onlineCountVotingRound,
-      icon: Icons.how_to_vote_outlined,
-      children: <Widget>[
-        _buttonWrap(
-          <Widget>[
-            OutlinedButton.icon(
-              onPressed:
-                  !canRefreshVoteCount || _busyAction == 'refreshVoteCount'
-                      ? null
-                      : () => _refreshVoteCounts(showError: true),
-              icon: const Icon(Icons.refresh_outlined),
-              label: Text(l10n.onlineCountRefreshVoteCount),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _voteCountHelperText(l10n),
-          style: const TextStyle(fontSize: 14, color: Colors.black54),
-        ),
-        if (_voteCountRefreshFailed) ...<Widget>[
-          const SizedBox(height: 6),
-          Text(
-            l10n.onlineCountCouldNotRefreshVoteCount,
-            style: const TextStyle(fontSize: 14, color: Colors.redAccent),
-          ),
-        ],
-        const SizedBox(height: 12),
-        if (_session?.status == OnlineRoundStatus.open &&
-            _allAwardRoundsClosed) ...<Widget>[
-          _BodyText(l10n.onlineCountAllVotingRoundsClosedFinalize),
-          const SizedBox(height: 12),
-        ],
-        if (awards.isEmpty)
-          Text(
-            l10n.onlineCountNoSessionYet,
-            style: const TextStyle(fontSize: 15, color: Colors.black54),
-          )
-        else
-          for (final OnlineAward award in awards)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: award.status == OnlineRoundStatus.open
-                      ? Colors.green.shade50
-                      : Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: award.status == OnlineRoundStatus.open
-                        ? Colors.green.shade300
-                        : Colors.black12,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              onlineAwardLabel(award.type, locale),
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          _StatusPill(
-                            label: onlineStatusLabel(award.status, locale),
-                            status: award.status,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        _voteCountLabel(award, l10n),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: award.status == OnlineRoundStatus.open
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      if (award.status == OnlineRoundStatus.open)
-                        _fullWidthButton(
-                          child: FilledButton.icon(
-                            onPressed: award.id.isNotEmpty &&
-                                    _busyAction != 'closeAward-${award.id}'
-                                ? () => _closeAward(award)
-                                : null,
-                            icon: const Icon(Icons.stop_circle_outlined),
-                            label: Text(l10n.onlineCountCloseVoting),
-                          ),
-                        )
-                      else if (award.status == OnlineRoundStatus.draft)
-                        _fullWidthButton(
-                          child: FilledButton.icon(
-                            onPressed:
-                                _session?.status == OnlineRoundStatus.open &&
-                                        !hasOpenAward &&
-                                        _isAwardReady(award.type) &&
-                                        award.id.isNotEmpty &&
-                                        _busyAction != 'openAward-${award.id}'
-                                    ? () => _openAward(award)
-                                    : null,
-                            icon: const Icon(Icons.play_arrow_outlined),
-                            label: Text(l10n.onlineCountOpenVoting),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
       ],
     );
   }
@@ -2119,6 +2216,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
   }
 
   Widget _textField({
+    Key? key,
     required TextEditingController controller,
     required String label,
     String? helperText,
@@ -2133,6 +2231,7 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
+        key: key,
         controller: controller,
         enabled: enabled,
         obscureText: obscureText,
@@ -2165,36 +2264,81 @@ class _OnlineCountScreenState extends State<OnlineCountScreen> {
     );
   }
 
-  String _saveCandidatesLabel(OnlineAwardType type, AppLocalizations l10n) {
-    return switch (type) {
-      OnlineAwardType.bestSpeaker => l10n.onlineCountSaveBestSpeakerCandidates,
-      OnlineAwardType.bestTableTopics =>
-        l10n.onlineCountSaveTableTopicsCandidates,
-      OnlineAwardType.bestEvaluator => l10n.onlineCountSaveEvaluatorCandidates,
-    };
-  }
-
-  String _candidatesSavedLabel(OnlineAwardType type, AppLocalizations l10n) {
-    return switch (type) {
-      OnlineAwardType.bestSpeaker => l10n.onlineCountBestSpeakerCandidatesSaved,
-      OnlineAwardType.bestTableTopics =>
-        l10n.onlineCountTableTopicsCandidatesSaved,
-      OnlineAwardType.bestEvaluator => l10n.onlineCountEvaluatorCandidatesSaved,
-    };
-  }
-
-  String _candidateSetupStatusLabel(
+  String _awardManagementStatusLabel(
     OnlineAward award,
-    bool isSaved,
     AppLocalizations l10n,
   ) {
     return switch (award.status) {
       OnlineRoundStatus.open => l10n.onlineCountCandidateStateVotingOpen,
       OnlineRoundStatus.closed => l10n.onlineCountCandidateStateVotingClosed,
-      OnlineRoundStatus.draft => isSaved
-          ? l10n.onlineCountCandidateStateCandidatesSaved
-          : l10n.onlineCountCandidateStateAddCandidates,
+      OnlineRoundStatus.draft => _isCandidateTextSaved(award.type)
+          ? l10n.onlineCountCandidateStateReady
+          : _hasUnsavedCandidateChanges(award.type)
+              ? l10n.onlineCountCandidateStateUnsavedChanges
+              : l10n.onlineCountCandidateStateAddCandidates,
     };
+  }
+
+  bool _hasUnsavedCandidateChanges(OnlineAwardType type) {
+    return _hasCandidateLines(type) ||
+        (_savedCandidateFingerprints[type]?.isNotEmpty ?? false);
+  }
+
+  OnlineAwardType? _preferredExpandedAwardType() {
+    final OnlineAward? openAward = _openAwardForDisplay();
+    if (openAward != null) {
+      return openAward.type;
+    }
+    final OnlineAward? readyAward = _nextReadyAward();
+    if (readyAward != null) {
+      return readyAward.type;
+    }
+    return _nextDraftAward()?.type;
+  }
+
+  bool _shouldAutoExpandAward(OnlineAward award) {
+    if (award.status == OnlineRoundStatus.closed) {
+      return false;
+    }
+    if (_editingCandidateAwards.contains(award.type)) {
+      return true;
+    }
+    return _preferredExpandedAwardType() == award.type;
+  }
+
+  String _awardKeySuffix(OnlineAwardType type) {
+    return switch (type) {
+      OnlineAwardType.bestSpeaker => 'bestSpeaker',
+      OnlineAwardType.bestTableTopics => 'tableTopics',
+      OnlineAwardType.bestEvaluator => 'evaluator',
+    };
+  }
+
+  OnlineAwardResult? _resultForAward(OnlineAwardType type) {
+    final OnlineResults? results = _results;
+    if (results == null) {
+      return null;
+    }
+    for (final OnlineAwardResult result in results.awards) {
+      if (result.type == type) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  List<String> _candidateNamesForAward(OnlineAwardType type) {
+    final List<String> localCandidates = parseOnlineCandidateLines(
+      _candidateControllers[type]?.text ?? '',
+    );
+    if (localCandidates.isNotEmpty) {
+      return localCandidates;
+    }
+    return _resultForAward(type)
+            ?.candidates
+            .map((OnlineCandidateResult candidate) => candidate.name)
+            .toList(growable: false) ??
+        <String>[];
   }
 
   bool _isCandidateTextSaved(OnlineAwardType type) {

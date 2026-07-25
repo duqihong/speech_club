@@ -833,10 +833,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onlineCountCloseMeeting => '结束投票流程';
 
   @override
+  String get onlineCountAwardManagement => '奖项管理';
+
+  @override
   String get onlineCountCandidateSetup => '候选人设置';
 
   @override
   String get onlineCountCandidateStateAddCandidates => '添加候选人';
+
+  @override
+  String get onlineCountCandidateStateUnsavedChanges => '更改尚未保存';
+
+  @override
+  String get onlineCountCandidateStateReady => '已准备';
 
   @override
   String get onlineCountCandidateStateCandidatesSaved => '候选人已保存';
@@ -867,6 +876,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onlineCountVotingRound => '投票轮次';
+
+  @override
+  String get onlineCountEditCandidates => '编辑候选人';
+
+  @override
+  String get onlineCountSaveChanges => '保存更改';
 
   @override
   String get onlineCountOpenVoting => '开放投票';

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_club/features/vote_bests/data/online_count/online_count_api.dart';
 import 'package:speech_club/features/vote_bests/data/online_count/online_count_models.dart';
 import 'package:speech_club/features/vote_bests/data/vote_results_recipient_repository.dart';
 import 'package:speech_club/features/vote_bests/ui/online_count_screen.dart';
@@ -13,13 +16,26 @@ void main() {
     WidgetTester tester, {
     List<OnlineAward> debugInitialAwards = const <OnlineAward>[],
     Locale? locale,
+    TextScaler? textScaler,
+    OnlineCountApi? api,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: OnlineCountScreen(debugInitialAwards: debugInitialAwards),
+        builder: textScaler == null
+            ? null
+            : (BuildContext context, Widget? child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+                  child: child!,
+                );
+              },
+        home: OnlineCountScreen(
+          api: api,
+          debugInitialAwards: debugInitialAwards,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -30,6 +46,64 @@ void main() {
       (Widget widget) =>
           widget is TextField && widget.decoration?.labelText == label,
     );
+  }
+
+  Finder awardCard(String suffix) {
+    return find.byKey(ValueKey<String>('onlineAwardCard_$suffix'));
+  }
+
+  Finder awardControl(String control, String suffix) {
+    return find.byKey(ValueKey<String>('onlineAward${control}_$suffix'));
+  }
+
+  Future<void> scrollToAward(
+    WidgetTester tester,
+    String suffix,
+  ) async {
+    if (awardCard(suffix).evaluate().isEmpty) {
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey<String>('onlineAwardManagement')),
+        500,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+    }
+    await tester.scrollUntilVisible(
+      awardCard(suffix),
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> scrollToTop(WidgetTester tester) async {
+    for (int index = 0; index < 3; index += 1) {
+      await tester.drag(
+        find.byType(Scrollable).first,
+        const Offset(0, 1200),
+      );
+      await tester.pumpAndSettle();
+    }
+  }
+
+  Future<void> revealAwardControl(
+    WidgetTester tester, {
+    required String suffix,
+    required String awardLabel,
+    required Finder control,
+  }) async {
+    await scrollToAward(tester, suffix);
+    if (control.evaluate().isEmpty) {
+      await tester.tap(
+        find.descendant(
+          of: awardCard(suffix),
+          matching: find.text(awardLabel),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+    await tester.ensureVisible(control);
+    await tester.pumpAndSettle();
   }
 
   Future<void> openDangerZone(
@@ -255,7 +329,7 @@ void main() {
 
     expect(find.text('Current Status'), findsNothing);
     expect(find.text('Online Club Ready'), findsOneWidget);
-    expect(find.text('Next step: Create Current Meeting'), findsOneWidget);
+    expect(find.text('Next step: Create Current Meeting'), findsWidgets);
     expect(find.text('Club: Demo Club'), findsOneWidget);
     expect(find.text('Club code: demo-club'), findsNothing);
     expect(find.text('Voting QR is ready below.'), findsNothing);
@@ -430,22 +504,19 @@ void main() {
         findsNothing);
     expect(find.text('Delete Current Meeting'), findsNothing);
     expect(find.text('Create Current Meeting'), findsNothing);
-    expect(find.text('Candidate Setup'), findsOneWidget);
-    expect(find.text('Enter one candidate per line for each award.'),
-        findsOneWidget);
-    final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
-      textFieldWithLabel('One candidate per line'),
+    expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Voting Round'), findsNothing);
+    expect(find.text('Award Management'), findsOneWidget);
+    expect(awardCard('bestSpeaker'), findsOneWidget);
+    expect(awardCard('tableTopics'), findsOneWidget);
+    expect(awardCard('evaluator'), findsOneWidget);
+    expect(find.text('Add candidates'), findsNWidgets(3));
+    final TextField speakerField = tester.widget<TextField>(
+      awardControl('Candidates', 'bestSpeaker'),
     );
-    expect(candidateFields.length, 3);
-    expect(
-      candidateFields.every((TextField field) => field.enabled == true),
-      isTrue,
-    );
-    expect(
-      candidateFields
-          .every((TextField field) => field.controller!.text.isEmpty),
-      isTrue,
-    );
+    expect(speakerField.enabled, isTrue);
+    expect(speakerField.controller!.text, isEmpty);
+    expect(awardControl('Open', 'bestSpeaker'), findsNothing);
     for (final String sampleName in <String>[
       'Alice',
       'Bob',
@@ -459,12 +530,7 @@ void main() {
     ]) {
       expect(find.text(sampleName), findsNothing);
     }
-    await tester.scrollUntilVisible(
-      find.text('Ready for award voting?'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToTop(tester);
     expect(find.text('Ready for award voting?'), findsOneWidget);
     expect(
       find.text(
@@ -491,23 +557,23 @@ void main() {
     await pumpOnlineCountScreen(tester, locale: const Locale('zh'));
 
     await tester.scrollUntilVisible(
-      find.text('候选人设置'),
+      find.text('奖项管理'),
       500,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('候选人设置'), findsNothing);
+    expect(find.text('投票轮次'), findsNothing);
+    expect(find.text('奖项管理'), findsOneWidget);
+    await scrollToAward(tester, 'evaluator');
     expect(find.text('最佳评论员'), findsOneWidget);
-    expect(find.text('保存评论员候选人'), findsOneWidget);
+    expect(find.text('添加候选人'), findsWidgets);
     expect(find.text('最佳点评者'), findsNothing);
     expect(find.text('保存点评候选人'), findsNothing);
+    expect(tester.takeException(), isNull);
 
-    await tester.scrollUntilVisible(
-      find.text('准备开始奖项投票了吗？'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToTop(tester);
 
     expect(
       find.text(
@@ -515,6 +581,36 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Chinese award cards fit iPhone 11 with enlarged text',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(414, 896);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(
+        withSession: true,
+        sessionStatus: OnlineRoundStatus.open.value,
+      ),
+      ...candidateDraftPrefs(),
+      ...candidateSavedPrefs(),
+      ...awardStatePrefs(),
+    });
+
+    await pumpOnlineCountScreen(
+      tester,
+      locale: const Locale('zh'),
+      textScaler: const TextScaler.linear(1.5),
+    );
+    await scrollToAward(tester, 'bestSpeaker');
+
+    expect(find.text('奖项管理'), findsOneWidget);
+    expect(find.text('已准备'), findsNWidgets(3));
+    expect(find.text('编辑候选人'), findsOneWidget);
+    expect(find.text('开放投票'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
@@ -532,25 +628,23 @@ void main() {
 
     await pumpOnlineCountScreen(tester);
 
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
+    await scrollToAward(tester, 'bestSpeaker');
+    expect(find.text('Unsaved changes'), findsNWidgets(3));
+    final Finder speakerCandidates = awardControl(
+      'Candidates',
+      'bestSpeaker',
     );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Alice\nBen'), findsOneWidget);
-    expect(find.text('Cara'), findsOneWidget);
-    expect(find.text('Eva'), findsOneWidget);
-    final Iterable<TextField> candidateFields = tester.widgetList<TextField>(
-      textFieldWithLabel('One candidate per line'),
+    await revealAwardControl(
+      tester,
+      suffix: 'bestSpeaker',
+      awardLabel: 'Best Speaker',
+      control: speakerCandidates,
     );
-    expect(
-      candidateFields.every((TextField field) => field.enabled == true),
-      isTrue,
-    );
+    final TextField speakerField = tester.widget<TextField>(speakerCandidates);
+    expect(speakerField.controller!.text, 'Alice\nBen');
+    expect(speakerField.enabled, isTrue);
     final OutlinedButton saveSpeakerButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Save Best Speaker Candidates'),
+      awardControl('Save', 'bestSpeaker'),
     );
     expect(saveSpeakerButton.onPressed, isNotNull);
   });
@@ -563,15 +657,9 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-
+    await scrollToAward(tester, 'bestSpeaker');
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').first,
+      awardControl('Candidates', 'bestSpeaker'),
       'Alice',
     );
     await tester.pumpAndSettle();
@@ -579,16 +667,11 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToAward(tester, 'bestSpeaker');
 
     expect(find.text('Alice'), findsOneWidget);
     final OutlinedButton saveSpeakerButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Save Best Speaker Candidates'),
+      awardControl('Save', 'bestSpeaker'),
     );
     expect(saveSpeakerButton.onPressed, isNotNull);
   });
@@ -604,23 +687,17 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
+    await scrollToAward(tester, 'bestSpeaker');
+    expect(find.text('Ready'), findsOneWidget);
+    expect(find.text('Alice'), findsOneWidget);
+    expect(awardControl('Edit', 'bestSpeaker'), findsOneWidget);
+    final FilledButton draftOpenButton = tester.widget<FilledButton>(
+      awardControl('Open', 'bestSpeaker'),
     );
-    await tester.pumpAndSettle();
+    expect(draftOpenButton.onPressed, isNull);
+    expect(find.text('Add candidates'), findsNWidgets(2));
 
-    expect(find.text('Best Speaker Candidates Saved'), findsOneWidget);
-    expect(find.text('Table Topics Candidates Saved'), findsNothing);
-    expect(find.text('Evaluator Candidates Saved'), findsNothing);
-
-    await tester.scrollUntilVisible(
-      find.text('Ready for award voting?'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToTop(tester);
 
     FilledButton openMeetingButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting Session'),
@@ -630,12 +707,6 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Ready for award voting?'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
 
     openMeetingButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting Session'),
@@ -653,24 +724,22 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollToAward(tester, 'bestSpeaker');
+    await tester.tap(awardControl('Edit', 'bestSpeaker'));
     await tester.pumpAndSettle();
+    final Finder speakerCandidates = awardControl('Candidates', 'bestSpeaker');
+    expect(
+      tester.widget<TextField>(speakerCandidates).controller!.text,
+      'Alice',
+    );
 
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').first,
+      speakerCandidates,
       'Alice\nBen',
     );
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Ready for award voting?'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    expect(find.text('Unsaved changes'), findsOneWidget);
+    await scrollToTop(tester);
 
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting Session'),
@@ -685,6 +754,54 @@ void main() {
     );
   });
 
+  testWidgets('saving candidate edits restores compact Ready state',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      ...savedClubPrefs(withSession: true),
+      ...candidateDraftPrefs(bestTableTopics: '', bestEvaluator: ''),
+      ...candidateSavedPrefs(bestTableTopics: '', bestEvaluator: ''),
+      ...awardStatePrefs(),
+    });
+    final OnlineCountApi api = OnlineCountApi(
+      baseUrl: 'https://example.com',
+      client: MockClient((http.Request request) async {
+        expect(request.url.path, '/api/admin/session/session-1/candidates');
+        return http.Response(
+          '{"ok":true,"candidates":['
+          '{"candidateId":"candidate-1","awardId":"award-1",'
+          '"candidateName":"Alice"},'
+          '{"candidateId":"candidate-2","awardId":"award-1",'
+          '"candidateName":"Ben"}]}',
+          200,
+        );
+      }),
+    );
+
+    await pumpOnlineCountScreen(tester, api: api);
+    await scrollToAward(tester, 'bestSpeaker');
+    await tester.tap(awardControl('Edit', 'bestSpeaker'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      awardControl('Candidates', 'bestSpeaker'),
+      'Alice\nBen',
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Unsaved changes'), findsOneWidget);
+    await tester.tap(awardControl('Save', 'bestSpeaker'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ready'), findsOneWidget);
+    expect(find.text('Alice · Ben'), findsOneWidget);
+    expect(awardControl('Candidates', 'bestSpeaker'), findsNothing);
+    expect(awardControl('Edit', 'bestSpeaker'), findsOneWidget);
+    await scrollToTop(tester);
+    final FilledButton openMeetingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Open Voting Session'),
+    );
+    expect(openMeetingButton.onPressed, isNotNull);
+  });
+
   testWidgets('one ready award still allows opening when another is edited',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
@@ -695,24 +812,16 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollToAward(tester, 'bestSpeaker');
+    await tester.tap(awardControl('Edit', 'bestSpeaker'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').first,
+      awardControl('Candidates', 'bestSpeaker'),
       'Alice\nBen',
     );
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Ready for award voting?'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToTop(tester);
 
     final FilledButton openMeetingButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Open Voting Session'),
@@ -771,58 +880,46 @@ void main() {
     expect(find.text('Status: Voting Session Open'), findsWidgets);
     expect(find.text('Close Voting Session'), findsOneWidget);
     expect(find.text('Create Current Meeting'), findsNothing);
-    expect(find.text('Candidate Setup'), findsOneWidget);
+    expect(find.text('Candidate Setup'), findsNothing);
+    expect(find.text('Voting Round'), findsNothing);
+    expect(find.text('Award Management'), findsOneWidget);
+    expect(awardCard('bestSpeaker'), findsOneWidget);
+    expect(awardCard('tableTopics'), findsOneWidget);
+    expect(awardCard('evaluator'), findsOneWidget);
     expect(find.text('Voting open'), findsOneWidget);
-    expect(find.text('Add candidates'), findsOneWidget);
+    expect(find.text('Unsaved changes'), findsOneWidget);
     expect(find.text('Voting closed'), findsOneWidget);
-    final List<TextField> candidateFields = tester
-        .widgetList<TextField>(textFieldWithLabel('One candidate per line'))
-        .toList(growable: false);
-    expect(candidateFields, hasLength(3));
-    expect(candidateFields[0].enabled, isFalse);
-    expect(candidateFields[1].enabled, isTrue);
-    expect(candidateFields[2].enabled, isFalse);
-    final OutlinedButton speakerSaveButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Best Speaker Candidates Saved'),
+    expect(awardControl('Candidates', 'bestSpeaker'), findsNothing);
+    expect(awardControl('Candidates', 'evaluator'), findsNothing);
+    expect(find.text('Alice'), findsOneWidget);
+    expect(find.text('Votes received: 0'), findsOneWidget);
+    final FilledButton closeVotingButton = tester.widget<FilledButton>(
+      awardControl('Close', 'bestSpeaker'),
     );
-    final OutlinedButton tableTopicsSaveButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Save Table Topics Candidates'),
-    );
-    final OutlinedButton evaluatorSaveButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Evaluator Candidates Saved'),
-    );
-    expect(speakerSaveButton.onPressed, isNull);
-    expect(tableTopicsSaveButton.onPressed, isNotNull);
-    expect(evaluatorSaveButton.onPressed, isNull);
-
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Voting Round'), findsOneWidget);
-    expect(find.text('Refresh Vote Count'), findsOneWidget);
-    expect(
-      find.text('Vote counts auto-refresh every 5 seconds.'),
-      findsOneWidget,
-    );
+    expect(closeVotingButton.onPressed, isNotNull);
     final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+      awardControl('Refresh', 'bestSpeaker'),
     );
     expect(refreshVoteCountButton.onPressed, isNotNull);
 
-    await tester.scrollUntilVisible(
-      find.text('Votes received: 0').first,
-      500,
-      scrollable: find.byType(Scrollable).first,
+    await revealAwardControl(
+      tester,
+      suffix: 'tableTopics',
+      awardLabel: 'Best Table Topics Speaker',
+      control: awardControl('Candidates', 'tableTopics'),
     );
-    await tester.pumpAndSettle();
+    final TextField tableTopicsField = tester.widget<TextField>(
+      awardControl('Candidates', 'tableTopics'),
+    );
+    expect(tableTopicsField.enabled, isTrue);
+    expect(tableTopicsField.controller!.text, 'Cara');
+    final OutlinedButton tableTopicsSaveButton = tester.widget<OutlinedButton>(
+      awardControl('Save', 'tableTopics'),
+    );
+    expect(tableTopicsSaveButton.onPressed, isNotNull);
 
     expect(find.text('Open · Votes received: 0'), findsNothing);
     expect(find.text('Status: Open'), findsNothing);
-    expect(find.text('Votes received: 0'), findsWidgets);
     expect(find.text('Final votes: 0'), findsOneWidget);
     expect(find.text('Results'), findsNothing);
   });
@@ -849,34 +946,15 @@ void main() {
     expect(find.text('Status: Voting Session Open'), findsOneWidget);
     expect(
       find.text('Next step: Add candidates for Best Speaker'),
-      findsOneWidget,
+      findsWidgets,
     );
 
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('Open a voting round to start receiving votes.'),
-      findsOneWidget,
-    );
-    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
-    );
-    expect(refreshVoteCountButton.onPressed, isNull);
-    final Iterable<FilledButton> openVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
-    );
-    expect(openVotingButtons, hasLength(3));
-    expect(
-      openVotingButtons
-          .every((FilledButton button) => button.onPressed == null),
-      isTrue,
-    );
+    await scrollToAward(tester, 'bestSpeaker');
+    expect(find.text('Award Management'), findsOneWidget);
+    expect(find.text('Add candidates'), findsNWidgets(3));
+    expect(awardControl('Candidates', 'bestSpeaker'), findsOneWidget);
+    expect(awardControl('Open', 'bestSpeaker'), findsNothing);
+    expect(find.text('Refresh Vote Count'), findsNothing);
   });
 
   testWidgets('restored open meeting enables only its ready draft award',
@@ -912,47 +990,24 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
+    await scrollToAward(tester, 'tableTopics');
+    expect(find.text('Ready'), findsOneWidget);
+    final FilledButton tableTopicsOpenButton = tester.widget<FilledButton>(
+      awardControl('Open', 'tableTopics'),
     );
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('Open a voting round to start receiving votes.'),
-      findsOneWidget,
-    );
-    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
-    );
-    expect(refreshVoteCountButton.onPressed, isNull);
-    final Iterable<FilledButton> openVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
-    );
-    expect(openVotingButtons.length, 3);
-    expect(openVotingButtons.elementAt(0).onPressed, isNull);
-    expect(openVotingButtons.elementAt(1).onPressed, isNotNull);
-    expect(openVotingButtons.elementAt(2).onPressed, isNull);
+    expect(tableTopicsOpenButton.onPressed, isNotNull);
+    expect(awardControl('Open', 'bestSpeaker'), findsNothing);
+    expect(awardControl('Open', 'evaluator'), findsNothing);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToAward(tester, 'tableTopics');
 
-    final Iterable<FilledButton> rebuiltOpenVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
+    final FilledButton rebuiltOpenButton = tester.widget<FilledButton>(
+      awardControl('Open', 'tableTopics'),
     );
-    expect(rebuiltOpenVotingButtons.length, 3);
-    expect(rebuiltOpenVotingButtons.elementAt(0).onPressed, isNull);
-    expect(rebuiltOpenVotingButtons.elementAt(1).onPressed, isNotNull);
-    expect(rebuiltOpenVotingButtons.elementAt(2).onPressed, isNull);
+    expect(rebuiltOpenButton.onPressed, isNotNull);
+    expect(find.text('Cara'), findsOneWidget);
   });
 
   testWidgets('unsaved edits disable only that award Open Voting action',
@@ -976,53 +1031,27 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollToAward(tester, 'tableTopics');
+    await tester.tap(awardControl('Edit', 'tableTopics'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      textFieldWithLabel('One candidate per line').at(1),
+      awardControl('Candidates', 'tableTopics'),
       'Cara\nDana',
     );
     await tester.pumpAndSettle();
-    expect(find.text('Table Topics Candidates Saved'), findsNothing);
-    expect(
-      find.widgetWithText(OutlinedButton, 'Save Table Topics Candidates'),
-      findsOneWidget,
-    );
+    expect(find.text('Unsaved changes'), findsOneWidget);
+    expect(awardControl('Save', 'tableTopics'), findsOneWidget);
+    expect(awardControl('Open', 'tableTopics'), findsNothing);
 
-    await tester.scrollUntilVisible(
-      find.text('Current Meeting'),
-      -500,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToTop(tester);
 
     expect(
       find.text('Next step: Add candidates for Best Speaker'),
-      findsOneWidget,
+      findsWidgets,
     );
 
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-
-    final Iterable<FilledButton> openVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
-    );
-    expect(openVotingButtons, hasLength(3));
-    expect(
-      openVotingButtons
-          .every((FilledButton button) => button.onPressed == null),
-      isTrue,
-    );
+    expect(find.text('Open Voting'), findsNothing);
   });
 
   testWidgets('restored open award only enables Close Voting for that award',
@@ -1036,15 +1065,10 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
+    await scrollToAward(tester, 'bestSpeaker');
 
     final FilledButton closeVotingButton = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Close Voting', skipOffstage: false),
+      awardControl('Close', 'bestSpeaker'),
     );
     expect(closeVotingButton.onPressed, isNotNull);
     expect(
@@ -1052,19 +1076,13 @@ void main() {
       findsOneWidget,
     );
     final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
+      awardControl('Refresh', 'bestSpeaker'),
     );
     expect(refreshVoteCountButton.onPressed, isNotNull);
-    final Iterable<FilledButton> openVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
-    );
-    expect(openVotingButtons.length, 2);
-    expect(
-      openVotingButtons
-          .every((FilledButton button) => button.onPressed == null),
-      isTrue,
-    );
+    expect(awardControl('Candidates', 'bestSpeaker'), findsNothing);
+    expect(awardCard('tableTopics'), findsOneWidget);
+    expect(awardCard('evaluator'), findsOneWidget);
+    expect(find.text('Open Voting'), findsNothing);
   });
 
   testWidgets(
@@ -1089,46 +1107,28 @@ void main() {
     });
 
     await pumpOnlineCountScreen(tester);
-    await tester.scrollUntilVisible(
-      find.text('Candidate Setup'),
-      500,
-      scrollable: find.byType(Scrollable).first,
+    await scrollToAward(tester, 'bestSpeaker');
+    expect(find.text('Voting closed'), findsOneWidget);
+    expect(find.text('Final votes: 0'), findsOneWidget);
+    expect(awardControl('Candidates', 'bestSpeaker'), findsNothing);
+    expect(awardControl('Edit', 'bestSpeaker'), findsNothing);
+    await tester.tap(
+      find.descendant(
+        of: awardCard('bestSpeaker'),
+        matching: find.text('Best Speaker'),
+      ),
     );
     await tester.pumpAndSettle();
-
     expect(find.text('Alice'), findsOneWidget);
+
+    await scrollToAward(tester, 'tableTopics');
     expect(find.text('Cara'), findsOneWidget);
-    final List<TextField> candidateFields = tester
-        .widgetList<TextField>(textFieldWithLabel('One candidate per line'))
-        .toList(growable: false);
-    expect(candidateFields[0].enabled, isFalse);
-    expect(candidateFields[1].enabled, isTrue);
-    expect(candidateFields[2].enabled, isTrue);
-
-    await tester.scrollUntilVisible(
-      find.text('Voting Round'),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Final votes: 0', skipOffstage: false), findsOneWidget);
     expect(find.text('Status: Closed', skipOffstage: false), findsNothing);
-    expect(
-      find.text('Open a voting round to start receiving votes.'),
-      findsOneWidget,
+    final FilledButton tableTopicsOpenButton = tester.widget<FilledButton>(
+      awardControl('Open', 'tableTopics'),
     );
-    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
-    );
-    expect(refreshVoteCountButton.onPressed, isNull);
-    final Iterable<FilledButton> openVotingButtons =
-        tester.widgetList<FilledButton>(
-      find.widgetWithText(FilledButton, 'Open Voting', skipOffstage: false),
-    );
-    expect(openVotingButtons.length, 2);
-    expect(openVotingButtons.elementAt(0).onPressed, isNotNull);
-    expect(openVotingButtons.elementAt(1).onPressed, isNull);
+    expect(tableTopicsOpenButton.onPressed, isNotNull);
+    expect(awardCard('evaluator'), findsOneWidget);
   });
 
   testWidgets('open meeting with all awards closed points to close meeting',
@@ -1158,25 +1158,23 @@ void main() {
     expect(find.text('Next step: Close Voting Session'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Voting Round'),
+      find.text('Award Management'),
       700,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('Voting Round'), findsNothing);
     expect(
       find.text(
         'All voting rounds are closed. Close the voting session to finalize results.',
       ),
       findsOneWidget,
     );
-    expect(
-        find.text('Vote counting is complete for all rounds.'), findsOneWidget);
+    expect(find.text('Voting closed'), findsNWidgets(3));
+    expect(find.text('Final votes: 0'), findsNWidgets(3));
     expect(find.text('Status: Closed', skipOffstage: false), findsNothing);
-    final OutlinedButton refreshVoteCountButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, 'Refresh Vote Count'),
-    );
-    expect(refreshVoteCountButton.onPressed, isNull);
+    expect(find.text('Refresh Vote Count'), findsNothing);
   });
 
   testWidgets('disposing while vote polling is active does not throw',

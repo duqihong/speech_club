@@ -1700,6 +1700,12 @@ abstract class AppLocalizations {
   /// **'Close Voting Session'**
   String get onlineCountCloseMeeting;
 
+  /// No description provided for @onlineCountAwardManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Award Management'**
+  String get onlineCountAwardManagement;
+
   /// No description provided for @onlineCountCandidateSetup.
   ///
   /// In en, this message translates to:
@@ -1711,6 +1717,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add candidates'**
   String get onlineCountCandidateStateAddCandidates;
+
+  /// No description provided for @onlineCountCandidateStateUnsavedChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved changes'**
+  String get onlineCountCandidateStateUnsavedChanges;
+
+  /// No description provided for @onlineCountCandidateStateReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get onlineCountCandidateStateReady;
 
   /// No description provided for @onlineCountCandidateStateCandidatesSaved.
   ///
@@ -1771,6 +1789,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voting Round'**
   String get onlineCountVotingRound;
+
+  /// No description provided for @onlineCountEditCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit candidates'**
+  String get onlineCountEditCandidates;
+
+  /// No description provided for @onlineCountSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get onlineCountSaveChanges;
 
   /// No description provided for @onlineCountOpenVoting.
   ///
